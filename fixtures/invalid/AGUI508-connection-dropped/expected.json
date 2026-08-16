@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "AGUI508",
+    "severity": "error",
+    "message": "Connection ended mid-run 'run_001' without RUN_FINISHED or RUN_ERROR",
+    "eventIndex": -1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#runfinished"
+  },
+  {
+    "rule": "AGUI003",
+    "severity": "error",
+    "message": "Run 'run_001' ended without RUN_FINISHED or RUN_ERROR",
+    "eventIndex": -1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#runfinished",
+    "relatedEventIndex": 0
+  }
+]

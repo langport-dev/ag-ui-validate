@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "AGUI507",
+    "severity": "info",
+    "message": "Response appears buffered: entire body (5 events) arrived in a single chunk",
+    "eventIndex": -1,
+    "specUrl": "https://docs.ag-ui.com/concepts/architecture#standard-http-client"
+  }
+]

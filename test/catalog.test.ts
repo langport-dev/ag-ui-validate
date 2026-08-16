@@ -52,14 +52,10 @@ describe("rule catalog", () => {
     ).toThrow(/specUrl/)
   })
 
-  it("every core rule has an invalid fixture directory whose expected.json fires it", () => {
+  it("every rule has an invalid fixture directory whose expected.json fires it", () => {
     const root = fileURLToPath(new URL("../fixtures/invalid/", import.meta.url))
     const dirs = readdirSync(root)
     for (const rule of CATALOG.rules) {
-      // TODO(M5): transport rules (AGUI501, 505-508) need live-connection
-      // fixtures (SSE framing, timing, disconnects); they arrive with the
-      // transport layer. Everything else must have corpus coverage now.
-      if (rule.checkedIn === "transport") continue
       const dir = dirs.find((d) => d.startsWith(`${rule.id}-`))
       expect(dir, `${rule.id} has no fixtures/invalid/${rule.id}-*/ directory`).toBeDefined()
       const expected = JSON.parse(readFileSync(`${root}${dir}/expected.json`, "utf8")) as { rule: string }[]

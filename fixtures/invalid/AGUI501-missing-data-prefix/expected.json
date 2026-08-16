@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "AGUI501",
+    "severity": "error",
+    "message": "Malformed SSE framing: line '{\"type\":\"CUSTOM\",\"name\":\"acme.ping\",\"value\":1,\"timestamp\":17…' looks like a JSON payload but lacks the 'data:' field prefix, so SSE clients silently drop it",
+    "eventIndex": -1,
+    "specUrl": "https://html.spec.whatwg.org/multipage/server-sent-events.html#event-stream-interpretation"
+  }
+]

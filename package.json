@@ -39,6 +39,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./transport": {
+      "import": {
+        "types": "./dist/transport.d.ts",
+        "default": "./dist/transport.js"
+      },
+      "require": {
+        "types": "./dist/transport.d.cts",
+        "default": "./dist/transport.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [

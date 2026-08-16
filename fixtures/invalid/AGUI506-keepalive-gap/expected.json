@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "AGUI506",
+    "severity": "info",
+    "message": "No event or keepalive frame for 47s",
+    "eventIndex": -1,
+    "specUrl": "https://docs.ag-ui.com/concepts/architecture#standard-http-client"
+  }
+]

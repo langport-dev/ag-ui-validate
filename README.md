@@ -11,8 +11,25 @@ cat run.jsonl | npx ag-ui-validate -
 ```
 
 > **Status: pre-release.** The core validator (`createValidator` / `feed` /
-> `finalize` / `report`) is implemented; transport, CLI, and the Vitest matcher
-> are in progress.
+> `finalize` / `report`), the language-neutral fixture corpus, and the
+> transport layer (`ag-ui-validate/transport`) are implemented; the CLI and
+> the Vitest matcher are in progress.
+
+## Validating a live endpoint
+
+```ts
+import { validateEndpoint } from "ag-ui-validate/transport"
+
+const { report } = await validateEndpoint("http://localhost:8000/agui", {
+  headers: { authorization: "Bearer …" },
+  onDiagnostic: (d) => console.error(`${d.severity} ${d.rule} ${d.message}`),
+})
+```
+
+The transport layer POSTs a minimal `RunAgentInput`, consumes the SSE or
+NDJSON response, feeds every frame through the core validator, and evaluates
+the transport-level rules (SSE framing, Content-Type, keepalive gaps,
+buffering, mid-run disconnects) that recorded input cannot exercise.
 
 ## Core API
 

@@ -82,6 +82,8 @@ export interface Report {
   internalErrors: string[]
 }
 
+export type ValidationLayer = "core" | "transport"
+
 export interface ValidatorOptions {
   /** Pins the rule set to a spec version. Only "0.x" exists today. */
   spec?: "0.x"
@@ -92,6 +94,12 @@ export interface ValidatorOptions {
   features?: string[]
   /** Per-rule severity overrides; "off" disables a rule. */
   severityOverrides?: Record<string, SeverityOrOff>
+  /**
+   * Which rule layers are being evaluated. "core" is always on. Wrapping
+   * layers that check transport rules (via emitExternal) declare "transport"
+   * so those rules stop being reported as skipped. Default: ["core"].
+   */
+  layers?: ValidationLayer[]
 }
 
 export interface Validator {
@@ -108,4 +116,15 @@ export interface Validator {
   finalize(): Diagnostic[]
   /** Cumulative report over everything fed so far. Never throws. */
   report(): Report
+  /**
+   * For wrapping layers (transport, CLI): report a layer-checked rule through
+   * the same catalog formatting, severity overrides, and summary as core
+   * diagnostics. Returns the diagnostic, or null when the rule is unknown
+   * (recorded in internalErrors) or overridden off. Never throws.
+   */
+  emitExternal(
+    rule: string,
+    params?: Record<string, unknown>,
+    extra?: { eventIndex?: number; pointer?: string; relatedEventIndex?: number },
+  ): Diagnostic | null
 }

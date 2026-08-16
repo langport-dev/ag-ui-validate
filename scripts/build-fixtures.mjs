@@ -11,6 +11,7 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { createValidator } from "../dist/index.js"
+import { validateBody } from "../dist/transport.js"
 
 const FIXTURES = fileURLToPath(new URL("../fixtures/", import.meta.url))
 
@@ -390,6 +391,76 @@ const INVALID = {
 }
 
 // ---------------------------------------------------------------------------
+// Transport fixtures: scenario.json instead of stream.jsonl — an HTTP
+// response body described as timed byte chunks. Runners simulate the clock
+// with each chunk's gapMs and feed the bytes through their transport layer.
+// ---------------------------------------------------------------------------
+
+const sseFrame = (e) => `data: ${JSON.stringify(e)}\n\n`
+
+const runFrames = (extra = []) => {
+  const events = [
+    start("run_001", "thread_001"),
+    ...text("msg_001", "All good here."),
+    ...extra,
+    finish("run_001", "thread_001"),
+  ]
+  return events.map(sseFrame)
+}
+
+const TRANSPORT = {
+  "AGUI501-missing-data-prefix": {
+    intent: ["AGUI501"],
+    scenario: {
+      contentType: "text/event-stream",
+      chunks: [
+        { gapMs: 0, text: sseFrame(start("run_001", "thread_001")) },
+        // The classic broken server: a JSON payload with no "data:" prefix.
+        // SSE clients silently drop it as an unknown field.
+        { gapMs: 0, text: `${JSON.stringify({ type: "CUSTOM", name: "acme.ping", value: 1, timestamp: t() })}\n\n` },
+        { gapMs: 0, text: sseFrame(finish("run_001", "thread_001")) },
+      ],
+    },
+  },
+  "AGUI505-unexpected-content-type": {
+    intent: ["AGUI505"],
+    scenario: {
+      contentType: "application/json",
+      chunks: runFrames().map((text) => ({ gapMs: 0, text })),
+    },
+  },
+  "AGUI506-keepalive-gap": {
+    intent: ["AGUI506"],
+    scenario: {
+      contentType: "text/event-stream",
+      chunks: [
+        { gapMs: 0, text: sseFrame(start("run_001", "thread_001")) },
+        ...text("msg_001", "Thinking very hard…").map((e) => ({ gapMs: 0, text: sseFrame(e) })),
+        // 47 seconds of silence with no keepalive comment frame.
+        { gapMs: 47000, text: sseFrame(finish("run_001", "thread_001")) },
+      ],
+    },
+  },
+  "AGUI507-buffered-response": {
+    intent: ["AGUI507"],
+    scenario: {
+      contentType: "text/event-stream",
+      // The entire multi-event body arrives as one chunk: a buffering proxy
+      // or an unflushed handler, not incremental streaming.
+      chunks: [{ gapMs: 0, text: runFrames().join("") }],
+    },
+  },
+  "AGUI508-connection-dropped": {
+    intent: ["AGUI508", "AGUI003"],
+    scenario: {
+      contentType: "text/event-stream",
+      chunks: [{ gapMs: 0, text: sseFrame(start("run_001", "thread_001")) }],
+      abnormalEof: true,
+    },
+  },
+}
+
+// ---------------------------------------------------------------------------
 // Run every stream, verify intent, write files.
 // ---------------------------------------------------------------------------
 
@@ -437,6 +508,39 @@ for (const [dir, { intent, events, options }] of Object.entries(INVALID)) {
   }
 }
 
+async function runScenario(scenario) {
+  const encoder = new TextEncoder()
+  const clock = { t: 0 }
+  async function* chunks() {
+    for (const chunk of scenario.chunks) {
+      clock.t += chunk.gapMs ?? 0
+      yield encoder.encode(chunk.text)
+    }
+    if (scenario.abnormalEof) throw new Error("connection dropped (simulated)")
+  }
+  const result = await validateBody(chunks(), scenario.contentType ?? null, {
+    now: () => clock.t,
+    ...(scenario.options !== undefined ? { validator: scenario.options } : {}),
+  })
+  return result.report.diagnostics
+}
+
+for (const [dir, { intent, scenario }] of Object.entries(TRANSPORT)) {
+  const ruleFromDir = dir.slice(0, 7)
+  if (!intent.includes(ruleFromDir)) {
+    problems.push(`invalid/${dir}: directory rule ${ruleFromDir} missing from intent [${intent}]`)
+    continue
+  }
+  const diags = await runScenario(scenario)
+  const fired = diags.map((d) => d.rule)
+  if (JSON.stringify(fired) !== JSON.stringify(intent)) {
+    problems.push(`invalid/${dir}: intended [${intent}] but fired [${fired}]`)
+    continue
+  }
+  outputs.push({ path: `invalid/${dir}/scenario.json`, content: JSON.stringify(scenario, null, 2) + "\n" })
+  outputs.push({ path: `invalid/${dir}/expected.json`, content: JSON.stringify(diags, null, 2) + "\n" })
+}
+
 if (problems.length > 0) {
   console.error("REFUSING to write fixtures — intent mismatches:\n" + problems.map((p) => `  - ${p}`).join("\n"))
   process.exit(1)
@@ -449,4 +553,6 @@ for (const { path, content } of outputs) {
   mkdirSync(full.slice(0, full.lastIndexOf("/")), { recursive: true })
   writeFileSync(full, content)
 }
-console.log(`Wrote ${Object.keys(VALID).length} valid + ${Object.keys(INVALID).length} invalid fixtures (${outputs.length} files)`)
+console.log(
+  `Wrote ${Object.keys(VALID).length} valid + ${Object.keys(INVALID).length + Object.keys(TRANSPORT).length} invalid fixtures (${outputs.length} files, incl. ${Object.keys(TRANSPORT).length} transport scenarios)`,
+)

@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 import { EVENT_TABLE, createValidator } from "../src/index.js"
 import type { Diagnostic, ValidatorOptions } from "../src/index.js"
+import { validateBody } from "../src/transport/index.js"
 
 const FIXTURES = fileURLToPath(new URL("../fixtures/", import.meta.url))
 
@@ -58,16 +59,47 @@ describe("valid fixtures (false-positive guards)", () => {
   })
 })
 
+interface TransportScenario {
+  contentType?: string | null
+  chunks: { gapMs?: number; text: string }[]
+  abnormalEof?: boolean
+  options?: ValidatorOptions
+}
+
+// Transport fixtures describe an HTTP response body as timed byte chunks; a
+// simulated clock advances by each chunk's gapMs (see fixtures/README.md).
+async function runScenario(scenario: TransportScenario): Promise<Diagnostic[]> {
+  const encoder = new TextEncoder()
+  const clock = { t: 0 }
+  async function* chunks(): AsyncGenerator<Uint8Array> {
+    for (const chunk of scenario.chunks) {
+      clock.t += chunk.gapMs ?? 0
+      yield encoder.encode(chunk.text)
+    }
+    if (scenario.abnormalEof === true) throw new Error("connection dropped (simulated)")
+  }
+  const result = await validateBody(chunks(), scenario.contentType ?? null, {
+    now: () => clock.t,
+    ...(scenario.options !== undefined ? { validator: scenario.options } : {}),
+  })
+  return result.report.diagnostics
+}
+
 describe("invalid fixtures (one per rule)", () => {
-  it.each(invalidDirs)("%s", (dir) => {
+  it.each(invalidDirs)("%s", async (dir) => {
     const base = `${FIXTURES}invalid/${dir}`
-    const lines = streamLines(`${base}/stream.jsonl`)
     const expected: Diagnostic[] = JSON.parse(readFileSync(`${base}/expected.json`, "utf8"))
-    const optionsPath = `${base}/options.json`
-    const options: ValidatorOptions | undefined = existsSync(optionsPath)
-      ? JSON.parse(readFileSync(optionsPath, "utf8"))
-      : undefined
-    const actual = runFixture(lines, options)
+    let actual: Diagnostic[]
+    if (existsSync(`${base}/scenario.json`)) {
+      actual = await runScenario(JSON.parse(readFileSync(`${base}/scenario.json`, "utf8")))
+    } else {
+      const lines = streamLines(`${base}/stream.jsonl`)
+      const optionsPath = `${base}/options.json`
+      const options: ValidatorOptions | undefined = existsSync(optionsPath)
+        ? JSON.parse(readFileSync(optionsPath, "utf8"))
+        : undefined
+      actual = runFixture(lines, options)
+    }
     expect(actual).toEqual(expected)
     // The directory's namesake rule must actually be among the findings.
     expect(actual.map((d) => d.rule)).toContain(dir.slice(0, 7))

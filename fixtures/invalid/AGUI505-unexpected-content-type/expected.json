@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "AGUI505",
+    "severity": "warning",
+    "message": "Content-Type 'application/json' is neither text/event-stream nor application/x-ndjson",
+    "eventIndex": -1,
+    "specUrl": "https://html.spec.whatwg.org/multipage/server-sent-events.html#sse-processing-model"
+  }
+]

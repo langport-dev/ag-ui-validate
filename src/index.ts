@@ -59,6 +59,7 @@ function describeValue(v: unknown): string {
 export function createValidator(opts: ValidatorOptions = {}): Validator {
   const overrides = opts.severityOverrides ?? {}
   const declaredFeatures = new Set(opts.features ?? [])
+  const layers = new Set(["core", ...(opts.layers ?? [])])
 
   const diagnostics: Diagnostic[] = []
   const internalErrors: string[] = []
@@ -398,6 +399,16 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
       return batch
     },
 
+    emitExternal(rule, params = {}, extra = {}): Diagnostic | null {
+      const batch: Diagnostic[] = []
+      try {
+        mkEmit(batch, null)(rule, params, extra)
+      } catch (e) {
+        internalErrors.push(`emitExternal(${rule}): ${e instanceof Error ? e.message : String(e)}`)
+      }
+      return batch[0] ?? null
+    },
+
     report(): Report {
       const summary = { errors: 0, warnings: 0, info: 0 }
       for (const d of diagnostics) {
@@ -415,9 +426,11 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
             : "not-exercised"
       }
 
-      const skipped = TRANSPORT_RULE_IDS
-        .filter((id) => overrides[id] !== "off")
-        .map((rule) => ({ rule, reason: TRANSPORT_SKIP_REASON }))
+      const skipped = layers.has("transport")
+        ? []
+        : TRANSPORT_RULE_IDS
+            .filter((id) => overrides[id] !== "off")
+            .map((rule) => ({ rule, reason: TRANSPORT_SKIP_REASON }))
       if (!declaredFeatures.has("shared-state") && overrides.AGUI305 !== "off") {
         skipped.push({
           rule: "AGUI305",

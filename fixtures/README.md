@@ -15,15 +15,18 @@ fixtures/
 │   ├── agentic-chat.expected.json     (optional; assumed [] when absent)
 │   └── …
 └── invalid/                     one directory per rule
-    └── AGUI203-unterminated-tool-call/
-        ├── stream.jsonl         the event stream
-        ├── expected.json        the exact expected Diagnostic[]
-        └── options.json         (optional) validator options for this run
+    ├── AGUI203-unterminated-tool-call/
+    │   ├── stream.jsonl         the event stream
+    │   ├── expected.json        the exact expected Diagnostic[]
+    │   └── options.json         (optional) validator options for this run
+    └── AGUI506-keepalive-gap/   transport rules use a scenario instead
+        ├── scenario.json        an HTTP response body as timed byte chunks
+        └── expected.json
 ```
 
 ## Running the corpus against an implementation
 
-For every fixture:
+For every event-stream fixture (`stream.jsonl`):
 
 1. Read the `.jsonl` file and split it into lines; drop empty lines.
 2. Feed each remaining line to the validator **as a raw string** — do not
@@ -35,6 +38,19 @@ For every fixture:
 5. Deep-compare the accumulated diagnostics with `expected.json`. Order
    matters: diagnostics are emitted in stream order, and end-of-stream
    diagnostics use `eventIndex: -1`.
+
+For every transport fixture (`scenario.json`) — these exercise the rules that
+need a live connection (AGUI501, AGUI505–AGUI508):
+
+1. The scenario describes an HTTP response: `contentType` and `chunks`, each
+   chunk being `{ "gapMs": n, "text": "…" }` — the raw bytes as they arrived,
+   with `gapMs` of simulated silence before the chunk.
+2. Feed the chunk bytes through your transport layer (SSE or NDJSON per the
+   content type, sniffing when unknown) with a simulated clock that advances
+   by each `gapMs`; the keepalive window is the default 30 000 ms.
+3. `"abnormalEof": true` means the connection errored after the last chunk
+   (as opposed to closing cleanly) — the AGUI508 condition.
+4. Finalize and deep-compare diagnostics with `expected.json` as above.
 
 Every `invalid/` fixture must fire its directory's namesake rule; every
 `valid/` fixture must produce exactly its `*.expected.json` (usually nothing —
@@ -70,9 +86,6 @@ silently bake an implementation bug into `expected.json`.
 
 ## Not yet covered
 
-- **Transport rules** (AGUI501, AGUI505–AGUI508) need a live connection
-  (SSE framing, Content-Type, keepalive timing, mid-run disconnects) and get
-  their fixtures with the transport layer (M5).
 - **`valid/real-world/`** — captures from real frameworks (LangGraph, CrewAI,
   Pydantic AI, Agno, Langflow `stream_protocol=agui`). Contributions welcome;
   sanitise credentials before submitting.
