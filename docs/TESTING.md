@@ -107,6 +107,18 @@ HTTP bodies as timed byte chunks with a simulated clock — see
 
 ---
 
+## 9. GitHub Action (M8)
+
+| What | How |
+|---|---|
+| Driver, GitHub-style | `npx vitest run test/action/run.test.ts` — spawns `action/run.mjs` with `INPUT_*` env vars and temp `GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` files, exactly as the composite step does; asserts exit codes, outputs, summary markdown, SARIF file |
+| In a real workflow | the `action-self-test` job in `.github/workflows/ci.yml` runs `uses: ./action` (with `version: local`) against a valid and an invalid fixture on every push and asserts outcome + outputs + SARIF |
+
+The action is a thin wrapper: one CLI invocation using the `--*-file` flags,
+so the reporters themselves are covered by the reporter and CLI suites.
+
+---
+
 ## What must never regress
 
 - **The core never throws** on any input (`npm run fuzz`, hostile-object tests

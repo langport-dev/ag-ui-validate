@@ -88,6 +88,16 @@ describe("parseCliArgs", () => {
     expect(ok(["-"]).color).toBeNull() // auto
   })
 
+  it("file-output flags store paths and combine with any stdout format", () => {
+    const c = ok(["-", "--sarif-file", "out.sarif", "--junit-file=out.xml", "--json-file", "r.json"])
+    expect(c.sarifFile).toBe("out.sarif")
+    expect(c.junitFile).toBe("out.xml")
+    expect(c.jsonFile).toBe("r.json")
+    expect(c.format).toBe("pretty") // stdout format untouched
+    expect(ok(["-", "--json", "--sarif-file", "o.sarif"]).format).toBe("json")
+    expect(err(["-", "--sarif-file"])).toMatch(/value/i)
+  })
+
   it("rejects unknown flags with usage help", () => {
     expect(err(["-", "--frobnicate"])).toMatch(/unknown/i)
   })
@@ -97,7 +107,7 @@ describe("parseCliArgs", () => {
   })
 
   it("USAGE mentions every flag", () => {
-    for (const flag of ["--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off", "--features", "--timeout", "--header", "--no-color"]) {
+    for (const flag of ["--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off", "--features", "--timeout", "--header", "--no-color", "--sarif-file", "--junit-file", "--json-file"]) {
       expect(USAGE).toContain(flag)
     }
   })

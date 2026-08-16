@@ -108,9 +108,13 @@ describe("sarif", () => {
     expect(run.tool.driver.version).toBe("1.2.3")
     const levels = run.results.map((r) => r.level)
     expect(levels).toEqual(["error", "warning", "note"])
-    // rule metadata carries the spec citation
+    // rule metadata comes from the catalog: title, catalog severity, citation
     const meta = run.tool.driver.rules.find((r) => r.id === "AGUI203")!
     expect(meta.helpUri).toContain("docs.ag-ui.com")
+    expect(meta.shortDescription?.text).toBe("Unterminated tool call")
+    expect(meta.defaultConfiguration?.level).toBe("error")
+    const info = run.tool.driver.rules.find((r) => r.id === "AGUI902")!
+    expect(info.defaultConfiguration?.level).toBe("note")
     // line-based location for line-oriented input: eventIndex 42 -> line 43
     expect(run.results[0]!.locations[0]!.physicalLocation.region.startLine).toBe(43)
     // stream-level findings carry no location
@@ -133,6 +137,12 @@ describe("junit", () => {
     expect(xml).toContain("AGUI203")
     expect(xml).toContain("m&lt;1&gt;") // the < > in the message got escaped
     expect(xml).not.toContain("m<1>")
+  })
+
+  it("wraps the suite in a <testsuites> root for strict CI parsers", () => {
+    const xml = toJUnit(report, { name: "run.jsonl" })
+    expect(xml).toMatch(/<testsuites [^>]*tests="3"[^>]*>/)
+    expect(xml.trim().endsWith("</testsuites>")).toBe(true)
   })
 
   it("a clean report is a single passing testcase", () => {

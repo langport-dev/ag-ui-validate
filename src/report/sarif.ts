@@ -2,6 +2,7 @@
 // Level mapping: error→error, warning→warning, info→note. When the input was a
 // line-oriented file (JSONL/captured SSE fed line-per-event is not guaranteed,
 // so only the caller knows), event N is reported at line N+1 via artifactUri.
+import { RULES } from "../rules/catalog.js"
 import type { Diagnostic, Report } from "../types.js"
 
 export interface SarifOptions {
@@ -33,7 +34,12 @@ export interface SarifLog {
         name: string
         version: string
         informationUri: string
-        rules: Array<{ id: string; helpUri: string }>
+        rules: Array<{
+          id: string
+          helpUri: string
+          shortDescription?: { text: string }
+          defaultConfiguration?: { level: SarifLevel }
+        }>
       }
     }
     results: SarifResult[]
@@ -46,10 +52,24 @@ const LEVEL: Record<Diagnostic["severity"], SarifLevel> = {
   info: "note",
 }
 
+type SarifRule = {
+  id: string
+  helpUri: string
+  shortDescription?: { text: string }
+  defaultConfiguration?: { level: SarifLevel }
+}
+
 export function toSarif(report: Report, opts: SarifOptions): SarifLog {
-  const rules = new Map<string, { id: string; helpUri: string }>()
+  const rules = new Map<string, SarifRule>()
   for (const d of report.diagnostics) {
-    if (!rules.has(d.rule)) rules.set(d.rule, { id: d.rule, helpUri: d.specUrl })
+    if (rules.has(d.rule)) continue
+    const entry: SarifRule = { id: d.rule, helpUri: d.specUrl }
+    const catalog = RULES.get(d.rule)
+    if (catalog !== undefined) {
+      entry.shortDescription = { text: catalog.title }
+      entry.defaultConfiguration = { level: LEVEL[catalog.severity] }
+    }
+    rules.set(d.rule, entry)
   }
 
   const results: SarifResult[] = report.diagnostics.map((d) => ({

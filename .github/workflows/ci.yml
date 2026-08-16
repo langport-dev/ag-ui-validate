@@ -21,3 +21,35 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+
+  action-self-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: action passes on a valid stream
+        id: good
+        uses: ./action
+        with:
+          target: fixtures/valid/agentic-chat.jsonl
+          version: local
+      - name: action fails on a violating stream
+        id: bad
+        uses: ./action
+        continue-on-error: true
+        with:
+          target: fixtures/invalid/AGUI203-unterminated-tool-call/stream.jsonl
+          version: local
+          sarif-file: agui.sarif
+      - name: assert the failing run behaved as documented
+        shell: bash
+        run: |
+          test "${{ steps.bad.outcome }}" = "failure"
+          test "${{ steps.bad.outputs.errors }}" = "1"
+          test "${{ steps.good.outputs.errors }}" = "0"
+          node -e "const s = require('./agui.sarif'); if (s.version !== '2.1.0') process.exit(1)"

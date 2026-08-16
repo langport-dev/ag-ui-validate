@@ -90,6 +90,33 @@ describe.skipIf(!existsSync(CLI))("cli integration (dist/cli.js)", () => {
     expect(r.stdout).toContain("ag-ui-validate")
     expect(r.stdout).toContain("--max-warnings")
   })
+
+  it("file-output flags write all requested formats in a single run", async () => {
+    const { mkdtempSync, readFileSync, rmSync } = await import("node:fs")
+    const { tmpdir } = await import("node:os")
+    const { join } = await import("node:path")
+    const dir = mkdtempSync(join(tmpdir(), "agui-cli-"))
+    try {
+      const sarif = join(dir, "out.sarif")
+      const junit = join(dir, "out.xml")
+      const json = join(dir, "report.json")
+      const r = await cli([
+        fixture("invalid/AGUI203-unterminated-tool-call/stream.jsonl"),
+        "--sarif-file", sarif,
+        "--junit-file", junit,
+        "--json-file", json,
+      ])
+      expect(r.code).toBe(1)
+      expect(r.stdout).toContain("AGUI203") // stdout still pretty
+      const sarifDoc = JSON.parse(readFileSync(sarif, "utf8"))
+      expect(sarifDoc.version).toBe("2.1.0")
+      expect(readFileSync(junit, "utf8")).toContain("<testsuites")
+      const jsonDoc = JSON.parse(readFileSync(json, "utf8"))
+      expect(jsonDoc.summary.errors).toBe(1)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
 })
 
 if (!existsSync(CLI)) {

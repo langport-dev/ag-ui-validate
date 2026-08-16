@@ -71,6 +71,19 @@ Useful flags (see `--help` for all):
 | `--max-warnings 0` | fail CI on any warning |
 | `--header "Authorization: Bearer …"`, `--timeout 30` | endpoint options |
 
+### Validate in CI (GitHub Action)
+
+```yaml
+- uses: langport-dev/ag-ui-validate/action@main
+  with:
+    target: http://localhost:8000/agui   # or a recorded .jsonl file
+    sarif-file: agui.sarif               # optional: upload via codeql-action
+```
+
+The step fails on error-severity findings, writes a findings table to the job
+summary, and exposes `errors`/`warnings`/`info` outputs — see
+[action/README.md](action/README.md).
+
 ### Test your agent in Vitest
 
 ```ts

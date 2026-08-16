@@ -16,6 +16,10 @@ export interface CliConfig {
   headers: Record<string, string>
   features?: string[]
   severityOverrides: Record<string, Severity | "off">
+  /** Write these formats to files in the same run, whatever stdout shows. */
+  sarifFile?: string
+  junitFile?: string
+  jsonFile?: string
   help: boolean
   version: boolean
 }
@@ -33,6 +37,9 @@ Output (default: human-readable):
   --json                          machine-readable report on stdout
   --sarif                         SARIF 2.1.0 log on stdout (code scanning)
   --junit                         JUnit XML on stdout (CI test reports)
+  --json-file <path>              additionally write the JSON report to a file
+  --sarif-file <path>             additionally write a SARIF log to a file
+  --junit-file <path>             additionally write JUnit XML to a file
   --no-color                      disable ANSI colors
 
 Rules:
@@ -113,6 +120,9 @@ const FLAGS: Record<string, Flag> = {
       return null
     },
   },
+  "--sarif-file": { takesValue: true, apply: (c, v) => ((c.sarifFile = v), null) },
+  "--junit-file": { takesValue: true, apply: (c, v) => ((c.junitFile = v), null) },
+  "--json-file": { takesValue: true, apply: (c, v) => ((c.jsonFile = v), null) },
   "--features": {
     takesValue: true,
     apply: (c, v) => {

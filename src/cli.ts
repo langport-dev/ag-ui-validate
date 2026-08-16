@@ -3,7 +3,7 @@
 // Everything it does is delegated: parsing to cli-args.ts, validation to the
 // core + transport layers, output to the pure reporters. This file only wires
 // process.argv/stdin/stdout/exit codes to those pieces.
-import { createReadStream, readFileSync } from "node:fs"
+import { createReadStream, readFileSync, writeFileSync } from "node:fs"
 import process from "node:process"
 import { decideExitCode, parseCliArgs, USAGE } from "./cli-args.js"
 import type { CliConfig } from "./cli-args.js"
@@ -98,6 +98,23 @@ async function main(): Promise<number> {
   }
 
   const report = result.report
+  // Line-based SARIF locations only make sense when events map 1:1 to lines.
+  const lineOriented = !isUrl && config.target !== "-" && /\.(jsonl|ndjson)$/i.test(config.target)
+  const sarifOptions = lineOriented
+    ? { toolVersion: version, artifactUri: config.target }
+    : { toolVersion: version }
+
+  if (config.jsonFile !== undefined) {
+    const doc = toJsonReport(report, { tool: { name: TOOL_NAME, version }, target: targetLabel })
+    writeFileSync(config.jsonFile, `${JSON.stringify(doc, null, 2)}\n`)
+  }
+  if (config.sarifFile !== undefined) {
+    writeFileSync(config.sarifFile, `${JSON.stringify(toSarif(report, sarifOptions), null, 2)}\n`)
+  }
+  if (config.junitFile !== undefined) {
+    writeFileSync(config.junitFile, toJUnit(report, { name: targetLabel }))
+  }
+
   if (pretty) {
     if (printed > 0) process.stdout.write("\n")
     process.stdout.write(`${formatReportSummary(report, { color })}\n`)
@@ -105,12 +122,7 @@ async function main(): Promise<number> {
     const doc = toJsonReport(report, { tool: { name: TOOL_NAME, version }, target: targetLabel })
     process.stdout.write(`${JSON.stringify(doc, null, 2)}\n`)
   } else if (config.format === "sarif") {
-    // Line-based locations only make sense when events map 1:1 to lines.
-    const lineOriented = !isUrl && config.target !== "-" && /\.(jsonl|ndjson)$/i.test(config.target)
-    const opts = lineOriented
-      ? { toolVersion: version, artifactUri: config.target }
-      : { toolVersion: version }
-    process.stdout.write(`${JSON.stringify(toSarif(report, opts), null, 2)}\n`)
+    process.stdout.write(`${JSON.stringify(toSarif(report, sarifOptions), null, 2)}\n`)
   } else {
     process.stdout.write(toJUnit(report, { name: targetLabel }))
   }

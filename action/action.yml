@@ -1,0 +1,71 @@
+name: "ag-ui-validate"
+description: "Validate an AG-UI agent endpoint or recorded event stream for protocol conformance"
+author: "Faraz (https://langport.dev)"
+branding:
+  icon: "check-circle"
+  color: "purple"
+
+inputs:
+  target:
+    description: "What to validate: an endpoint URL, a recorded stream file (JSONL/NDJSON or SSE capture), or - for stdin"
+    required: true
+  version:
+    description: "ag-ui-validate version to run via npx, or 'local' to use the dist/ build in this checkout"
+    required: false
+    default: "latest"
+  max-warnings:
+    description: "Fail when warning-severity findings exceed this number"
+    required: false
+  features:
+    description: "Comma-separated declared features (enables feature-conditional rules)"
+    required: false
+  rules:
+    description: "Whitespace-separated severity overrides, e.g. 'AGUI105=error AGUI902=off'"
+    required: false
+  headers:
+    description: "Extra request headers for endpoint targets, one 'Name: value' per line"
+    required: false
+  timeout:
+    description: "Abort an endpoint request after this many seconds"
+    required: false
+  sarif-file:
+    description: "Write a SARIF 2.1.0 log here (upload with github/codeql-action/upload-sarif)"
+    required: false
+  junit-file:
+    description: "Write a JUnit XML report here"
+    required: false
+  json-file:
+    description: "Write the machine-readable JSON report here"
+    required: false
+
+outputs:
+  exit-code:
+    description: "The CLI exit code: 0 clean, 1 findings, 2 tool failure"
+    value: ${{ steps.validate.outputs.exit-code }}
+  errors:
+    description: "Number of error-severity findings"
+    value: ${{ steps.validate.outputs.errors }}
+  warnings:
+    description: "Number of warning-severity findings"
+    value: ${{ steps.validate.outputs.warnings }}
+  info:
+    description: "Number of info-severity findings"
+    value: ${{ steps.validate.outputs.info }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: validate
+      shell: bash
+      env:
+        INPUT_TARGET: ${{ inputs.target }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_MAX_WARNINGS: ${{ inputs.max-warnings }}
+        INPUT_FEATURES: ${{ inputs.features }}
+        INPUT_RULES: ${{ inputs.rules }}
+        INPUT_HEADERS: ${{ inputs.headers }}
+        INPUT_TIMEOUT: ${{ inputs.timeout }}
+        INPUT_SARIF_FILE: ${{ inputs.sarif-file }}
+        INPUT_JUNIT_FILE: ${{ inputs.junit-file }}
+        INPUT_JSON_FILE: ${{ inputs.json-file }}
+      run: node "${GITHUB_ACTION_PATH}/run.mjs"

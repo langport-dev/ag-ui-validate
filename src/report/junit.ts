@@ -23,31 +23,34 @@ export function toJUnit(report: Report, opts: JUnitOptions): string {
   const suite = esc(opts.name)
 
   if (report.diagnostics.length === 0) {
-    lines.push(`<testsuite name="${suite}" tests="1" failures="0" errors="0" skipped="0">`)
+    lines.push('<testsuites name="ag-ui-validate" tests="1" failures="0" errors="0" skipped="0">')
+    lines.push(`  <testsuite name="${suite}" tests="1" failures="0" errors="0" skipped="0">`)
     lines.push(
-      `  <testcase name="AG-UI conformance: no violations across ${report.eventCount} events" classname="${suite}"/>`,
+      `    <testcase name="AG-UI conformance: no violations across ${report.eventCount} events" classname="${suite}"/>`,
     )
-    lines.push("</testsuite>")
+    lines.push("  </testsuite>")
+    lines.push("</testsuites>")
     return `${lines.join("\n")}\n`
   }
 
   const failures = report.diagnostics.filter((d) => d.severity === "error").length
   const skipped = report.diagnostics.length - failures
-  lines.push(
-    `<testsuite name="${suite}" tests="${report.diagnostics.length}" failures="${failures}" errors="0" skipped="${skipped}">`,
-  )
+  const counts = `tests="${report.diagnostics.length}" failures="${failures}" errors="0" skipped="${skipped}"`
+  lines.push(`<testsuites name="ag-ui-validate" ${counts}>`)
+  lines.push(`  <testsuite name="${suite}" ${counts}>`)
   for (const d of report.diagnostics) {
     const where = d.eventIndex >= 0 ? `event ${d.eventIndex}` : "stream"
     const name = esc(`${d.rule} (${where})`)
-    lines.push(`  <testcase name="${name}" classname="${suite}">`)
+    lines.push(`    <testcase name="${name}" classname="${suite}">`)
     const body = `${esc(d.message)}\n${esc(d.specUrl)}`
     if (d.severity === "error") {
-      lines.push(`    <failure message="${esc(d.message)}">${body}</failure>`)
+      lines.push(`      <failure message="${esc(d.message)}">${body}</failure>`)
     } else {
-      lines.push(`    <skipped message="${esc(`${d.severity}: ${d.message}`)}">${body}</skipped>`)
+      lines.push(`      <skipped message="${esc(`${d.severity}: ${d.message}`)}">${body}</skipped>`)
     }
-    lines.push("  </testcase>")
+    lines.push("    </testcase>")
   }
-  lines.push("</testsuite>")
+  lines.push("  </testsuite>")
+  lines.push("</testsuites>")
   return `${lines.join("\n")}\n`
 }
