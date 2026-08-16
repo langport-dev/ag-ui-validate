@@ -24,7 +24,7 @@ loudly when missing). Scripts under `scripts/` also import from `dist/`.
 |---|---|
 | Reproducible from lockfile | `rm -rf node_modules dist && npm ci && npm run typecheck && npm run build && npm test` |
 | Exports map correctness | `npx publint` — checks main/module/exports consistency against the packed tarball |
-| Type resolution everywhere | `npx @arethetypeswrong/cli --pack .` — must be green for node10 / node16-cjs / node16-esm / bundler, for `.`, `./transport`, and `./report` |
+| Type resolution everywhere | `npx @arethetypeswrong/cli --pack .` — must be green for node10 / node16-cjs / node16-esm / bundler, for `.`, `./transport`, and `./report`. Known exception: `./vitest` is ESM-only (vitest itself cannot be `require`d), so its node16-from-CJS cell shows "resolution failed" by design |
 | Both module systems load | `node -e "require('./dist/index.cjs')"` and `node --input-type=module -e "import('./dist/index.js')"` |
 
 ## 2. Protocol grounding (M1)
@@ -95,6 +95,15 @@ HTTP bodies as timed byte chunks with a simulated clock — see
 | Recorded-input mode | `npx vitest run test/transport/recorded.test.ts` — timing rules skipped-with-reason on captures, SSE framing still checked, read failures are tool failures |
 | **The real binary** | `npm run build && npx vitest run test/cli/integration.test.ts` — spawns `dist/cli.js` against fixtures: exit codes 0/1/2, stdin, `--json`/`--sarif` parse, `--off` silences. Skipped (loudly) if `dist/cli.js` is missing |
 | By hand | `node dist/cli.js fixtures/invalid/AGUI203-unterminated-tool-call/stream.jsonl` (exit 1), `cat fixtures/valid/agentic-chat.jsonl \| node dist/cli.js -` (exit 0), `node dist/cli.js <your-endpoint-url>` |
+
+---
+
+## 8. Vitest matcher (M7)
+
+| What | How |
+|---|---|
+| Matcher behavior | `npx vitest run test/vitest/matcher.test.ts` — pass/fail semantics, `.not`, options forwarding, `maxWarnings`, JSONL string input, failure-message content, invalid-usage TypeError |
+| **As a real consumer** | `npm pack` the tarball into a scratch project, `npm install <tarball> vitest`, write a test with `import "ag-ui-validate/vitest"`, run `vitest` (runtime) and `tsc --noEmit` (the `Matchers` augmentation) — both must pass with zero project-side setup |
 
 ---
 

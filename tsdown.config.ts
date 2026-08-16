@@ -12,6 +12,18 @@ export default defineConfig([
     platform: "neutral",
   },
   {
+    // The vitest matcher is ESM-only because vitest itself is: a CJS build
+    // would require("vitest") and break at runtime.
+    entry: { vitest: "src/vitest/index.ts" },
+    format: ["esm"],
+    fixedExtension: false,
+    dts: true,
+    sourcemap: true,
+    clean: false,
+    target: "es2022",
+    platform: "neutral",
+  },
+  {
     // The CLI executable is the one Node-only artifact (bin entry, ESM-only).
     entry: { cli: "src/cli.ts" },
     format: ["esm"],

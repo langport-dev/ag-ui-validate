@@ -71,6 +71,25 @@ Useful flags (see `--help` for all):
 | `--max-warnings 0` | fail CI on any warning |
 | `--header "Authorization: Bearer …"`, `--timeout 30` | endpoint options |
 
+### Test your agent in Vitest
+
+```ts
+import "ag-ui-validate/vitest" // registers the matcher (put it in setupFiles)
+
+it("streams a conformant run", async () => {
+  const events = await captureRunEvents(myAgent) // however you record them
+  expect(events).toBeValidAGUI()
+})
+```
+
+The matcher takes an array of events (objects or JSON strings) or a whole
+JSONL capture as one string. Failures print each finding with its rule ID and
+spec link. Options mirror the validator:
+`{ features, severityOverrides, maxWarnings }` — e.g.
+`expect(events).toBeValidAGUI({ maxWarnings: 0 })` to fail on warnings too.
+The raw matcher function is also exported, so Jest users can
+`expect.extend({ toBeValidAGUI })` themselves.
+
 ### Validate recorded events (pure, runs anywhere)
 
 ```ts

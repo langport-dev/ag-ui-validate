@@ -21,7 +21,10 @@
   "homepage": "https://github.com/langport-dev/ag-ui-validate#readme",
   "bugs": "https://github.com/langport-dev/ag-ui-validate/issues",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/vitest.js",
+    "./src/vitest/index.ts"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -34,7 +37,8 @@
   "typesVersions": {
     "*": {
       "transport": ["./dist/transport.d.ts"],
-      "report": ["./dist/report.d.ts"]
+      "report": ["./dist/report.d.ts"],
+      "vitest": ["./dist/vitest.d.ts"]
     }
   },
   "exports": {
@@ -68,6 +72,12 @@
         "default": "./dist/report.cjs"
       }
     },
+    "./vitest": {
+      "import": {
+        "types": "./dist/vitest.d.ts",
+        "default": "./dist/vitest.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -88,6 +98,14 @@
     "changeset": "changeset",
     "version": "changeset version",
     "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "vitest": ">=2.1.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@ag-ui/core": "^0.0.58",
