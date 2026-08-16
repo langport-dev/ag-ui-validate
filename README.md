@@ -1,52 +1,161 @@
 # ag-ui-validate
 
-Conformance validator for the [AG-UI protocol](https://docs.ag-ui.com). Feed it an
-AG-UI event stream — live from an endpoint, or from a recorded file — and it reports
-every way the stream violates the protocol, with a rule ID, a severity, a location,
-and a link to the governing spec section.
+Conformance validator for the [AG-UI protocol](https://docs.ag-ui.com)
+(Agent–User Interaction Protocol). Point it at an AG-UI endpoint — or feed it
+a recorded event stream — and it reports every way the stream violates the
+protocol, with a rule ID, a severity, a location, and a link to the governing
+spec section.
+
+```
+✖ AGUI203  error  event 42  TOOL_CALL_START id 'call_7' never terminated
+✖ AGUI302  error  event 51  STATE_DELTA failed to apply: /items/3: '3' is not a valid index for an array of length 0
+✖ AGUI503  error  event 60  Unknown event type 'runStarted' — did you mean 'RUN_STARTED'?
+ℹ AGUI902  info   —         None of the 61 events carry the optional timestamp property
+
+2 errors, 0 warnings, 1 info — 3 of 7 AG-UI features exercised
+```
+
+> **Status: pre-release.** The core validator, the language-neutral fixture
+> corpus, and the transport layer are implemented and tested. The CLI
+> (`npx ag-ui-validate <url|->`), the Vitest matcher, and SARIF/JUnit
+> reporters are in progress.
+
+## Why
+
+AG-UI has SDKs and integrations, but no conformance tooling: nothing tells an
+implementer *your stream is subtly wrong, here's the rule and the spec
+section*. This project is that tool — the AG-UI analogue of what
+[a2a-inspector](https://github.com/a2aproject/a2a-inspector) is for A2A.
+
+Three design commitments make it trustworthy:
+
+- **Every diagnostic cites the spec.** Each of the 40 rules carries a
+  `specUrl` (and where possible an exact `specQuote`) pointing at the
+  governing section of [docs.ag-ui.com](https://docs.ag-ui.com) or the WHATWG
+  SSE spec. Behaviour the spec doesn't clearly govern is reported at `info`
+  severity at most, and logged in
+  [docs/spec-questions.md](docs/spec-questions.md) for filing upstream.
+- **The validator never throws.** Broken input is its input. Malformed JSON,
+  unknown event types, hostile objects — all diagnostics, never exceptions
+  (fuzz-tested against 50k hostile inputs).
+- **False positives are treated as worse than false negatives.** The rules are
+  grounded in `@ag-ui/core` v0.0.58 and the current docs; where the two
+  disagree, the SDK wins and the discrepancy is recorded.
+
+## Quickstart
 
 ```bash
-npx ag-ui-validate http://localhost:8000/agui
-cat run.jsonl | npx ag-ui-validate -
+npm install --save-dev ag-ui-validate
 ```
 
-> **Status: pre-release.** The core validator (`createValidator` / `feed` /
-> `finalize` / `report`), the language-neutral fixture corpus, and the
-> transport layer (`ag-ui-validate/transport`) are implemented; the CLI and
-> the Vitest matcher are in progress.
-
-## Validating a live endpoint
-
-```ts
-import { validateEndpoint } from "ag-ui-validate/transport"
-
-const { report } = await validateEndpoint("http://localhost:8000/agui", {
-  headers: { authorization: "Bearer …" },
-  onDiagnostic: (d) => console.error(`${d.severity} ${d.rule} ${d.message}`),
-})
-```
-
-The transport layer POSTs a minimal `RunAgentInput`, consumes the SSE or
-NDJSON response, feeds every frame through the core validator, and evaluates
-the transport-level rules (SSE framing, Content-Type, keepalive gaps,
-buffering, mid-run disconnects) that recorded input cannot exercise.
-
-## Core API
+### Validate recorded events (pure, runs anywhere)
 
 ```ts
 import { createValidator } from "ag-ui-validate"
 
-const v = createValidator()
+const v = createValidator({
+  features: ["shared-state"],            // optional: enables feature-specific rules
+  severityOverrides: { AGUI902: "off" }, // optional: tune or disable rules
+})
+
 for (const event of events) {
-  const diags = v.feed(event) // Diagnostic[] — emitted as soon as detectable
+  // feed parsed objects or raw JSON strings — bad JSON is a diagnostic
+  const diagnostics = v.feed(event)      // findings, as soon as detectable
 }
-const final = v.finalize()    // end-of-stream checks (unterminated calls, missing RUN_FINISHED, …)
-const report = v.report()     // { diagnostics, summary, features }
+v.finalize()                             // end-of-stream checks
+
+const { diagnostics, summary, features, skipped } = v.report()
 ```
 
-Every diagnostic cites the spec section it enforces via `specUrl`. The rule catalog
-lives in [`src/rules/catalog.json`](src/rules/catalog.json) as data, so other
-implementations can share it.
+The core is a pure function over an event sequence: zero I/O, zero runtime
+dependencies, isomorphic across Node 20+, browsers, Deno, and Workers.
+
+### Validate a live endpoint
+
+```ts
+import { validateEndpoint } from "ag-ui-validate/transport"
+
+const { report, status, eventCount } = await validateEndpoint(
+  "http://localhost:8000/agui",
+  {
+    headers: { authorization: "Bearer …" },
+    onDiagnostic: (d) => console.error(`${d.severity} ${d.rule} ${d.message}`),
+  },
+)
+```
+
+The transport layer POSTs a minimal `RunAgentInput`, consumes the SSE or
+NDJSON response, streams every frame through the core, and additionally
+evaluates the transport-level rules that recorded input can't exercise: SSE
+framing (including the classic missing-`data:`-prefix bug), Content-Type,
+keepalive gaps, buffered-not-flushed responses, and mid-run disconnects.
+
+### Diagnostic shape
+
+```jsonc
+{
+  "rule": "AGUI203",
+  "severity": "error",            // "error" | "warning" | "info"
+  "message": "TOOL_CALL_START id 'call_7' never terminated",
+  "eventIndex": 42,               // 0-based; -1 for end-of-stream findings
+  "eventType": "RUN_FINISHED",    // optional
+  "pointer": "/toolCallId",       // optional RFC 6901 pointer into the event
+  "relatedEventIndex": 17,        // optional, e.g. the unterminated start
+  "specUrl": "https://docs.ag-ui.com/concepts/events#tool-call-events"
+}
+```
+
+## The rule catalog
+
+40 rules, maintained as **data** in
+[src/rules/catalog.json](src/rules/catalog.json) so other implementations
+(Python, Go, …) can share them:
+
+| Group | IDs | Examples |
+|---|---|---|
+| Lifecycle | AGUI001–008 | run must start with `RUN_STARTED`, terminate with `RUN_FINISHED`/`RUN_ERROR`, nothing after a terminal event |
+| Text messages | AGUI101–106 | content without start, unterminated messages, duplicate `messageId` |
+| Tool calls | AGUI201–208 | unterminated calls, args that don't concatenate to valid JSON, results referencing unknown calls |
+| State | AGUI301–305 | RFC 6902 patch validity, deltas that fail to apply to reconstructed state |
+| Reasoning | AGUI401–402 | reasoning content without an open reasoning message |
+| Transport | AGUI501–508 | SSE framing, Content-Type, keepalive gaps, buffering, dropped connections |
+| Hygiene | AGUI901–903 | `RAW`-wrapping typed events, missing timestamps, un-namespaced `CUSTOM` names |
+
+The event taxonomy itself (33 wire types, field schemas) is derived from
+[`@ag-ui/core`](https://www.npmjs.com/package/@ag-ui/core)'s own schemas and
+drift-tested against the installed SDK on every run.
+
+## The fixture corpus
+
+[fixtures/](fixtures/README.md) is a language-neutral conformance corpus:
+7 valid streams (one per canonical AG-UI feature — the false-positive guards)
+and 40 invalid fixtures (one per rule) with exact expected diagnostics. Any
+validator implementation that consumes the shared catalog can be tested
+against it; the replay protocol is documented in the corpus README.
+
+## Development
+
+```bash
+npm ci
+npm run typecheck   # includes a src-only pass proving the core uses no Node APIs
+npm run build       # dual ESM/CJS via tsdown
+npm test            # full suite: unit + corpus + drift + purity + SDK alignment
+npm run demo        # pretty-printed findings for a deliberately broken stream
+npm run e2e         # live-transport checks against a real local HTTP server
+npm run fuzz        # 50k hostile inputs against the never-throws invariant
+npm run links:check # every specUrl resolves and every anchor exists
+```
+
+Component-by-component instructions live in
+[docs/TESTING.md](docs/TESTING.md). Spec ambiguities found while grounding the
+rules are tracked in [docs/spec-questions.md](docs/spec-questions.md).
+
+Adding a rule: add the catalog entry (with its `specUrl`), add the fixture
+stream + intended findings to `scripts/build-fixtures.mjs`, and run
+`npm run fixtures:build` — the meta-tests fail until both exist. Rule
+*proposals* belong upstream as issues on
+[`ag-ui-protocol/ag-ui`](https://github.com/ag-ui-protocol/ag-ui) first; this
+project does not invent rules the spec doesn't support.
 
 ## License
 

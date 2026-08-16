@@ -67,6 +67,10 @@
     "test:watch": "vitest",
     "fixtures:build": "npm run build && node scripts/build-fixtures.mjs",
     "protocol:derive": "node scripts/generate-event-table.mjs",
+    "demo": "node scripts/demo.mjs",
+    "fuzz": "node scripts/fuzz.mjs",
+    "e2e": "node scripts/e2e-live-server.mjs",
+    "links:check": "node scripts/check-spec-links.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "prepublishOnly": "npm run build"
