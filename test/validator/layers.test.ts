@@ -56,3 +56,26 @@ describe("emitExternal", () => {
     expect(d!.eventIndex).toBe(4)
   })
 })
+
+describe("markSkipped", () => {
+  it("adds explicit skip entries to the report", () => {
+    const v = createValidator({ layers: ["core", "transport"] })
+    v.markSkipped("AGUI506", "keepalive timing is not meaningful for recorded input")
+    expect(v.report().skipped).toContainEqual({
+      rule: "AGUI506",
+      reason: "keepalive timing is not meaningful for recorded input",
+    })
+  })
+
+  it("explicit marks replace layer-computed entries for the same rule", () => {
+    const v = createValidator() // transport layer not declared: 5 layer-computed skips
+    v.markSkipped("AGUI506", "custom reason")
+    const entries = v.report().skipped.filter((s) => s.rule === "AGUI506")
+    expect(entries).toEqual([{ rule: "AGUI506", reason: "custom reason" }])
+  })
+
+  it("never throws on unknown rules", () => {
+    const v = createValidator()
+    expect(() => v.markSkipped("AGUI999", "whatever")).not.toThrow()
+  })
+})

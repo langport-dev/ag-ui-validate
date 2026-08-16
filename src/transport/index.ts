@@ -56,6 +56,14 @@ export interface TransportOptions {
   fetchImpl?: FetchLike
   /** Injectable clock for keepalive/buffering measurement. Default: Date.now. */
   now?: () => number
+  /**
+   * The body is a recording (file, stdin) rather than a live connection.
+   * Timing-based rules (AGUI506, AGUI507) and mid-stream disconnect detection
+   * (AGUI508) are meaningless for recordings; they are reported as skipped
+   * with a reason instead of risking false positives, and read failures become
+   * TransportErrors (tool failure) rather than AGUI508 findings.
+   */
+  recorded?: boolean
   signal?: AbortSignal
   /** Called after each fed event with the diagnostics it produced. */
   onEvent?: (raw: string, diagnostics: Diagnostic[]) => void
@@ -151,6 +159,7 @@ export async function validateBody(
   const v = createValidator({ ...(opts.validator ?? {}), layers })
   const now = opts.now ?? Date.now
   const keepaliveWindow = opts.keepaliveWindowMs ?? DEFAULT_KEEPALIVE_MS
+  const recorded = opts.recorded === true
 
   const emitTransport: typeof v.emitExternal = (rule, params, extra) => {
     const d = v.emitExternal(rule, params, extra)
@@ -174,8 +183,18 @@ export async function validateBody(
   }
 
   const mime = contentType === null ? null : (contentType.split(";")[0] ?? "").trim().toLowerCase()
-  if (contentType !== null && mime !== "text/event-stream" && mime !== "application/x-ndjson") {
+  if (contentType === null) {
+    v.markSkipped("AGUI505", "no Content-Type header is available for this input")
+  } else if (mime !== "text/event-stream" && mime !== "application/x-ndjson") {
     emitTransport("AGUI505", { contentType: mime === "" ? "(none)" : mime })
+  }
+  if (recorded) {
+    v.markSkipped("AGUI506", "keepalive timing is not meaningful for recorded input")
+    v.markSkipped("AGUI507", "chunk arrival timing is not meaningful for recorded input")
+    v.markSkipped(
+      "AGUI508",
+      "abnormal disconnects cannot be distinguished from end-of-capture in recorded input",
+    )
   }
 
   let format: "sse" | "ndjson"
@@ -183,6 +202,9 @@ export async function validateBody(
   if (mime === "text/event-stream") format = "sse"
   else if (mime === "application/x-ndjson") format = "ndjson"
   else ({ format, replay: stream } = await sniffFormat(stream))
+  if (format === "ndjson") {
+    v.markSkipped("AGUI501", "the stream is NDJSON; there is no SSE framing to check")
+  }
 
   let eventCount = 0
   let runOpen = false
@@ -216,6 +238,15 @@ export async function validateBody(
       for await (const line of ndjsonLines(stream)) feedRaw(line)
     }
   } catch (e) {
+    if (recorded) {
+      // A read failure on a recording is a broken input, not an observation
+      // about the agent's transport behavior.
+      throw e instanceof TransportError
+        ? e
+        : new TransportError(
+            `failed to read recorded input: ${e instanceof Error ? e.message : String(e)}`,
+          )
+    }
     transportError = e instanceof Error ? e.message : String(e)
     if (runOpen) {
       // The connection died mid-run. The core's finalize will additionally
@@ -225,12 +256,14 @@ export async function validateBody(
     }
   }
 
-  if (lastArrival !== null) maxGapMs = Math.max(maxGapMs, now() - lastArrival)
-  if (maxGapMs > keepaliveWindow) {
-    emitTransport("AGUI506", { seconds: Math.round(maxGapMs / 1000) })
-  }
-  if (chunkCount === 1 && eventCount >= 3) {
-    emitTransport("AGUI507", { detail: `entire body (${eventCount} events) arrived in a single chunk` })
+  if (!recorded) {
+    if (lastArrival !== null) maxGapMs = Math.max(maxGapMs, now() - lastArrival)
+    if (maxGapMs > keepaliveWindow) {
+      emitTransport("AGUI506", { seconds: Math.round(maxGapMs / 1000) })
+    }
+    if (chunkCount === 1 && eventCount >= 3) {
+      emitTransport("AGUI507", { detail: `entire body (${eventCount} events) arrived in a single chunk` })
+    }
   }
 
   const finalDiags = v.finalize()

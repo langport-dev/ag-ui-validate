@@ -25,12 +25,16 @@
   "engines": {
     "node": ">=20"
   },
+  "bin": {
+    "ag-ui-validate": "./dist/cli.js"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "transport": ["./dist/transport.d.ts"]
+      "transport": ["./dist/transport.d.ts"],
+      "report": ["./dist/report.d.ts"]
     }
   },
   "exports": {
@@ -52,6 +56,16 @@
       "require": {
         "types": "./dist/transport.d.cts",
         "default": "./dist/transport.cjs"
+      }
+    },
+    "./report": {
+      "import": {
+        "types": "./dist/report.d.ts",
+        "default": "./dist/report.js"
+      },
+      "require": {
+        "types": "./dist/report.d.cts",
+        "default": "./dist/report.cjs"
       }
     },
     "./package.json": "./package.json"

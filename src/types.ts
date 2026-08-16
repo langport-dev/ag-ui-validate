@@ -127,4 +127,10 @@ export interface Validator {
     params?: Record<string, unknown>,
     extra?: { eventIndex?: number; pointer?: string; relatedEventIndex?: number },
   ): Diagnostic | null
+  /**
+   * For wrapping layers: declare that a rule was NOT evaluated and why (e.g.
+   * timing rules on recorded input). The entry appears in report().skipped,
+   * replacing any layer-computed entry for the same rule. Never throws.
+   */
+  markSkipped(rule: string, reason: string): void
 }

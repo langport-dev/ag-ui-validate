@@ -63,6 +63,7 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
 
   const diagnostics: Diagnostic[] = []
   const internalErrors: string[] = []
+  const explicitSkips = new Map<string, string>()
   const stream: StreamState = {
     eventCount: 0,
     sawTimestamp: false,
@@ -409,6 +410,10 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
       return batch[0] ?? null
     },
 
+    markSkipped(rule, reason): void {
+      explicitSkips.set(String(rule), String(reason))
+    },
+
     report(): Report {
       const summary = { errors: 0, warnings: 0, info: 0 }
       for (const d of diagnostics) {
@@ -426,7 +431,7 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
             : "not-exercised"
       }
 
-      const skipped = layers.has("transport")
+      let skipped = layers.has("transport")
         ? []
         : TRANSPORT_RULE_IDS
             .filter((id) => overrides[id] !== "off")
@@ -441,6 +446,10 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
         if (severity === "off" && RULES.has(rule)) {
           skipped.push({ rule, reason: "disabled by severityOverrides" })
         }
+      }
+      if (explicitSkips.size > 0) {
+        skipped = skipped.filter((s) => !explicitSkips.has(s.rule))
+        for (const [rule, reason] of explicitSkips) skipped.push({ rule, reason })
       }
 
       return {

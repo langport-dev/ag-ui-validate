@@ -48,6 +48,29 @@ Three design commitments make it trustworthy:
 npm install --save-dev ag-ui-validate
 ```
 
+### CLI
+
+```bash
+npx ag-ui-validate http://localhost:8000/agui   # live endpoint (POSTs a RunAgentInput)
+npx ag-ui-validate run.jsonl                    # recorded stream (NDJSON/JSONL or SSE capture)
+cat run.jsonl | npx ag-ui-validate -            # stdin
+```
+
+Exit codes: `0` clean, `1` findings at error level (or warnings over
+`--max-warnings`), `2` tool failure. Timing-based transport rules are
+meaningless for recordings, so they are reported as *skipped with a reason*
+rather than risking false positives.
+
+Useful flags (see `--help` for all):
+
+| Flag | Effect |
+| --- | --- |
+| `--json` / `--sarif` / `--junit` | machine-readable report on stdout (SARIF 2.1.0 for code scanning, JUnit XML for CI) |
+| `--rule AGUI105=error`, `--off AGUI902` | per-rule severity overrides |
+| `--features shared-state,...` | declare exercised features (enables e.g. AGUI305) |
+| `--max-warnings 0` | fail CI on any warning |
+| `--header "Authorization: Bearer …"`, `--timeout 30` | endpoint options |
+
 ### Validate recorded events (pure, runs anywhere)
 
 ```ts
@@ -89,6 +112,15 @@ NDJSON response, streams every frame through the core, and additionally
 evaluates the transport-level rules that recorded input can't exercise: SSE
 framing (including the classic missing-`data:`-prefix bug), Content-Type,
 keepalive gaps, buffered-not-flushed responses, and mid-run disconnects.
+
+### Render a report
+
+The CLI's output formats are plain functions over a `Report`, importable for
+your own tooling:
+
+```ts
+import { formatReportSummary, toSarif, toJUnit } from "ag-ui-validate/report"
+```
 
 ### Diagnostic shape
 

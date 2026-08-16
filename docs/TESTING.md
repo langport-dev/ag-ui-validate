@@ -9,12 +9,12 @@ its own tests, plus scripted checks for the things unit tests can't cover
 ```bash
 npm ci             # clean install from the lockfile (what CI does)
 npm run typecheck  # two passes: src-only with zero Node/DOM types, then all
-npm run build      # tsdown dual ESM/CJS + declarations
-npm test           # the full vitest suite (~310 tests)
+npm run build      # tsdown dual ESM/CJS + declarations, plus the CLI bin
+npm test           # the full vitest suite (~370 tests)
 ```
 
-Scripts under `scripts/` import from `dist/`, so run `npm run build` before
-any of them.
+Build before test: the CLI integration suite spawns `dist/cli.js` (it skips
+loudly when missing). Scripts under `scripts/` also import from `dist/`.
 
 ---
 
@@ -24,7 +24,7 @@ any of them.
 |---|---|
 | Reproducible from lockfile | `rm -rf node_modules dist && npm ci && npm run typecheck && npm run build && npm test` |
 | Exports map correctness | `npx publint` — checks main/module/exports consistency against the packed tarball |
-| Type resolution everywhere | `npx @arethetypeswrong/cli --pack .` — must be green for node10 / node16-cjs / node16-esm / bundler, for both `.` and `./transport` |
+| Type resolution everywhere | `npx @arethetypeswrong/cli --pack .` — must be green for node10 / node16-cjs / node16-esm / bundler, for `.`, `./transport`, and `./report` |
 | Both module systems load | `node -e "require('./dist/index.cjs')"` and `node --input-type=module -e "import('./dist/index.js')"` |
 
 ## 2. Protocol grounding (M1)
@@ -86,12 +86,25 @@ HTTP bodies as timed byte chunks with a simulated clock — see
 
 ---
 
+## 7. CLI (M6)
+
+| What | How |
+|---|---|
+| Argument parser (pure) | `npx vitest run test/cli/args.test.ts` — every flag in both `--flag value` and `--flag=value` forms, error messages, exit-code policy |
+| Reporters (pure) | `npx vitest run test/report/reporters.test.ts` — pretty lines/summary, JSON document, SARIF 2.1.0 (level mapping, `helpUri`, line regions), JUnit XML escaping |
+| Recorded-input mode | `npx vitest run test/transport/recorded.test.ts` — timing rules skipped-with-reason on captures, SSE framing still checked, read failures are tool failures |
+| **The real binary** | `npm run build && npx vitest run test/cli/integration.test.ts` — spawns `dist/cli.js` against fixtures: exit codes 0/1/2, stdin, `--json`/`--sarif` parse, `--off` silences. Skipped (loudly) if `dist/cli.js` is missing |
+| By hand | `node dist/cli.js fixtures/invalid/AGUI203-unterminated-tool-call/stream.jsonl` (exit 1), `cat fixtures/valid/agentic-chat.jsonl \| node dist/cli.js -` (exit 0), `node dist/cli.js <your-endpoint-url>` |
+
+---
+
 ## What must never regress
 
 - **The core never throws** on any input (`npm run fuzz`, hostile-object tests
   in `engine.test.ts`).
 - **The core stays pure** — zero runtime deps, zero I/O, no clocks
-  (`test/purity.test.ts` + `tsconfig.src.json`).
+  (`test/purity.test.ts` + `tsconfig.src.json`). `src/cli.ts` is the one
+  deliberate Node-only file; the purity test asserts nothing else imports it.
 - **Every diagnostic cites the spec** (`test/catalog.test.ts`,
   `npm run links:check`).
 - **Every rule has corpus coverage** (`test/catalog.test.ts` meta-test).

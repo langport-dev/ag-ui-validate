@@ -21,7 +21,11 @@ function walk(dir: string): string[] {
 }
 
 const allFiles = walk(SRC)
-const coreFiles = allFiles.filter((f) => !f.includes(`${SRC}transport`))
+// The CLI executable is the one deliberately Node-only file: it is a bin
+// entry, never importable from the library, and may use any Node API.
+const NODE_ONLY = [join(SRC, "cli.ts")]
+const scannedFiles = allFiles.filter((f) => !NODE_ONLY.includes(f))
+const coreFiles = scannedFiles.filter((f) => !f.includes(`${SRC}transport`))
 
 // Usage patterns (call/construct/property), so prose in comments can still
 // name the APIs without tripping the guard.
@@ -50,7 +54,7 @@ describe("core purity (src/ minus transport/)", () => {
 })
 
 describe("transport isomorphism (web APIs allowed, Node APIs not)", () => {
-  it.each(allFiles.filter((f) => f.includes(`${SRC}transport`)).map((f) => [f.slice(SRC.length), f] as const))(
+  it.each(scannedFiles.filter((f) => f.includes(`${SRC}transport`)).map((f) => [f.slice(SRC.length), f] as const))(
     "%s",
     (_rel, file) => {
       const source = readFileSync(file, "utf8")
@@ -59,4 +63,13 @@ describe("transport isomorphism (web APIs allowed, Node APIs not)", () => {
       }
     },
   )
+})
+
+describe("node-only isolation", () => {
+  it("no library file imports the CLI executable", () => {
+    for (const file of scannedFiles) {
+      const source = readFileSync(file, "utf8")
+      expect(/from\s+"[^"]*\/cli\.js"|from\s+"\.\/cli\.js"/.test(source), `${file} imports cli.js`).toBe(false)
+    }
+  })
 })
