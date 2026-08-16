@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI203",
+    "severity": "error",
+    "message": "TOOL_CALL_START id 'call_7' never terminated",
+    "eventIndex": 3,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#tool-call-events",
+    "relatedEventIndex": 1
+  }
+]

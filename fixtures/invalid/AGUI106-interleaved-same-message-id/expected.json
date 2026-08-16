@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI106",
+    "severity": "error",
+    "message": "TEXT_MESSAGE_START for messageId 'msg_001', which is already open",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#implementation-considerations",
+    "eventType": "TEXT_MESSAGE_START",
+    "pointer": "/messageId",
+    "relatedEventIndex": 1
+  }
+]

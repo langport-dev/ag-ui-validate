@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI303",
+    "severity": "error",
+    "message": "STATE_DELTA is not a valid RFC 6902 patch document: operation 0 has invalid op 'merge'",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#statedelta",
+    "eventType": "STATE_DELTA",
+    "pointer": "/delta/0/op"
+  }
+]

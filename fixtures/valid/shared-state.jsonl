@@ -1,0 +1,8 @@
+{"type":"RUN_STARTED","threadId":"thread_state","runId":"run_001","timestamp":1755300006000}
+{"type":"STATE_SNAPSHOT","snapshot":{"recipe":{"title":"Pasta","ingredients":["tomato"]}},"timestamp":1755300006100}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300006200}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"Adding garlic to the recipe.","timestamp":1755300006300}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_001","timestamp":1755300006400}
+{"type":"STATE_DELTA","delta":[{"op":"add","path":"/recipe/ingredients/-","value":"garlic"}],"timestamp":1755300006500}
+{"type":"STATE_DELTA","delta":[{"op":"test","path":"/recipe/title","value":"Pasta"},{"op":"replace","path":"/recipe/title","value":"Garlic Pasta"}],"timestamp":1755300006600}
+{"type":"RUN_FINISHED","threadId":"thread_state","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300006700}

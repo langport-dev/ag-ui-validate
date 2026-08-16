@@ -1,0 +1,5 @@
+{"type":"RUN_STARTED","threadId":"thread_fe_tools","runId":"run_001","timestamp":1755300005500}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","toolCallName":"generate_haiku","timestamp":1755300005600}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"{\"topic\":\"conformance\"}","timestamp":1755300005700}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300005800}
+{"type":"RUN_FINISHED","threadId":"thread_fe_tools","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300005900}

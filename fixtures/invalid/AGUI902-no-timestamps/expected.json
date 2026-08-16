@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "AGUI902",
+    "severity": "info",
+    "message": "None of the 2 events carry the optional timestamp property",
+    "eventIndex": -1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#base-event-properties"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI402",
+    "severity": "warning",
+    "message": "REASONING_START messageId 'rsn_001' never ended",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#reasoning-events",
+    "relatedEventIndex": 1
+  }
+]

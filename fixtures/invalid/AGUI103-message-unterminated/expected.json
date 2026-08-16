@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI103",
+    "severity": "error",
+    "message": "TEXT_MESSAGE_START messageId 'msg_001' never ended",
+    "eventIndex": 3,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#text-message-events",
+    "relatedEventIndex": 1
+  }
+]

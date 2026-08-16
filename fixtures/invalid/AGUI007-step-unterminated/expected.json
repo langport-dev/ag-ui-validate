@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI007",
+    "severity": "error",
+    "message": "STEP_STARTED 'plan' never finished",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#stepstarted",
+    "relatedEventIndex": 1
+  }
+]

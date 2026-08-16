@@ -1,0 +1,4 @@
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300013600}
+{"type":"TOOL_CALL_START","toolCallId":"call_7","toolCallName":"get_weather","timestamp":1755300013700}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_7","delta":"{\"city\":\"Berlin\"}","timestamp":1755300013800}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300013900}

@@ -1,0 +1,11 @@
+{"type":"RUN_STARTED","threadId":"thread_predict","runId":"run_001","timestamp":1755300006800}
+{"type":"STATE_SNAPSHOT","snapshot":{"document":""},"timestamp":1755300006900}
+{"type":"CUSTOM","name":"PredictState","value":[{"state_key":"document","tool":"write_document","tool_argument":"document"}],"timestamp":1755300007000}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","toolCallName":"write_document","timestamp":1755300007100}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"{\"document\":\"Hello world.\"}","timestamp":1755300007200}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300007300}
+{"type":"STATE_DELTA","delta":[{"op":"replace","path":"/document","value":"Hello world."}],"timestamp":1755300007400}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300007500}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"Written.","timestamp":1755300007600}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_001","timestamp":1755300007700}
+{"type":"RUN_FINISHED","threadId":"thread_predict","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300007800}

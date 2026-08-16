@@ -1,0 +1,9 @@
+[
+  {
+    "rule": "AGUI305",
+    "severity": "warning",
+    "message": "features include 'shared-state' but no STATE_SNAPSHOT was emitted",
+    "eventIndex": -1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#state-management-events"
+  }
+]

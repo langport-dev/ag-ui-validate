@@ -1,0 +1,13 @@
+{"type":"RUN_STARTED","threadId":"thread_genui","runId":"run_001","timestamp":1755300004200}
+{"type":"STATE_SNAPSHOT","snapshot":{"steps":[{"name":"plan","status":"pending"},{"name":"execute","status":"pending"}]},"timestamp":1755300004300}
+{"type":"STEP_STARTED","stepName":"plan","timestamp":1755300004400}
+{"type":"STATE_DELTA","delta":[{"op":"replace","path":"/steps/0/status","value":"in_progress"}],"timestamp":1755300004500}
+{"type":"STATE_DELTA","delta":[{"op":"replace","path":"/steps/0/status","value":"done"}],"timestamp":1755300004600}
+{"type":"STEP_FINISHED","stepName":"plan","timestamp":1755300004700}
+{"type":"STEP_STARTED","stepName":"execute","timestamp":1755300004800}
+{"type":"STATE_DELTA","delta":[{"op":"replace","path":"/steps/1/status","value":"done"}],"timestamp":1755300004900}
+{"type":"STEP_FINISHED","stepName":"execute","timestamp":1755300005000}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300005100}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"All steps complete.","timestamp":1755300005200}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_001","timestamp":1755300005300}
+{"type":"RUN_FINISHED","threadId":"thread_genui","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300005400}

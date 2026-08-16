@@ -50,6 +50,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.src.json && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "fixtures:build": "npm run build && node scripts/build-fixtures.mjs",
+    "protocol:derive": "node scripts/generate-event-table.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "prepublishOnly": "npm run build"

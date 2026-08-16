@@ -1,0 +1,14 @@
+{"type":"RUN_STARTED","threadId":"thread_tools","runId":"run_001","timestamp":1755300001500}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300001600}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"Checking the weather…","timestamp":1755300001700}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_001","timestamp":1755300001800}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","toolCallName":"get_weather","parentMessageId":"msg_001","timestamp":1755300001900}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"{\"city\":\"Ber","timestamp":1755300002000}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"lin\"}","timestamp":1755300002100}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300002200}
+{"type":"TOOL_CALL_RESULT","messageId":"msg_002","toolCallId":"call_001","content":"{\"tempC\":21}","role":"tool","timestamp":1755300002300}
+{"type":"RAW","event":{"kind":"langgraph_checkpoint","checkpoint_id":"ckpt_42"},"source":"langgraph","timestamp":1755300002400}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_003","role":"assistant","timestamp":1755300002500}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_003","delta":"It is 21°C in Berlin.","timestamp":1755300002600}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_003","timestamp":1755300002700}
+{"type":"RUN_FINISHED","threadId":"thread_tools","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300002800}

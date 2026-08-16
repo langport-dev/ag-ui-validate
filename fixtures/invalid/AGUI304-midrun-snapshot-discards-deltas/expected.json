@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI304",
+    "severity": "info",
+    "message": "STATE_SNAPSHOT replaces state previously built from 1 delta(s)",
+    "eventIndex": 3,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#statesnapshot",
+    "eventType": "STATE_SNAPSHOT"
+  }
+]

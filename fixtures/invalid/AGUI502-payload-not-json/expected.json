@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI502",
+    "severity": "error",
+    "message": "Event payload is not valid JSON: Unexpected token 'b', \"{\"type\": broken json\" is not valid JSON",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#base-event-properties",
+    "eventType": ""
+  }
+]

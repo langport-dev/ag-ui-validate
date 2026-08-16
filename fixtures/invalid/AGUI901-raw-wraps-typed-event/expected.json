@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI901",
+    "severity": "info",
+    "message": "RAW event wraps an event of type 'TOOL_CALL_RESULT', which has a typed AG-UI equivalent",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#raw",
+    "eventType": "RAW",
+    "pointer": "/event/type"
+  }
+]

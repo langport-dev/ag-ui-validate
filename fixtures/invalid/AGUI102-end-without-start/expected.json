@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI102",
+    "severity": "error",
+    "message": "TEXT_MESSAGE_END for messageId 'msg_ghost' with no open TEXT_MESSAGE_START",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#textmessageend",
+    "eventType": "TEXT_MESSAGE_END",
+    "pointer": "/messageId"
+  }
+]

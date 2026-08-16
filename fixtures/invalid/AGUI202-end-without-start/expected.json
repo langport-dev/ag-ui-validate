@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI202",
+    "severity": "error",
+    "message": "TOOL_CALL_END for toolCallId 'call_ghost' with no open TOOL_CALL_START",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallend",
+    "eventType": "TOOL_CALL_END",
+    "pointer": "/toolCallId"
+  }
+]

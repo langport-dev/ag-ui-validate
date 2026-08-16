@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI104",
+    "severity": "error",
+    "message": "messageId 'msg_001' was already used by a completed message",
+    "eventIndex": 4,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#textmessagestart",
+    "eventType": "TEXT_MESSAGE_START",
+    "pointer": "/messageId",
+    "relatedEventIndex": 3
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI105",
+    "severity": "warning",
+    "message": "TEXT_MESSAGE_CONTENT for messageId 'msg_001' has an empty delta",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#textmessagecontent",
+    "eventType": "TEXT_MESSAGE_CONTENT",
+    "pointer": "/delta",
+    "relatedEventIndex": 1
+  }
+]

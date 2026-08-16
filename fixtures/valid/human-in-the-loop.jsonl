@@ -1,0 +1,13 @@
+{"type":"RUN_STARTED","threadId":"thread_hitl","runId":"run_001","timestamp":1755300002900}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300003000}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"I need your approval to delete 3 files.","timestamp":1755300003100}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_001","timestamp":1755300003200}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","toolCallName":"confirm_action","parentMessageId":"msg_001","timestamp":1755300003300}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"{\"action\":\"delete\",\"count\":3}","timestamp":1755300003400}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300003500}
+{"type":"RUN_FINISHED","threadId":"thread_hitl","runId":"run_001","outcome":{"type":"interrupt","interrupts":[{"id":"int_001","reason":"approval_required","toolCallId":"call_001"}]},"timestamp":1755300003600}
+{"type":"RUN_STARTED","threadId":"thread_hitl","runId":"run_002","timestamp":1755300003700,"parentRunId":"run_001"}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_002","role":"assistant","timestamp":1755300003800}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_002","delta":"Done — 3 files deleted.","timestamp":1755300003900}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_002","timestamp":1755300004000}
+{"type":"RUN_FINISHED","threadId":"thread_hitl","runId":"run_002","outcome":{"type":"success"},"timestamp":1755300004100}

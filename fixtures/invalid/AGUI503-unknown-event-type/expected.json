@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI503",
+    "severity": "error",
+    "message": "Unknown event type 'AGUI_PING' (not in @ag-ui/core v0.0.58, and not RAW or CUSTOM)",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#event-types-overview",
+    "eventType": "AGUI_PING"
+  }
+]

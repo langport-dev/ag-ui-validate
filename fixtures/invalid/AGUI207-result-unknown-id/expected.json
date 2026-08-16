@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI207",
+    "severity": "error",
+    "message": "TOOL_CALL_RESULT references toolCallId 'call_ghost', which was never started",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallresult",
+    "eventType": "TOOL_CALL_RESULT",
+    "pointer": "/toolCallId"
+  }
+]

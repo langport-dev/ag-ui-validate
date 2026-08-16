@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI204",
+    "severity": "error",
+    "message": "Concatenated TOOL_CALL_ARGS for toolCallId 'call_001' do not parse as JSON: Unexpected token 'o', \"{\"city\":oops}\" is not valid JSON",
+    "eventIndex": 4,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallargs",
+    "relatedEventIndex": 1
+  }
+]

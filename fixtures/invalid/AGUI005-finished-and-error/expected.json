@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI005",
+    "severity": "error",
+    "message": "RUN_ERROR emitted after the run already terminated with RUN_FINISHED",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#runfinished",
+    "eventType": "RUN_ERROR",
+    "relatedEventIndex": 1
+  }
+]

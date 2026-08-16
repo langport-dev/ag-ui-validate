@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI006",
+    "severity": "error",
+    "message": "STEP_FINISHED 'plan' has no open STEP_STARTED",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#stepfinished",
+    "eventType": "STEP_FINISHED",
+    "pointer": "/stepName"
+  }
+]

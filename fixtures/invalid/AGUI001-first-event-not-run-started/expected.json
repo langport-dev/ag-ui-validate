@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI001",
+    "severity": "error",
+    "message": "First event of the run is TEXT_MESSAGE_START; expected RUN_STARTED",
+    "eventIndex": 0,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#runstarted",
+    "eventType": "TEXT_MESSAGE_START"
+  }
+]

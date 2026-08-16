@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI004",
+    "severity": "error",
+    "message": "TEXT_MESSAGE_START follows the run's terminal RUN_FINISHED",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#lifecycle-events",
+    "eventType": "TEXT_MESSAGE_START",
+    "relatedEventIndex": 1
+  }
+]

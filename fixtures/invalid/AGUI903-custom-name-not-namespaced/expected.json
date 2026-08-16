@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI903",
+    "severity": "info",
+    "message": "CUSTOM event name 'update' has no namespace prefix (e.g. 'vendor.event')",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#custom",
+    "eventType": "CUSTOM",
+    "pointer": "/name"
+  }
+]

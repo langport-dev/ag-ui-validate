@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI205",
+    "severity": "error",
+    "message": "toolCallId 'call_001' was already used by a completed tool call",
+    "eventIndex": 3,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallstart",
+    "eventType": "TOOL_CALL_START",
+    "pointer": "/toolCallId",
+    "relatedEventIndex": 2
+  }
+]

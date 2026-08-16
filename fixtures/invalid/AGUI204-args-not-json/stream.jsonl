@@ -1,0 +1,6 @@
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300014000}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","toolCallName":"get_weather","timestamp":1755300014100}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"{\"city\":","timestamp":1755300014200}
+{"type":"TOOL_CALL_ARGS","toolCallId":"call_001","delta":"oops}","timestamp":1755300014300}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300014400}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300014500}

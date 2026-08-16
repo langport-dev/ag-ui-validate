@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI101",
+    "severity": "error",
+    "message": "TEXT_MESSAGE_CONTENT for messageId 'msg_ghost' with no open TEXT_MESSAGE_START",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#text-message-events",
+    "eventType": "TEXT_MESSAGE_CONTENT",
+    "pointer": "/messageId"
+  }
+]

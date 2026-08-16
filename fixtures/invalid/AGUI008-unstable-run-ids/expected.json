@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI008",
+    "severity": "warning",
+    "message": "RUN_FINISHED runId 'run_999' does not match RUN_STARTED runId 'run_001'",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#runstarted",
+    "eventType": "RUN_FINISHED",
+    "pointer": "/runId",
+    "relatedEventIndex": 0
+  }
+]

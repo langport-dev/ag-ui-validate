@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI206",
+    "severity": "warning",
+    "message": "TOOL_CALL_RESULT for toolCallId 'call_001' arrived while the call is still open",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallresult",
+    "eventType": "TOOL_CALL_RESULT",
+    "pointer": "/toolCallId",
+    "relatedEventIndex": 1
+  }
+]

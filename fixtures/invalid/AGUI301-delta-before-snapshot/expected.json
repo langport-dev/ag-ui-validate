@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI301",
+    "severity": "info",
+    "message": "STATE_DELTA precedes any STATE_SNAPSHOT; the base it applies to is not observable on this stream",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#statesnapshot",
+    "eventType": "STATE_DELTA"
+  }
+]

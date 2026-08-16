@@ -1,7 +1,8 @@
 // Meta-test for the rule catalog: every entry must cite the spec, and (from
 // M4) have fixture coverage. Tests may use node built-ins; the runtime core
 // may not.
-import { existsSync, readFileSync } from "node:fs"
+import { readFileSync, readdirSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 import { CATALOG, RULES, formatMessage, validateCatalog } from "../src/rules/catalog.js"
 
@@ -51,11 +52,21 @@ describe("rule catalog", () => {
     ).toThrow(/specUrl/)
   })
 
-  // TODO(M4): once fixtures/ lands, replace this with a hard assertion that
-  // every rule has fixtures/invalid/<id>-*/ and appears in a valid/ fixture's
-  // false-positive guard.
-  it("every rule has a fixture directory (pending M4)", (ctx) => {
-    const fixturesRoot = new URL("../fixtures/invalid", import.meta.url)
-    if (!existsSync(fixturesRoot)) ctx.skip()
+  it("every core rule has an invalid fixture directory whose expected.json fires it", () => {
+    const root = fileURLToPath(new URL("../fixtures/invalid/", import.meta.url))
+    const dirs = readdirSync(root)
+    for (const rule of CATALOG.rules) {
+      // TODO(M5): transport rules (AGUI501, 505-508) need live-connection
+      // fixtures (SSE framing, timing, disconnects); they arrive with the
+      // transport layer. Everything else must have corpus coverage now.
+      if (rule.checkedIn === "transport") continue
+      const dir = dirs.find((d) => d.startsWith(`${rule.id}-`))
+      expect(dir, `${rule.id} has no fixtures/invalid/${rule.id}-*/ directory`).toBeDefined()
+      const expected = JSON.parse(readFileSync(`${root}${dir}/expected.json`, "utf8")) as { rule: string }[]
+      expect(
+        expected.map((d) => d.rule),
+        `${dir}/expected.json must include ${rule.id}`,
+      ).toContain(rule.id)
+    }
   })
 })

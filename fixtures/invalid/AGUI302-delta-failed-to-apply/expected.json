@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI302",
+    "severity": "error",
+    "message": "STATE_DELTA failed to apply: /items/3: '3' is not a valid index for an array of length 0",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#statedelta",
+    "eventType": "STATE_DELTA",
+    "pointer": "/delta/0"
+  }
+]

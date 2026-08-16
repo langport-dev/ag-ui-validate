@@ -1,0 +1,14 @@
+{"type":"RUN_STARTED","threadId":"thread_chat","runId":"run_001","timestamp":1755300000100}
+{"type":"REASONING_START","messageId":"rsn_001","timestamp":1755300000200}
+{"type":"REASONING_MESSAGE_START","messageId":"rmsg_001","role":"reasoning","timestamp":1755300000300}
+{"type":"REASONING_MESSAGE_CONTENT","messageId":"rmsg_001","delta":"The user greeted me; respond warmly.","timestamp":1755300000400}
+{"type":"REASONING_MESSAGE_END","messageId":"rmsg_001","timestamp":1755300000500}
+{"type":"REASONING_END","messageId":"rsn_001","timestamp":1755300000600}
+{"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300000700}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"Hello! ","timestamp":1755300000800}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"How can I help ","timestamp":1755300000900}
+{"type":"TEXT_MESSAGE_CONTENT","messageId":"msg_001","delta":"you today?","timestamp":1755300001000}
+{"type":"TEXT_MESSAGE_END","messageId":"msg_001","timestamp":1755300001100}
+{"type":"TEXT_MESSAGE_CHUNK","messageId":"msg_002","delta":"Chunked messages ","timestamp":1755300001200}
+{"type":"TEXT_MESSAGE_CHUNK","delta":"work too.","timestamp":1755300001300}
+{"type":"RUN_FINISHED","threadId":"thread_chat","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300001400}

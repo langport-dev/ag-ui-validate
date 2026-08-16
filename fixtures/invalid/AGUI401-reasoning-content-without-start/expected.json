@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI401",
+    "severity": "error",
+    "message": "REASONING_MESSAGE_CONTENT for messageId 'rmsg_ghost' with no open REASONING_MESSAGE_START",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/events#reasoningmessagecontent",
+    "eventType": "REASONING_MESSAGE_CONTENT",
+    "pointer": "/messageId"
+  }
+]
