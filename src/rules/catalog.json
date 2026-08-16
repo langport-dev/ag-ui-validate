@@ -1,0 +1,431 @@
+{
+  "$comment": "AG-UI conformance rule catalog. Data, not code: a Python/Go implementation shares these rules. Severities follow the working agreement that behaviour the spec does not clearly govern is at most 'info' — entries with 'specQuestion' were downgraded accordingly; see docs/spec-questions.md.",
+  "catalogVersion": "0.1.0",
+  "spec": "0.x",
+  "rules": [
+    {
+      "id": "AGUI001",
+      "severity": "error",
+      "title": "Run does not start with RUN_STARTED",
+      "messageTemplate": "First event of the run is {type}; expected RUN_STARTED",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#runstarted",
+      "specQuote": "The RunStarted event is the first event emitted when an agent begins processing a request.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI002",
+      "severity": "error",
+      "title": "Multiple RUN_STARTED in one run",
+      "messageTemplate": "Duplicate RUN_STARTED (runId '{runId}') before the active run terminated",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#lifecycle-events",
+      "specQuote": "The RunStarted and either RunFinished or RunError events are mandatory, forming the boundaries of an agent run.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI003",
+      "severity": "error",
+      "title": "Run not terminated",
+      "messageTemplate": "Run '{runId}' ended without RUN_FINISHED or RUN_ERROR",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#runfinished",
+      "specQuote": "Every run terminates with either RunFinished or RunError.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI004",
+      "severity": "error",
+      "title": "Event after terminal event",
+      "messageTemplate": "{type} follows the run's terminal {terminalType}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#lifecycle-events",
+      "specQuote": "The RunStarted and either RunFinished or RunError events are mandatory, forming the boundaries of an agent run.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI005",
+      "severity": "error",
+      "title": "RUN_FINISHED and RUN_ERROR are mutually exclusive",
+      "messageTemplate": "{type} emitted after the run already terminated with {terminalType}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#runfinished",
+      "specQuote": "Every run terminates with either RunFinished or RunError.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI006",
+      "severity": "error",
+      "title": "STEP_FINISHED without matching STEP_STARTED",
+      "messageTemplate": "STEP_FINISHED '{stepName}' has no open STEP_STARTED",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#stepfinished",
+      "specQuote": "The stepName must match the corresponding StepStarted event.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI007",
+      "severity": "error",
+      "title": "Step unterminated at run end",
+      "messageTemplate": "STEP_STARTED '{stepName}' never finished",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#stepstarted",
+      "specQuote": "The stepName must match the corresponding StepStarted event.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI008",
+      "severity": "warning",
+      "title": "Unstable threadId/runId across the run",
+      "messageTemplate": "RUN_FINISHED {field} '{actual}' does not match RUN_STARTED {field} '{expected}'",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#runstarted",
+      "specQuote": "It also provides crucial identifiers that can be used to associate subsequent events with this specific run.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI101",
+      "severity": "error",
+      "title": "TEXT_MESSAGE_CONTENT without start",
+      "messageTemplate": "TEXT_MESSAGE_CONTENT for messageId '{messageId}' with no open TEXT_MESSAGE_START",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#text-message-events",
+      "specQuote": "A message begins with a TextMessageStart event, followed by one or more TextMessageContent events that deliver chunks of text as they become available, and concludes with a TextMessageEnd event.",
+      "since": "0.x",
+      "feature": "agentic-chat",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI102",
+      "severity": "error",
+      "title": "TEXT_MESSAGE_END without start",
+      "messageTemplate": "TEXT_MESSAGE_END for messageId '{messageId}' with no open TEXT_MESSAGE_START",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#textmessageend",
+      "specQuote": "messageId: Matches the ID from TextMessageStart",
+      "since": "0.x",
+      "feature": "agentic-chat",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI103",
+      "severity": "error",
+      "title": "Text message unterminated at run end",
+      "messageTemplate": "TEXT_MESSAGE_START messageId '{messageId}' never ended",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#text-message-events",
+      "specQuote": "A message begins with a TextMessageStart event, followed by one or more TextMessageContent events that deliver chunks of text as they become available, and concludes with a TextMessageEnd event.",
+      "since": "0.x",
+      "feature": "agentic-chat",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI104",
+      "severity": "error",
+      "title": "Duplicate messageId within a run",
+      "messageTemplate": "messageId '{messageId}' was already used by a completed message",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#textmessagestart",
+      "specQuote": "It establishes a unique messageId that will be referenced by subsequent content chunks and the end event.",
+      "since": "0.x",
+      "feature": "agentic-chat",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI105",
+      "severity": "warning",
+      "title": "Empty content delta",
+      "messageTemplate": "TEXT_MESSAGE_CONTENT for messageId '{messageId}' has an empty delta",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#textmessagecontent",
+      "specQuote": "delta: Text content chunk (non-empty)",
+      "since": "0.x",
+      "feature": "agentic-chat",
+      "specQuestion": "SQ-2",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI106",
+      "severity": "error",
+      "title": "Interleaved message streams sharing a messageId",
+      "messageTemplate": "TEXT_MESSAGE_START for messageId '{messageId}', which is already open",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#implementation-considerations",
+      "specQuote": "Events with the same ID (e.g., messageId, toolCallId) belong to the same logical stream",
+      "since": "0.x",
+      "feature": "agentic-chat",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI201",
+      "severity": "error",
+      "title": "TOOL_CALL_ARGS without start",
+      "messageTemplate": "TOOL_CALL_ARGS for toolCallId '{toolCallId}' with no open TOOL_CALL_START",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#tool-call-events",
+      "specQuote": "When an agent needs to use a tool, it emits a ToolCallStart event, followed by one or more ToolCallArgs events that stream the arguments being passed to the tool, and concludes with a ToolCallEnd event.",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI202",
+      "severity": "error",
+      "title": "TOOL_CALL_END without start",
+      "messageTemplate": "TOOL_CALL_END for toolCallId '{toolCallId}' with no open TOOL_CALL_START",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallend",
+      "specQuote": "toolCallId: Matches the ID from ToolCallStart",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI203",
+      "severity": "error",
+      "title": "Unterminated tool call",
+      "messageTemplate": "TOOL_CALL_START id '{toolCallId}' never terminated",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#tool-call-events",
+      "specQuote": "When an agent needs to use a tool, it emits a ToolCallStart event, followed by one or more ToolCallArgs events that stream the arguments being passed to the tool, and concludes with a ToolCallEnd event.",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI204",
+      "severity": "error",
+      "title": "Tool call arguments are not valid JSON",
+      "messageTemplate": "Concatenated TOOL_CALL_ARGS for toolCallId '{toolCallId}' do not parse as JSON: {error}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallargs",
+      "specQuote": "Frontends should concatenate these deltas in the order received to construct the complete arguments object.",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI205",
+      "severity": "error",
+      "title": "Duplicate toolCallId within a run",
+      "messageTemplate": "toolCallId '{toolCallId}' was already used by a completed tool call",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallstart",
+      "specQuote": "toolCallId: Unique identifier for the tool call",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI206",
+      "severity": "warning",
+      "title": "TOOL_CALL_RESULT before TOOL_CALL_END",
+      "messageTemplate": "TOOL_CALL_RESULT for toolCallId '{toolCallId}' arrived while the call is still open",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallresult",
+      "specQuote": "This event is sent after the tool has been executed by the system and contains the actual output generated by the tool.",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI207",
+      "severity": "error",
+      "title": "TOOL_CALL_RESULT references unknown toolCallId",
+      "messageTemplate": "TOOL_CALL_RESULT references toolCallId '{toolCallId}', which was never started",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallresult",
+      "specQuote": "toolCallId: Matches the ID from the corresponding ToolCallStart event",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI208",
+      "severity": "info",
+      "title": "parentMessageId references unknown message",
+      "messageTemplate": "TOOL_CALL_START parentMessageId '{parentMessageId}' matches no message observed in this stream",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#toolcallstart",
+      "specQuote": "The optional parentMessageId allows linking the tool call to a specific message in the conversation, providing context for why the tool is being used.",
+      "since": "0.x",
+      "feature": "backend-tool-rendering",
+      "specQuestion": "SQ-11",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI301",
+      "severity": "info",
+      "title": "STATE_DELTA before any STATE_SNAPSHOT",
+      "messageTemplate": "STATE_DELTA precedes any STATE_SNAPSHOT; the base it applies to is not observable on this stream",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#statesnapshot",
+      "specQuote": "This event is typically sent at the beginning of an interaction or when synchronization is needed.",
+      "since": "0.x",
+      "feature": "shared-state",
+      "specQuestion": "SQ-1",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI302",
+      "severity": "error",
+      "title": "STATE_DELTA failed to apply",
+      "messageTemplate": "STATE_DELTA failed to apply: {error}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#statedelta",
+      "specQuote": "Each delta represents specific changes to apply to the current state model.",
+      "since": "0.x",
+      "feature": "shared-state",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI303",
+      "severity": "error",
+      "title": "STATE_DELTA is not a valid RFC 6902 patch document",
+      "messageTemplate": "STATE_DELTA is not a valid RFC 6902 patch document: {error}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#statedelta",
+      "specQuote": "The StateDelta event contains incremental updates to the agent's state in the form of JSON Patch operations (as defined in RFC 6902).",
+      "since": "0.x",
+      "feature": "shared-state",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI304",
+      "severity": "info",
+      "title": "Mid-run STATE_SNAPSHOT discards accumulated deltas",
+      "messageTemplate": "STATE_SNAPSHOT replaces state previously built from {deltaCount} delta(s)",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#statesnapshot",
+      "specQuote": "This event is typically sent at the beginning of an interaction or when synchronization is needed.",
+      "since": "0.x",
+      "feature": "shared-state",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI305",
+      "severity": "warning",
+      "title": "Shared state declared but never established",
+      "messageTemplate": "features include 'shared-state' but no STATE_SNAPSHOT was emitted",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#state-management-events",
+      "specQuote": "These events are used to manage and synchronize the agent's state with the frontend.",
+      "since": "0.x",
+      "feature": "shared-state",
+      "requiresFeature": true,
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI401",
+      "severity": "error",
+      "title": "REASONING_MESSAGE_CONTENT without start",
+      "messageTemplate": "REASONING_MESSAGE_CONTENT for messageId '{messageId}' with no open REASONING_MESSAGE_START",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#reasoningmessagecontent",
+      "specQuote": "Multiple content events with the same messageId should be concatenated to form the complete visible reasoning.",
+      "since": "0.x",
+      "specQuestion": "SQ-4",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI402",
+      "severity": "warning",
+      "title": "Reasoning unterminated at run end",
+      "messageTemplate": "{startType} messageId '{messageId}' never ended",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#reasoning-events",
+      "specQuote": "Reasoning events support LLM reasoning visibility and continuity, enabling chain-of-thought reasoning while maintaining privacy.",
+      "since": "0.x",
+      "specQuestion": "SQ-4",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI501",
+      "severity": "error",
+      "title": "Malformed SSE framing",
+      "messageTemplate": "Malformed SSE framing: {detail}",
+      "specUrl": "https://html.spec.whatwg.org/multipage/server-sent-events.html#event-stream-interpretation",
+      "since": "0.x",
+      "checkedIn": "transport"
+    },
+    {
+      "id": "AGUI502",
+      "severity": "error",
+      "title": "Event payload is not valid JSON",
+      "messageTemplate": "Event payload is not valid JSON: {error}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#base-event-properties",
+      "specQuote": "All events share a common set of base properties.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI503",
+      "severity": "error",
+      "title": "Unknown event type",
+      "messageTemplate": "Unknown event type '{type}' (not in @ag-ui/core v{sdkVersion}, and not RAW or CUSTOM)",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#event-types-overview",
+      "specQuote": "Events in the protocol are categorized by their purpose.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI504",
+      "severity": "error",
+      "title": "Event fails schema validation for its declared type",
+      "messageTemplate": "{type}: {detail}",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#base-event-properties",
+      "specQuote": "All events share a common set of base properties.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI505",
+      "severity": "warning",
+      "title": "Unexpected Content-Type",
+      "messageTemplate": "Content-Type '{contentType}' is neither text/event-stream nor application/x-ndjson",
+      "specUrl": "https://html.spec.whatwg.org/multipage/server-sent-events.html#sse-processing-model",
+      "since": "0.x",
+      "checkedIn": "transport"
+    },
+    {
+      "id": "AGUI506",
+      "severity": "info",
+      "title": "No keepalive frame within the configured window",
+      "messageTemplate": "No event or keepalive frame for {seconds}s",
+      "specUrl": "https://docs.ag-ui.com/concepts/architecture#standard-http-client",
+      "since": "0.x",
+      "specQuestion": "SQ-5",
+      "checkedIn": "transport"
+    },
+    {
+      "id": "AGUI507",
+      "severity": "info",
+      "title": "Response appears buffered rather than incrementally flushed",
+      "messageTemplate": "Response appears buffered: {detail}",
+      "specUrl": "https://docs.ag-ui.com/concepts/architecture#standard-http-client",
+      "since": "0.x",
+      "specQuestion": "SQ-5",
+      "checkedIn": "transport"
+    },
+    {
+      "id": "AGUI508",
+      "severity": "error",
+      "title": "Stream ended without a terminal event",
+      "messageTemplate": "Connection ended mid-run '{runId}' without RUN_FINISHED or RUN_ERROR",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#runfinished",
+      "specQuote": "Every run terminates with either RunFinished or RunError.",
+      "since": "0.x",
+      "checkedIn": "transport"
+    },
+    {
+      "id": "AGUI901",
+      "severity": "info",
+      "title": "RAW event wraps a typed AG-UI event",
+      "messageTemplate": "RAW event wraps an event of type '{wrappedType}', which has a typed AG-UI equivalent",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#raw",
+      "specQuote": "The Raw event acts as a container for events originating from external systems or sources that don't natively follow the Agent UI Protocol.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI902",
+      "severity": "info",
+      "title": "Events carry no timestamps",
+      "messageTemplate": "None of the {eventCount} events carry the optional timestamp property",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#base-event-properties",
+      "specQuote": "timestamp: Optional timestamp indicating when the event was created",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI903",
+      "severity": "info",
+      "title": "CUSTOM event name is not namespaced",
+      "messageTemplate": "CUSTOM event name '{name}' has no namespace prefix (e.g. 'vendor.event')",
+      "specUrl": "https://docs.ag-ui.com/concepts/events#custom",
+      "specQuote": "Teams should document their custom events to ensure consistent implementation across frontends and agents.",
+      "since": "0.x",
+      "specQuestion": "SQ-14",
+      "checkedIn": "core"
+    }
+  ]
+}

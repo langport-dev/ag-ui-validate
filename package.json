@@ -1,0 +1,65 @@
+{
+  "name": "ag-ui-validate",
+  "version": "0.0.0",
+  "description": "Conformance validator for the AG-UI protocol. Feed it an event stream, get every violation with a rule ID, a severity, and a link to the governing spec section.",
+  "keywords": [
+    "ag-ui",
+    "agui",
+    "agent-user-interaction",
+    "conformance",
+    "validator",
+    "protocol",
+    "sse",
+    "agents"
+  ],
+  "license": "MIT",
+  "author": "Faraz (https://langport.dev)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/langport-dev/ag-ui-validate.git"
+  },
+  "homepage": "https://github.com/langport-dev/ag-ui-validate#readme",
+  "bugs": "https://github.com/langport-dev/ag-ui-validate/issues",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p tsconfig.src.json && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@ag-ui/core": "^0.0.58",
+    "@changesets/cli": "^3.0.0",
+    "@types/node": "^26.2.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
