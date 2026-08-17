@@ -219,7 +219,7 @@ Component-by-component instructions live in
 rules are tracked in [docs/spec-questions.md](docs/spec-questions.md).
 
 Adding a rule: add the catalog entry (with its `specUrl`), add the fixture
-stream + intended findings to `scripts/build-fixtures.mjs`, and run
+stream + intended findings to `js/scripts/build-fixtures.mjs`, and run
 `npm run fixtures:build` — the meta-tests fail until both exist. Rule
 *proposals* belong upstream as issues on
 [`ag-ui-protocol/ag-ui`](https://github.com/ag-ui-protocol/ag-ui) first; this

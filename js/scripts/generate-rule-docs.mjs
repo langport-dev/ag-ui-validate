@@ -8,7 +8,7 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 
-const ROOT = fileURLToPath(new URL("..", import.meta.url))
+const ROOT = fileURLToPath(new URL("../..", import.meta.url))
 const catalog = JSON.parse(readFileSync(join(ROOT, "spec/catalog.json"), "utf8"))
 
 const GROUPS = {
@@ -73,7 +73,7 @@ function rulePage(rule) {
   const lines = [
     `# ${rule.id} — ${rule.title}`,
     "",
-    "<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.",
+    "<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.",
     "     Do not edit by hand; run `npm run docs:generate`. -->",
     "",
     `**Severity:** ${rule.severity} · **Group:** ${groupOf(rule.id)} · **Checked in:** ${rule.checkedIn} · **Since:** ${rule.since}`,
@@ -115,7 +115,7 @@ function index() {
   const lines = [
     "# Rule index",
     "",
-    "<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.",
+    "<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.",
     "     Do not edit by hand; run `npm run docs:generate`. -->",
     "",
     `All ${catalog.rules.length} conformance rules, grouped by the part of the`,

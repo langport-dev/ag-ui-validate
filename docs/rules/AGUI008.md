@@ -1,6 +1,6 @@
 # AGUI008 — Unstable threadId/runId across the run
 
-<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** warning · **Group:** Lifecycle · **Checked in:** core · **Since:** 0.x

@@ -9,7 +9,7 @@ import { createRequire } from "node:module"
 
 let validateEndpoint, TransportError
 try {
-  ;({ validateEndpoint, TransportError } = await import("../dist/transport.js"))
+  ;({ validateEndpoint, TransportError } = await import("../../dist/transport.js"))
 } catch {
   console.error("dist/ not found — run `npm run build` first")
   process.exit(2)

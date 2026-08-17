@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url"
 import * as core from "@ag-ui/core"
 import { describe, expect, it } from "vitest"
 
-const FIXTURES = fileURLToPath(new URL("../spec/fixtures/", import.meta.url))
+const FIXTURES = fileURLToPath(new URL("../../spec/fixtures/", import.meta.url))
 
 const lines = (path: string): string[] =>
   readFileSync(path, "utf8")

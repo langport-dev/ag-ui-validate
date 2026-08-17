@@ -1,6 +1,6 @@
 # AGUI901 — RAW event wraps a typed AG-UI event
 
-<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** Protocol hygiene · **Checked in:** core · **Since:** 0.x

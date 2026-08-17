@@ -1,6 +1,6 @@
 # AGUI304 — Mid-run STATE_SNAPSHOT discards accumulated deltas
 
-<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** State · **Checked in:** core · **Since:** 0.x

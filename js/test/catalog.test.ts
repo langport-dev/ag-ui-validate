@@ -20,7 +20,7 @@ describe("rule catalog", () => {
   )
 
   it("only downgraded/ambiguous rules cite spec questions, and all citations resolve", () => {
-    const specQuestions = readFileSync(new URL("../docs/spec-questions.md", import.meta.url), "utf8")
+    const specQuestions = readFileSync(new URL("../../docs/spec-questions.md", import.meta.url), "utf8")
     for (const rule of CATALOG.rules) {
       if (rule.specQuestion) {
         expect(specQuestions, `${rule.id} cites ${rule.specQuestion}`).toContain(`## ${rule.specQuestion}:`)
@@ -53,7 +53,7 @@ describe("rule catalog", () => {
   })
 
   it("every rule has an invalid fixture directory whose expected.json fires it", () => {
-    const root = fileURLToPath(new URL("../spec/fixtures/invalid/", import.meta.url))
+    const root = fileURLToPath(new URL("../../spec/fixtures/invalid/", import.meta.url))
     const dirs = readdirSync(root)
     for (const rule of CATALOG.rules) {
       const dir = dirs.find((d) => d.startsWith(`${rule.id}-`))

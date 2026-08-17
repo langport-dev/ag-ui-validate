@@ -1,6 +1,6 @@
 # AGUI105 — Empty content delta
 
-<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** warning · **Group:** Text messages · **Checked in:** core · **Since:** 0.x

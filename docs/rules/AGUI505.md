@@ -1,6 +1,6 @@
 # AGUI505 — Unexpected Content-Type
 
-<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** warning · **Group:** Transport · **Checked in:** transport · **Since:** 0.x

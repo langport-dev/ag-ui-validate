@@ -12,7 +12,7 @@ import { EVENT_TABLE, createValidator } from "../src/index.js"
 import type { Diagnostic, ValidatorOptions } from "../src/index.js"
 import { validateBody } from "../src/transport/index.js"
 
-const FIXTURES = fileURLToPath(new URL("../spec/fixtures/", import.meta.url))
+const FIXTURES = fileURLToPath(new URL("../../spec/fixtures/", import.meta.url))
 
 function streamLines(path: string): string[] {
   return readFileSync(path, "utf8")

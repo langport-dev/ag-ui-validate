@@ -23,7 +23,7 @@
   "type": "module",
   "sideEffects": [
     "./dist/vitest.js",
-    "./src/vitest/index.ts"
+    "./js/src/vitest/index.ts"
   ],
   "engines": {
     "node": ">=22"
@@ -88,22 +88,22 @@
   },
   "files": [
     "dist",
-    "src",
+    "js/src",
     "spec"
   ],
   "scripts": {
-    "build": "tsdown",
-    "typecheck": "tsc --noEmit -p tsconfig.src.json && tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "fixtures:build": "npm run build && node scripts/build-fixtures.mjs",
-    "protocol:derive": "node scripts/generate-event-table.mjs",
-    "docs:generate": "node scripts/generate-rule-docs.mjs",
-    "docs:check": "node scripts/generate-rule-docs.mjs --check",
-    "demo": "node scripts/demo.mjs",
-    "fuzz": "node scripts/fuzz.mjs",
-    "e2e": "node scripts/e2e-live-server.mjs",
-    "links:check": "node scripts/check-spec-links.mjs",
+    "build": "tsdown --config js/tsdown.config.mjs",
+    "typecheck": "tsc --noEmit -p js/tsconfig.src.json && tsc --noEmit -p js/tsconfig.json",
+    "test": "vitest run --config js/vitest.config.ts",
+    "test:watch": "vitest --config js/vitest.config.ts",
+    "fixtures:build": "npm run build && node js/scripts/build-fixtures.mjs",
+    "protocol:derive": "node js/scripts/generate-event-table.mjs",
+    "docs:generate": "node js/scripts/generate-rule-docs.mjs",
+    "docs:check": "node js/scripts/generate-rule-docs.mjs --check",
+    "demo": "node js/scripts/demo.mjs",
+    "fuzz": "node js/scripts/fuzz.mjs",
+    "e2e": "node js/scripts/e2e-live-server.mjs",
+    "links:check": "node js/scripts/check-spec-links.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "prepublishOnly": "npm run build"

@@ -1,6 +1,6 @@
 # AGUI507 — Response appears buffered rather than incrementally flushed
 
-<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** Transport · **Checked in:** transport · **Since:** 0.x
