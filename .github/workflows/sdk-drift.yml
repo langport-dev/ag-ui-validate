@@ -1,0 +1,112 @@
+name: SDK drift check
+
+# @ag-ui/core is pre-1.0 and will churn. Regular CI only re-derives the
+# protocol event table against whatever version package-lock.json pins, so a
+# new SDK release sits undetected until someone manually bumps the
+# devDependency. This job instead installs the LATEST published @ag-ui/core
+# on a schedule and re-runs the derivation against it:
+#   - a clean diff  -> open a PR with the regenerated event table (and the
+#     devDependency bump) for review;
+#   - a hard failure (new EventType with no CATEGORY mapping, or an
+#     EventType with no derivable schema) -> file an issue, since that needs
+#     a maintainer decision, not just a mechanical regeneration;
+#   - no diff -> no-op.
+#
+# Requires "Allow GitHub Actions to create and approve pull requests" enabled
+# under the repo's Settings > Actions > General (one-time, like npm trusted
+# publishing in publish.yml).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday, 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  check-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+
+      - name: Install latest @ag-ui/core
+        run: npm install @ag-ui/core@latest --save-dev
+
+      - name: Re-derive the protocol event table
+        id: derive
+        run: npm run protocol:derive
+        continue-on-error: true
+
+      - name: Build and test against the new derivation
+        id: verify
+        if: steps.derive.outcome == 'success'
+        run: npm run build && npm test
+        continue-on-error: true
+
+      - name: Read installed @ag-ui/core version
+        if: steps.derive.outcome == 'success'
+        id: sdk
+        run: echo "version=$(node -p "require('./node_modules/@ag-ui/core/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Open a PR with the regenerated table
+        if: steps.derive.outcome == 'success'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "chore: sync protocol event table with @ag-ui/core ${{ steps.sdk.outputs.version }}"
+          title: "SDK drift: @ag-ui/core ${{ steps.sdk.outputs.version }} changed the event schemas"
+          branch: sdk-drift/auto-update
+          delete-branch: true
+          labels: sdk-drift
+          add-paths: |
+            package.json
+            package-lock.json
+            src/protocol/event-table.ts
+          body: |
+            `@ag-ui/core` published a new version (`${{ steps.sdk.outputs.version }}`) whose
+            zod schemas no longer match the checked-in `src/protocol/event-table.ts`. Opened
+            automatically by [`sdk-drift.yml`](../blob/main/.github/workflows/sdk-drift.yml).
+
+            - `npm run build && npm test` against this derivation: **${{ steps.verify.outcome }}**
+
+            Review the diff — new or changed event types may need catalog rules — then merge
+            if it looks correct. If tests failed, something in the SDK's shape changed in a
+            way the validator needs to account for before this is safe to merge.
+
+      - name: File an issue when derivation itself fails
+        if: steps.derive.outcome == 'failure'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const title = "SDK drift: protocol:derive failed against the latest @ag-ui/core"
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "sdk-drift",
+            })
+            if (existing.some((i) => i.title === title)) return
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              labels: ["sdk-drift"],
+              body: [
+                "`npm run protocol:derive` failed against the latest published `@ag-ui/core`.",
+                "",
+                "This usually means a new `EventType` has no `CATEGORY` mapping (or a",
+                "documented `EventType` has no derivable schema) in",
+                "`scripts/generate-event-table.mjs` — that needs a maintainer decision, not",
+                "just a mechanical regeneration.",
+                "",
+                `Failed run: ${runUrl}`,
+              ].join("\n"),
+            })
