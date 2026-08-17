@@ -341,7 +341,7 @@
       "id": "AGUI503",
       "severity": "error",
       "title": "Unknown event type",
-      "messageTemplate": "Unknown event type '{type}' (not in @ag-ui/core v{sdkVersion}, and not RAW or CUSTOM)",
+      "messageTemplate": "Unknown event type '{type}' (not in the installed AG-UI SDK v{sdkVersion}, and not RAW or CUSTOM)",
       "specUrl": "https://docs.ag-ui.com/concepts/events#event-types-overview",
       "specQuote": "Events in the protocol are categorized by their purpose.",
       "since": "0.x",
