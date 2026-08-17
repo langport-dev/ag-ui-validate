@@ -1,6 +1,6 @@
 {
   "name": "ag-ui-validate",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Conformance validator for the AG-UI protocol. Feed it an event stream, get every violation with a rule ID, a severity, and a link to the governing spec section.",
   "keywords": [
     "ag-ui",
