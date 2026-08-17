@@ -108,6 +108,7 @@ describe("pretty grouped", () => {
   it("orders groups by severity, then rule id, and handles stream-level findings", () => {
     const out = formatGroupedDiagnostics([d902, d105, d203], { color: false })
     const order = ["AGUI203", "AGUI105", "AGUI902"].map((r) => out.indexOf(r))
+    expect(order).not.toContain(-1) // every rule id must actually appear, or indexOf(-1) can fake a sorted order
     expect(order).toEqual([...order].sort((a, b) => a - b))
     expect(out).toContain("×1")
     expect(out).toMatch(/stream/) // AGUI902 has no event index
