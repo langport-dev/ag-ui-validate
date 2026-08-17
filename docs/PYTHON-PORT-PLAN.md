@@ -112,6 +112,24 @@ Python derivation tool reads the same source of truth instead of a second
 hand-maintained copy drifting from the JS one. This is a small, low-risk PR independent
 of the port itself and is recommended as a follow-up now rather than something to defer.
 
+That same hoist has a second payoff worth recording: `scripts/check-spec-links.mjs`
+(spec-link verification) currently imports `EVENT_TABLE` from the built JS `dist/`
+purely to read each event's `specUrl` — but every one of those URLs is already a
+*deterministic function* of data that would live in the hoist (`EVENTS_DOC` + wire
+type + schema export name + category), not something zod-derived. Once
+`spec/event-categories.json` exists, `check-spec-links.mjs` no longer needs `dist/`
+at all — it becomes exactly as language-neutral as `generate-rule-docs.mjs`, checking
+one set of URLs that both languages cite identically (the docs pages don't change
+per-SDK). At that point it should move out of `js/scripts/` into the root `scripts/`
+alongside `generate-rule-docs.mjs`, and Python never needs its own copy. Until the
+hoist lands, though, it keeps its `dist/` dependency for real, not just by
+convention — moving it now would just make it a root-level file that still reaches
+into `js/../dist/`, which is worse, not more portable. The other five `js/scripts/`
+tools (`build-fixtures.mjs`, `demo.mjs`, `fuzz.mjs`, `e2e-live-server.mjs`, and the
+zod-introspection trio) don't have this out: they each test *this implementation's*
+validator/transport/build against real behavior, so Python will need its own
+independently-written equivalents (per the milestones below), not a shared file.
+
 Everything else genuinely is a straightforward, low-risk translation.
 
 ---
@@ -319,6 +337,7 @@ Mirrors the TS build order (M0–M9), each independently shippable:
    of locking in 3.11 today?
 6. **`spec/event-categories.json` hoist (§2):** small, independent pre-port cleanup —
    worth doing now as its own PR, or bundle it into PM1 when the derivation tool is
-   actually being written?
+   actually being written? Doing it now also unblocks moving
+   `check-spec-links.mjs` out of `js/scripts/` and into the root `scripts/` (§2).
 7. **Parity CI cadence (§5):** PR-path-filtered + nightly backstop as proposed, or a
    stricter/looser policy given the corpus will keep growing?
