@@ -32,3 +32,6 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ag_ui_validate"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"../spec" = "ag_ui_validate/spec"
