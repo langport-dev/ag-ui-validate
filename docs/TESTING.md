@@ -18,8 +18,14 @@ loudly when missing). Scripts under `js/scripts/` also import from `dist/`.
 
 The JS implementation lives under [js/](../js/) (`js/src/`, `js/test/`,
 `js/scripts/`) — `spec/`, `dist/`, and `package.json` itself stay at the repo
-root. The `npm run <script>` commands below all work unchanged from the repo
-root; to run a single test file directly, use `npm test -- <path-under-js/test>`
+root. `scripts/` at the repo root (not `js/scripts/`) holds tooling that does
+repo-wide, language-neutral work despite being written in Node — currently
+just [`generate-rule-docs.mjs`](../scripts/generate-rule-docs.mjs), which only
+reads `spec/` and writes `docs/`, with no dependency on the JS build; it
+stays put even when a Python implementation lands, unlike `js/scripts/`'s
+other tools, which all depend on `dist/` or `@ag-ui/core`'s zod schemas. The
+`npm run <script>` commands below all work unchanged from the repo root; to
+run a single test file directly, use `npm test -- <path-under-js/test>`
 (shown per-suite below) rather than a bare `npx vitest`, since vitest needs
 `js/vitest.config.ts` to find `js/test/`.
 

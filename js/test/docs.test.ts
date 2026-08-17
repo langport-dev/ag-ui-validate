@@ -1,5 +1,5 @@
 // Rule documentation stays generated, complete, and in sync with the catalog.
-// Pages are emitted by js/scripts/generate-rule-docs.mjs; hand-edits or a stale
+// Pages are emitted by scripts/generate-rule-docs.mjs; hand-edits or a stale
 // regeneration fail the drift check the same way protocol drift does.
 import { execFile } from "node:child_process"
 import { existsSync, readFileSync } from "node:fs"
@@ -66,7 +66,7 @@ describe("drift", () => {
     const r = await new Promise<{ code: number; out: string }>((resolve, reject) => {
       const child = execFile(
         process.execPath,
-        [`${ROOT}js/scripts/generate-rule-docs.mjs`, "--check"],
+        [`${ROOT}scripts/generate-rule-docs.mjs`, "--check"],
         { encoding: "utf8" },
         (error, stdout, stderr) =>
           resolve({ code: error ? 1 : 0, out: `${stdout}${stderr}` }),

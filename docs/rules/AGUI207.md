@@ -1,6 +1,6 @@
 # AGUI207 — TOOL_CALL_RESULT references unknown toolCallId
 
-<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Tool calls · **Checked in:** core · **Since:** 0.x

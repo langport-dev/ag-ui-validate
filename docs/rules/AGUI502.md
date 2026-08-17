@@ -1,6 +1,6 @@
 # AGUI502 — Event payload is not valid JSON
 
-<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Transport · **Checked in:** core · **Since:** 0.x

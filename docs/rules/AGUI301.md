@@ -1,6 +1,6 @@
 # AGUI301 — STATE_DELTA before any STATE_SNAPSHOT
 
-<!-- Generated from spec/catalog.json by js/scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** State · **Checked in:** core · **Since:** 0.x
