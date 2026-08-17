@@ -225,6 +225,12 @@ stream + intended findings to `scripts/build-fixtures.mjs`, and run
 [`ag-ui-protocol/ag-ui`](https://github.com/ag-ui-protocol/ag-ui) first; this
 project does not invent rules the spec doesn't support.
 
+Releasing: merge the pending changesets (`npx changeset version`) via a PR,
+then publish a GitHub release tagged `vX.Y.Z` (matching `package.json`) — the
+[Publish workflow](.github/workflows/publish.yml) typechecks, builds, tests,
+and publishes to npm with provenance via trusted publishing. The workflow
+fails fast if the tag and `package.json` disagree.
+
 ## License
 
 MIT — maintained by [Faraz](https://langport.dev).
