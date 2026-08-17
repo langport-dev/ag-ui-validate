@@ -42,6 +42,11 @@ implicitly closing the message), so "empty delta" cannot be a blanket rule.
 **Question for upstream:** is the docs' "(non-empty)" normative? If so, should the
 SDK schemas enforce it?
 
+**Related upstream:** [#337](https://github.com/ag-ui-protocol/ag-ui/issues/337),
+[#835](https://github.com/ag-ui-protocol/ag-ui/issues/835) — closed as middleware
+bugs, but they show the Python SDK *rejects* empty deltas while the TS SDK
+accepts them, so the SDKs disagree with each other as well as with the docs.
+
 ## SQ-3: Docs vs SDK — `TextMessageStart.role` — open
 
 Two mismatches:
@@ -80,6 +85,10 @@ missing keepalives are a recurring real-world failure (open issues in
 operational risk, not spec violations. Worth proposing as SHOULD-level transport
 guidance upstream; if adopted, these upgrade to `warning`.
 
+**Related upstream:** [#1001](https://github.com/ag-ui-protocol/ag-ui/issues/1001)
+— a per-adapter heartbeat workaround in the ADK middleware; no protocol-level
+guidance exists.
+
 ## SQ-6: Multi-run streams — serialized logs vs live responses — open
 
 [concepts/serialization](https://docs.ag-ui.com/concepts/serialization) is
@@ -95,6 +104,10 @@ flagged (a concatenated capture of two threads would false-positive).
 
 **Question for upstream:** may a live response stream contain multiple sequential
 runs, or only serialized histories?
+
+**Related upstream:** [#2148](https://github.com/ag-ui-protocol/ag-ui/issues/2148)
+— in-flight steering (new `runId` + `parentRunId` vs. reusing the active run) is
+an adjacent scenario whose answer probably decides this too.
 
 ## SQ-7: Draft `META` events — open
 
