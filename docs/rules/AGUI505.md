@@ -1,6 +1,6 @@
 # AGUI505 — Unexpected Content-Type
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** warning · **Group:** Transport · **Checked in:** transport · **Since:** 0.x
@@ -18,8 +18,8 @@ Source: <https://html.spec.whatwg.org/multipage/server-sent-events.html#sse-proc
 
 This rule is checked at the transport layer, so its fixture is a timed
 HTTP replay rather than a bare stream — see
-[`fixtures/invalid/AGUI505-unexpected-content-type`](../../fixtures/invalid/AGUI505-unexpected-content-type) and the replay
-protocol in [fixtures/README.md](../../fixtures/README.md):
+[`spec/fixtures/invalid/AGUI505-unexpected-content-type`](../../spec/fixtures/invalid/AGUI505-unexpected-content-type) and the replay
+protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
 
 ```json
 {

@@ -1,6 +1,6 @@
 # AGUI103 — Text message unterminated at run end
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Text messages · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#text-message-events>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI103-message-unterminated`](../../fixtures/invalid/AGUI103-message-unterminated)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI103-message-unterminated`](../../spec/fixtures/invalid/AGUI103-message-unterminated)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300011000}

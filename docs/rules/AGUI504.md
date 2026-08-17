@@ -1,6 +1,6 @@
 # AGUI504 — Event fails schema validation for its declared type
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Transport · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#base-event-properties>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI504-schema-violation`](../../fixtures/invalid/AGUI504-schema-violation)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI504-schema-violation`](../../spec/fixtures/invalid/AGUI504-schema-violation)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019500}

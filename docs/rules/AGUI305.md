@@ -1,6 +1,6 @@
 # AGUI305 — Shared state declared but never established
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** warning · **Group:** State · **Checked in:** core · **Since:** 0.x
@@ -19,7 +19,7 @@ otherwise it is reported as skipped.
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI305-shared-state-never-established`](../../fixtures/invalid/AGUI305-shared-state-never-established)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI305-shared-state-never-established`](../../spec/fixtures/invalid/AGUI305-shared-state-never-established)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300017900}

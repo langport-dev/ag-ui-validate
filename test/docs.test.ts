@@ -5,7 +5,7 @@ import { execFile } from "node:child_process"
 import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
-import catalog from "../src/rules/catalog.json"
+import catalog from "../spec/catalog.json"
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url))
 const page = (id: string) => `${ROOT}docs/rules/${id}.md`
@@ -35,7 +35,7 @@ describe("per-rule docs pages", () => {
     for (const rule of catalog.rules) {
       const md = readFileSync(page(rule.id), "utf8")
       expect(md, `${rule.id}.md lacks an example section`).toContain("## Example")
-      expect(md).toContain(`fixtures/invalid/${rule.id}-`)
+      expect(md).toContain(`spec/fixtures/invalid/${rule.id}-`)
     }
   })
 })

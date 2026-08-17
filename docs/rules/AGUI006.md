@@ -1,6 +1,6 @@
 # AGUI006 — STEP_FINISHED without matching STEP_STARTED
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Lifecycle · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#stepfinished>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI006-step-finished-unmatched`](../../fixtures/invalid/AGUI006-step-finished-unmatched)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI006-step-finished-unmatched`](../../spec/fixtures/invalid/AGUI006-step-finished-unmatched)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300009600}

@@ -1,6 +1,6 @@
 # AGUI901 — RAW event wraps a typed AG-UI event
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** Protocol hygiene · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#raw>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI901-raw-wraps-typed-event`](../../fixtures/invalid/AGUI901-raw-wraps-typed-event)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI901-raw-wraps-typed-event`](../../spec/fixtures/invalid/AGUI901-raw-wraps-typed-event)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019900}

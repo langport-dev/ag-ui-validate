@@ -1,6 +1,6 @@
 # AGUI001 — Run does not start with RUN_STARTED
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Lifecycle · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#runstarted>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI001-first-event-not-run-started`](../../fixtures/invalid/AGUI001-first-event-not-run-started)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI001-first-event-not-run-started`](../../spec/fixtures/invalid/AGUI001-first-event-not-run-started)):
 
 ```jsonl
 {"type":"TEXT_MESSAGE_START","messageId":"msg_001","role":"assistant","timestamp":1755300007900}

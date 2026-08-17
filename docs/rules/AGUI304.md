@@ -1,6 +1,6 @@
 # AGUI304 — Mid-run STATE_SNAPSHOT discards accumulated deltas
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** State · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#statesnapshot>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI304-midrun-snapshot-discards-deltas`](../../fixtures/invalid/AGUI304-midrun-snapshot-discards-deltas)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI304-midrun-snapshot-discards-deltas`](../../spec/fixtures/invalid/AGUI304-midrun-snapshot-discards-deltas)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300017400}

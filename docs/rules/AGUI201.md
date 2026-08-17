@@ -1,6 +1,6 @@
 # AGUI201 — TOOL_CALL_ARGS without start
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Tool calls · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#tool-call-events>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI201-args-without-start`](../../fixtures/invalid/AGUI201-args-without-start)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI201-args-without-start`](../../spec/fixtures/invalid/AGUI201-args-without-start)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300013000}

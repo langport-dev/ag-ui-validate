@@ -1,10 +1,10 @@
-// The fixture runner: the corpus in fixtures/ is the test suite. Adding a
-// rule means adding a fixture directory, not writing a test.
+// The fixture runner: the corpus in spec/fixtures/ is the test suite. Adding
+// a rule means adding a fixture directory, not writing a test.
 //
-// Protocol (language-neutral, see fixtures/README.md): feed every non-empty
-// line of the .jsonl as a RAW STRING (so malformed-JSON fixtures reach the
-// parser), finalize, and deep-compare the report's diagnostics against
-// expected.json.
+// Protocol (language-neutral, see spec/fixtures/README.md): feed every
+// non-empty line of the .jsonl as a RAW STRING (so malformed-JSON fixtures
+// reach the parser), finalize, and deep-compare the report's diagnostics
+// against expected.json.
 import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
@@ -12,7 +12,7 @@ import { EVENT_TABLE, createValidator } from "../src/index.js"
 import type { Diagnostic, ValidatorOptions } from "../src/index.js"
 import { validateBody } from "../src/transport/index.js"
 
-const FIXTURES = fileURLToPath(new URL("../fixtures/", import.meta.url))
+const FIXTURES = fileURLToPath(new URL("../spec/fixtures/", import.meta.url))
 
 function streamLines(path: string): string[] {
   return readFileSync(path, "utf8")
@@ -67,7 +67,7 @@ interface TransportScenario {
 }
 
 // Transport fixtures describe an HTTP response body as timed byte chunks; a
-// simulated clock advances by each chunk's gapMs (see fixtures/README.md).
+// simulated clock advances by each chunk's gapMs (see spec/fixtures/README.md).
 async function runScenario(scenario: TransportScenario): Promise<Diagnostic[]> {
   const encoder = new TextEncoder()
   const clock = { t: 0 }

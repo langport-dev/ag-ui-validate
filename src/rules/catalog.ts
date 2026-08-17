@@ -6,7 +6,7 @@
 // malformed catalog is a programming error in this package, so the loader
 // throws loudly at import time.
 
-import catalogJson from "./catalog.json"
+import catalogJson from "../../spec/catalog.json"
 
 export type Severity = "error" | "warning" | "info"
 export type SeverityOrOff = Severity | "off"

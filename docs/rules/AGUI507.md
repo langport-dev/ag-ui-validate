@@ -1,6 +1,6 @@
 # AGUI507 — Response appears buffered rather than incrementally flushed
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** Transport · **Checked in:** transport · **Since:** 0.x
@@ -22,8 +22,8 @@ accordingly (false positives are worse than false negatives).
 
 This rule is checked at the transport layer, so its fixture is a timed
 HTTP replay rather than a bare stream — see
-[`fixtures/invalid/AGUI507-buffered-response`](../../fixtures/invalid/AGUI507-buffered-response) and the replay
-protocol in [fixtures/README.md](../../fixtures/README.md):
+[`spec/fixtures/invalid/AGUI507-buffered-response`](../../spec/fixtures/invalid/AGUI507-buffered-response) and the replay
+protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
 
 ```json
 {

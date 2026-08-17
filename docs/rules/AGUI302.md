@@ -1,6 +1,6 @@
 # AGUI302 — STATE_DELTA failed to apply
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** State · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#statedelta>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI302-delta-failed-to-apply`](../../fixtures/invalid/AGUI302-delta-failed-to-apply)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI302-delta-failed-to-apply`](../../spec/fixtures/invalid/AGUI302-delta-failed-to-apply)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300016600}

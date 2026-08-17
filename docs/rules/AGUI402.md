@@ -1,6 +1,6 @@
 # AGUI402 — Reasoning unterminated at run end
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** warning · **Group:** Reasoning · **Checked in:** core · **Since:** 0.x
@@ -19,7 +19,7 @@ accordingly (false positives are worse than false negatives).
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI402-reasoning-unterminated`](../../fixtures/invalid/AGUI402-reasoning-unterminated)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI402-reasoning-unterminated`](../../spec/fixtures/invalid/AGUI402-reasoning-unterminated)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300018700}

@@ -1,6 +1,6 @@
 # AGUI005 — RUN_FINISHED and RUN_ERROR are mutually exclusive
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Lifecycle · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#runfinished>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI005-finished-and-error`](../../fixtures/invalid/AGUI005-finished-and-error)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI005-finished-and-error`](../../spec/fixtures/invalid/AGUI005-finished-and-error)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300009300}

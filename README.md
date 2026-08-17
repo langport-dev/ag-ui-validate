@@ -173,7 +173,7 @@ import { formatReportSummary, toSarif, toJUnit } from "ag-ui-validate/report"
 ## The rule catalog
 
 40 rules, maintained as **data** in
-[src/rules/catalog.json](src/rules/catalog.json) so other implementations
+[spec/catalog.json](spec/catalog.json) so other implementations
 (Python, Go, …) can share them. Every rule has its own page — spec grounding,
 severity, and a violating example from the corpus — in the
 **[rule index](docs/rules/README.md)** (generated from the catalog,
@@ -195,7 +195,7 @@ drift-tested against the installed SDK on every run.
 
 ## The fixture corpus
 
-[fixtures/](fixtures/README.md) is a language-neutral conformance corpus:
+[spec/fixtures/](spec/fixtures/README.md) is a language-neutral conformance corpus:
 7 valid streams (one per canonical AG-UI feature — the false-positive guards)
 and 40 invalid fixtures (one per rule) with exact expected diagnostics. Any
 validator implementation that consumes the shared catalog can be tested

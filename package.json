@@ -88,7 +88,8 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "spec"
   ],
   "scripts": {
     "build": "tsdown",
