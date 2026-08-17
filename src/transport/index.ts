@@ -1,7 +1,7 @@
 // ag-ui-validate/transport: SSE + NDJSON clients over the pure core.
 // This is the I/O layer — fetch, streams, and clocks live here, never in the
 // core. Uses only web-platform APIs (fetch, TextDecoder, AbortController) so
-// it stays isomorphic: Node 20+, browsers, Deno, Workers.
+// it stays isomorphic: Node 22+, browsers, Deno, Workers.
 
 import { createValidator } from "../index.js"
 import type { Diagnostic, Report, ValidationLayer, ValidatorOptions } from "../index.js"

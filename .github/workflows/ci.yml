@@ -6,9 +6,7 @@ on:
   pull_request:
 
 jobs:
-  # tsdown (the build tool) needs Node 22+; the built output targets es2022
-  # and supports Node 20+ at runtime, which the test matrix below proves.
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,33 +17,15 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+      - run: npm test
       - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
           include-hidden-files: true
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x, 22.x]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: npm
-      - run: npm ci
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      - run: npm test
-
   action-self-test:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
