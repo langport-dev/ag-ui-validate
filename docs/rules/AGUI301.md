@@ -1,6 +1,6 @@
 # AGUI301 — STATE_DELTA before any STATE_SNAPSHOT
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** State · **Checked in:** core · **Since:** 0.x
@@ -19,7 +19,7 @@ accordingly (false positives are worse than false negatives).
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI301-delta-before-snapshot`](../../fixtures/invalid/AGUI301-delta-before-snapshot)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI301-delta-before-snapshot`](../../spec/fixtures/invalid/AGUI301-delta-before-snapshot)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300016300}

@@ -1,6 +1,6 @@
 # AGUI503 — Unknown event type
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Transport · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#event-types-overview>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI503-unknown-event-type`](../../fixtures/invalid/AGUI503-unknown-event-type)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI503-unknown-event-type`](../../spec/fixtures/invalid/AGUI503-unknown-event-type)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019200}

@@ -1,6 +1,6 @@
 # AGUI207 — TOOL_CALL_RESULT references unknown toolCallId
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Tool calls · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#toolcallresult>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI207-result-unknown-id`](../../fixtures/invalid/AGUI207-result-unknown-id)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI207-result-unknown-id`](../../spec/fixtures/invalid/AGUI207-result-unknown-id)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300015600}

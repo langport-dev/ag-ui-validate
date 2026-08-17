@@ -42,14 +42,14 @@ jobs:
         id: good
         uses: ./action
         with:
-          target: fixtures/valid/agentic-chat.jsonl
+          target: spec/fixtures/valid/agentic-chat.jsonl
           version: local
       - name: action fails on a violating stream
         id: bad
         uses: ./action
         continue-on-error: true
         with:
-          target: fixtures/invalid/AGUI203-unterminated-tool-call/stream.jsonl
+          target: spec/fixtures/invalid/AGUI203-unterminated-tool-call/stream.jsonl
           version: local
           sarif-file: agui.sarif
       - name: assert the failing run behaved as documented

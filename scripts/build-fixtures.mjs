@@ -1,4 +1,4 @@
-// Builds the language-neutral fixture corpus (fixtures/).
+// Builds the language-neutral fixture corpus (spec/fixtures/).
 //
 // Each fixture below declares its event stream AND the exact rule IDs it is
 // intended to fire, written independently of the validator. The script runs
@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url"
 import { createValidator } from "../dist/index.js"
 import { validateBody } from "../dist/transport.js"
 
-const FIXTURES = fileURLToPath(new URL("../fixtures/", import.meta.url))
+const FIXTURES = fileURLToPath(new URL("../spec/fixtures/", import.meta.url))
 
 let ts = 1755300000000
 const t = () => (ts += 100)

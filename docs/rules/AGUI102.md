@@ -1,6 +1,6 @@
 # AGUI102 — TEXT_MESSAGE_END without start
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Text messages · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#textmessageend>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI102-end-without-start`](../../fixtures/invalid/AGUI102-end-without-start)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI102-end-without-start`](../../spec/fixtures/invalid/AGUI102-end-without-start)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300010700}

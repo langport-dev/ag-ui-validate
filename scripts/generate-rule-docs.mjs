@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Generates docs/rules/*.md (one page per rule), docs/rules/README.md (the
-// index), and llms.txt from src/rules/catalog.json + the fixture corpus.
+// index), and llms.txt from spec/catalog.json + the fixture corpus.
 // Deterministic: same inputs, byte-identical output. `--check` regenerates in
 // memory and fails on any drift, so the pages can never fall out of sync with
 // the catalog (test/docs.test.ts runs it in CI).
@@ -9,7 +9,7 @@ import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url))
-const catalog = JSON.parse(readFileSync(join(ROOT, "src/rules/catalog.json"), "utf8"))
+const catalog = JSON.parse(readFileSync(join(ROOT, "spec/catalog.json"), "utf8"))
 
 const GROUPS = {
   0: "Lifecycle",
@@ -22,7 +22,7 @@ const GROUPS = {
 }
 const groupOf = (id) => GROUPS[Number(id[4])] ?? "Other"
 
-const fixtureDirs = readdirSync(join(ROOT, "fixtures/invalid"))
+const fixtureDirs = readdirSync(join(ROOT, "spec/fixtures/invalid"))
 const fixtureFor = (id) => {
   const dir = fixtureDirs.find((d) => d.startsWith(`${id}-`))
   if (dir === undefined) throw new Error(`no fixture directory for ${id}`)
@@ -33,12 +33,12 @@ const MAX_EXAMPLE_LINES = 30
 
 function exampleSection(rule) {
   const dir = fixtureFor(rule.id)
-  const base = join(ROOT, "fixtures/invalid", dir)
+  const base = join(ROOT, "spec/fixtures/invalid", dir)
   const files = readdirSync(base)
   const lines = [`## Example`, ""]
   if (files.includes("stream.jsonl")) {
     lines.push(
-      `A violating stream from the corpus ([\`fixtures/invalid/${dir}\`](../../fixtures/invalid/${dir})):`,
+      `A violating stream from the corpus ([\`spec/fixtures/invalid/${dir}\`](../../spec/fixtures/invalid/${dir})):`,
       "",
       "```jsonl",
     )
@@ -52,8 +52,8 @@ function exampleSection(rule) {
     lines.push(
       `This rule is checked at the transport layer, so its fixture is a timed`,
       `HTTP replay rather than a bare stream — see`,
-      `[\`fixtures/invalid/${dir}\`](../../fixtures/invalid/${dir}) and the replay`,
-      `protocol in [fixtures/README.md](../../fixtures/README.md):`,
+      `[\`spec/fixtures/invalid/${dir}\`](../../spec/fixtures/invalid/${dir}) and the replay`,
+      `protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):`,
       "",
       "```json",
       readFileSync(join(base, "scenario.json"), "utf8").trimEnd(),
@@ -73,7 +73,7 @@ function rulePage(rule) {
   const lines = [
     `# ${rule.id} — ${rule.title}`,
     "",
-    "<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.",
+    "<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.",
     "     Do not edit by hand; run `npm run docs:generate`. -->",
     "",
     `**Severity:** ${rule.severity} · **Group:** ${groupOf(rule.id)} · **Checked in:** ${rule.checkedIn} · **Since:** ${rule.since}`,
@@ -115,7 +115,7 @@ function index() {
   const lines = [
     "# Rule index",
     "",
-    "<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.",
+    "<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.",
     "     Do not edit by hand; run `npm run docs:generate`. -->",
     "",
     `All ${catalog.rules.length} conformance rules, grouped by the part of the`,
@@ -152,7 +152,7 @@ function llmsTxt() {
     "- [Rule index](docs/rules/README.md): all rules by group with severities",
     "- [Spec questions](docs/spec-questions.md): tracked ambiguities in the AG-UI spec",
     "- [Testing guide](docs/TESTING.md): how every layer is verified",
-    "- [Fixture corpus](fixtures/README.md): language-neutral valid/invalid streams and the replay protocol",
+    "- [Fixture corpus](spec/fixtures/README.md): language-neutral valid/invalid streams and the replay protocol",
     "",
     "## Rules",
     "",

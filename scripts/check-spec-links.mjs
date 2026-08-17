@@ -13,7 +13,7 @@ try {
   process.exit(2)
 }
 
-const catalog = JSON.parse(readFileSync(new URL("../src/rules/catalog.json", import.meta.url), "utf8"))
+const catalog = JSON.parse(readFileSync(new URL("../spec/catalog.json", import.meta.url), "utf8"))
 
 const urls = new Set(catalog.rules.map((r) => r.specUrl))
 for (const spec of Object.values(EVENT_TABLE)) urls.add(spec.specUrl)

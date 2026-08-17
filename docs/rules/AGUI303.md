@@ -1,6 +1,6 @@
 # AGUI303 — STATE_DELTA is not a valid RFC 6902 patch document
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** State · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#statedelta>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI303-invalid-patch-document`](../../fixtures/invalid/AGUI303-invalid-patch-document)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI303-invalid-patch-document`](../../spec/fixtures/invalid/AGUI303-invalid-patch-document)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300017000}

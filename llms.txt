@@ -12,7 +12,7 @@
 - [Rule index](docs/rules/README.md): all rules by group with severities
 - [Spec questions](docs/spec-questions.md): tracked ambiguities in the AG-UI spec
 - [Testing guide](docs/TESTING.md): how every layer is verified
-- [Fixture corpus](fixtures/README.md): language-neutral valid/invalid streams and the replay protocol
+- [Fixture corpus](spec/fixtures/README.md): language-neutral valid/invalid streams and the replay protocol
 
 ## Rules
 

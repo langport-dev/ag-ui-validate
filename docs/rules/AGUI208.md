@@ -1,6 +1,6 @@
 # AGUI208 — parentMessageId references unknown message
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** info · **Group:** Tool calls · **Checked in:** core · **Since:** 0.x
@@ -19,7 +19,7 @@ accordingly (false positives are worse than false negatives).
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI208-unknown-parent-message-id`](../../fixtures/invalid/AGUI208-unknown-parent-message-id)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI208-unknown-parent-message-id`](../../spec/fixtures/invalid/AGUI208-unknown-parent-message-id)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300015900}

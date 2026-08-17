@@ -1,6 +1,6 @@
 # AGUI106 — Interleaved message streams sharing a messageId
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Text messages · **Checked in:** core · **Since:** 0.x
@@ -15,7 +15,7 @@ Source: <https://docs.ag-ui.com/concepts/events#implementation-considerations>
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI106-interleaved-same-message-id`](../../fixtures/invalid/AGUI106-interleaved-same-message-id)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI106-interleaved-same-message-id`](../../spec/fixtures/invalid/AGUI106-interleaved-same-message-id)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300012500}

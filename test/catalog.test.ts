@@ -53,11 +53,11 @@ describe("rule catalog", () => {
   })
 
   it("every rule has an invalid fixture directory whose expected.json fires it", () => {
-    const root = fileURLToPath(new URL("../fixtures/invalid/", import.meta.url))
+    const root = fileURLToPath(new URL("../spec/fixtures/invalid/", import.meta.url))
     const dirs = readdirSync(root)
     for (const rule of CATALOG.rules) {
       const dir = dirs.find((d) => d.startsWith(`${rule.id}-`))
-      expect(dir, `${rule.id} has no fixtures/invalid/${rule.id}-*/ directory`).toBeDefined()
+      expect(dir, `${rule.id} has no spec/fixtures/invalid/${rule.id}-*/ directory`).toBeDefined()
       const expected = JSON.parse(readFileSync(`${root}${dir}/expected.json`, "utf8")) as { rule: string }[]
       expect(
         expected.map((d) => d.rule),

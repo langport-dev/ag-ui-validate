@@ -1,6 +1,6 @@
 # AGUI401 — REASONING_MESSAGE_CONTENT without start
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Reasoning · **Checked in:** core · **Since:** 0.x
@@ -19,7 +19,7 @@ accordingly (false positives are worse than false negatives).
 
 ## Example
 
-A violating stream from the corpus ([`fixtures/invalid/AGUI401-reasoning-content-without-start`](../../fixtures/invalid/AGUI401-reasoning-content-without-start)):
+A violating stream from the corpus ([`spec/fixtures/invalid/AGUI401-reasoning-content-without-start`](../../spec/fixtures/invalid/AGUI401-reasoning-content-without-start)):
 
 ```jsonl
 {"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300018400}

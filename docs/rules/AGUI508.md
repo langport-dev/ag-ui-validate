@@ -1,6 +1,6 @@
 # AGUI508 — Stream ended without a terminal event
 
-<!-- Generated from src/rules/catalog.json by scripts/generate-rule-docs.mjs.
+<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
 **Severity:** error · **Group:** Transport · **Checked in:** transport · **Since:** 0.x
@@ -17,8 +17,8 @@ Source: <https://docs.ag-ui.com/concepts/events#runfinished>
 
 This rule is checked at the transport layer, so its fixture is a timed
 HTTP replay rather than a bare stream — see
-[`fixtures/invalid/AGUI508-connection-dropped`](../../fixtures/invalid/AGUI508-connection-dropped) and the replay
-protocol in [fixtures/README.md](../../fixtures/README.md):
+[`spec/fixtures/invalid/AGUI508-connection-dropped`](../../spec/fixtures/invalid/AGUI508-connection-dropped) and the replay
+protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
 
 ```json
 {
