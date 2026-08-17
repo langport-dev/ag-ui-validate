@@ -5,7 +5,7 @@
 
 let createValidator
 try {
-  ;({ createValidator } = await import("../dist/index.js"))
+  ;({ createValidator } = await import("../../dist/index.js"))
 } catch {
   console.error("dist/ not found — run `npm run build` first")
   process.exit(2)

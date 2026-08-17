@@ -10,10 +10,10 @@
 
 import { mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
-import { createValidator } from "../dist/index.js"
-import { validateBody } from "../dist/transport.js"
+import { createValidator } from "../../dist/index.js"
+import { validateBody } from "../../dist/transport.js"
 
-const FIXTURES = fileURLToPath(new URL("../spec/fixtures/", import.meta.url))
+const FIXTURES = fileURLToPath(new URL("../../spec/fixtures/", import.meta.url))
 
 let ts = 1755300000000
 const t = () => (ts += 100)

@@ -6,8 +6,8 @@ import { promisify } from "node:util"
 import { describe, expect, it } from "vitest"
 
 const run = promisify(execFile)
-const CLI = new URL("../../dist/cli.js", import.meta.url).pathname
-const fixture = (p: string) => new URL(`../../spec/fixtures/${p}`, import.meta.url).pathname
+const CLI = new URL("../../../dist/cli.js", import.meta.url).pathname
+const fixture = (p: string) => new URL(`../../../spec/fixtures/${p}`, import.meta.url).pathname
 
 async function cli(args: string[], opts: { stdin?: string } = {}) {
   return new Promise<{ code: number; stdout: string; stderr: string }>((resolve, reject) => {

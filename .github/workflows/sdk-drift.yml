@@ -68,10 +68,10 @@ jobs:
           add-paths: |
             package.json
             package-lock.json
-            src/protocol/event-table.ts
+            js/src/protocol/event-table.ts
           body: |
             `@ag-ui/core` published a new version (`${{ steps.sdk.outputs.version }}`) whose
-            zod schemas no longer match the checked-in `src/protocol/event-table.ts`. Opened
+            zod schemas no longer match the checked-in `js/src/protocol/event-table.ts`. Opened
             automatically by [`sdk-drift.yml`](../blob/main/.github/workflows/sdk-drift.yml).
 
             - `npm run build && npm test` against this derivation: **${{ steps.verify.outcome }}**
@@ -104,7 +104,7 @@ jobs:
                 "",
                 "This usually means a new `EventType` has no `CATEGORY` mapping (or a",
                 "documented `EventType` has no derivable schema) in",
-                "`scripts/generate-event-table.mjs` — that needs a maintainer decision, not",
+                "`js/scripts/generate-event-table.mjs` — that needs a maintainer decision, not",
                 "just a mechanical regeneration.",
                 "",
                 `Failed run: ${runUrl}`,

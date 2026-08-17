@@ -8,9 +8,9 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
-const CLI = new URL("../../dist/cli.js", import.meta.url).pathname
-const RUN_MJS = new URL("../../action/run.mjs", import.meta.url).pathname
-const fixture = (p: string) => new URL(`../../spec/fixtures/${p}`, import.meta.url).pathname
+const CLI = new URL("../../../dist/cli.js", import.meta.url).pathname
+const RUN_MJS = new URL("../../../action/run.mjs", import.meta.url).pathname
+const fixture = (p: string) => new URL(`../../../spec/fixtures/${p}`, import.meta.url).pathname
 
 let dir: string
 beforeEach(() => {

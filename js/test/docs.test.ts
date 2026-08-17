@@ -5,9 +5,9 @@ import { execFile } from "node:child_process"
 import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
-import catalog from "../spec/catalog.json"
+import catalog from "../../spec/catalog.json"
 
-const ROOT = fileURLToPath(new URL("..", import.meta.url))
+const ROOT = fileURLToPath(new URL("../..", import.meta.url))
 const page = (id: string) => `${ROOT}docs/rules/${id}.md`
 
 describe("per-rule docs pages", () => {
