@@ -1,0 +1,49 @@
+name: Publish to PyPI
+
+# Publishes the Python package (py/) to PyPI when a GitHub release tagged
+# "python-vX.Y.Z" is published. Auth is PyPI Trusted Publishing (OIDC): no
+# token secret — pypi.org has a pending publisher configured (one-time,
+# scoped to this repo + this workflow filename, no environment) that will
+# activate on this workflow's first successful run, minting a short-lived
+# credential per run.
+#
+# Deliberately its own tag prefix rather than sharing plain "vX.Y.Z" with
+# publish.yml (npm): the JS and Python packages version independently (the
+# JS package is already well past 0.0.x; this one is a name-reservation
+# placeholder today), so an ordinary npm release must not also attempt a
+# PyPI publish of an unrelated version. The `if:` below makes that a clean
+# no-op rather than a failed job on every npm release.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # required for PyPI trusted publishing
+
+jobs:
+  publish:
+    if: startsWith(github.event.release.tag_name, 'python-v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Release tag must match py/pyproject.toml
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          PKG="python-v$(python -c "import re; print(re.search(r'(?m)^version = \"([^\"]+)\"', open('py/pyproject.toml').read()).group(1))")"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::release tag $TAG does not match py/pyproject.toml $PKG — bump the version, merge, then re-tag"
+            exit 1
+          fi
+
+      - run: pip install build
+      - run: python -m build py --outdir py/dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: py/dist
