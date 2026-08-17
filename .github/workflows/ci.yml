@@ -52,4 +52,4 @@ jobs:
           test "${{ steps.bad.outcome }}" = "failure"
           test "${{ steps.bad.outputs.errors }}" = "1"
           test "${{ steps.good.outputs.errors }}" = "0"
-          node -e "const s = require('./agui.sarif'); if (s.version !== '2.1.0') process.exit(1)"
+          node -e "const s = JSON.parse(require('node:fs').readFileSync('./agui.sarif', 'utf8')); if (s.version !== '2.1.0') process.exit(1)"

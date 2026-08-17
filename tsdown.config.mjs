@@ -1,3 +1,6 @@
+// Plain .mjs (not .ts): the config must load on Node 20, which cannot strip
+// TypeScript types natively and tsdown's optional TS-config loader is not a
+// dependency we want.
 import { defineConfig } from "tsdown"
 
 export default defineConfig([
