@@ -22,5 +22,13 @@ Homepage = "https://github.com/langport-dev/ag-ui-validate"
 Repository = "https://github.com/langport-dev/ag-ui-validate"
 Issues = "https://github.com/langport-dev/ag-ui-validate/issues"
 
+[project.optional-dependencies]
+dev = [
+  # Official pydantic-based AG-UI SDK — devDependency only, mirrors @ag-ui/core's
+  # role on the TS side (protocol derivation + drift tests). Never a runtime dep.
+  "ag-ui-protocol>=0.1.0",
+  "pytest>=8.0.0",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/ag_ui_validate"]

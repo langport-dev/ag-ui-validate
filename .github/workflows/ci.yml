@@ -24,6 +24,18 @@ jobs:
           path: dist/
           include-hidden-files: true
 
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+        working-directory: py
+      - run: pytest
+        working-directory: py
+
   action-self-test:
     needs: test
     runs-on: ubuntu-latest
