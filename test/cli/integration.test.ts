@@ -91,6 +91,34 @@ describe.skipIf(!existsSync(CLI))("cli integration (dist/cli.js)", () => {
     expect(r.stdout).toContain("--max-warnings")
   })
 
+  it("--group collapses repeated findings but keeps totals correct", async () => {
+    const { mkdtempSync, rmSync, writeFileSync } = await import("node:fs")
+    const { tmpdir } = await import("node:os")
+    const { join } = await import("node:path")
+    const dir = mkdtempSync(join(tmpdir(), "agui-group-"))
+    try {
+      // three empty deltas -> three AGUI105 warnings
+      const events = [
+        { type: "RUN_STARTED", threadId: "t", runId: "r", timestamp: 1 },
+        { type: "TEXT_MESSAGE_START", messageId: "m1", role: "assistant", timestamp: 2 },
+        { type: "TEXT_MESSAGE_CONTENT", messageId: "m1", delta: "", timestamp: 3 },
+        { type: "TEXT_MESSAGE_CONTENT", messageId: "m1", delta: "", timestamp: 4 },
+        { type: "TEXT_MESSAGE_CONTENT", messageId: "m1", delta: "", timestamp: 5 },
+        { type: "TEXT_MESSAGE_END", messageId: "m1", timestamp: 6 },
+        { type: "RUN_FINISHED", threadId: "t", runId: "r", timestamp: 7 },
+      ]
+      const file = join(dir, "dups.jsonl")
+      writeFileSync(file, `${events.map((e) => JSON.stringify(e)).join("\n")}\n`)
+      const r = await cli([file, "--group"])
+      expect(r.code).toBe(0)
+      expect(r.stdout.split("AGUI105").length - 1).toBe(1) // one grouped line, not three
+      expect(r.stdout).toContain("×3")
+      expect(r.stdout).toContain("3 warnings") // summary totals unchanged
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   it("file-output flags write all requested formats in a single run", async () => {
     const { mkdtempSync, readFileSync, rmSync } = await import("node:fs")
     const { tmpdir } = await import("node:os")

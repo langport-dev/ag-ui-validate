@@ -20,6 +20,8 @@ export interface CliConfig {
   sarifFile?: string
   junitFile?: string
   jsonFile?: string
+  /** Pretty output only: one line per rule with a count, not one per finding. */
+  group: boolean
   help: boolean
   version: boolean
 }
@@ -40,6 +42,7 @@ Output (default: human-readable):
   --json-file <path>              additionally write the JSON report to a file
   --sarif-file <path>             additionally write a SARIF log to a file
   --junit-file <path>             additionally write JUnit XML to a file
+  --group                         one line per rule with a count (large streams)
   --no-color                      disable ANSI colors
 
 Rules:
@@ -67,6 +70,7 @@ const FLAGS: Record<string, Flag> = {
   "--help": { takesValue: false, apply: (c) => ((c.help = true), null) },
   "--version": { takesValue: false, apply: (c) => ((c.version = true), null) },
   "--no-color": { takesValue: false, apply: (c) => ((c.color = false), null) },
+  "--group": { takesValue: false, apply: (c) => ((c.group = true), null) },
   "--json": { takesValue: false, apply: (c) => setFormat(c, "json") },
   "--sarif": { takesValue: false, apply: (c) => setFormat(c, "sarif") },
   "--junit": { takesValue: false, apply: (c) => setFormat(c, "junit") },
@@ -150,6 +154,7 @@ export function parseCliArgs(argv: string[]): ParseResult {
     color: null,
     headers: {},
     severityOverrides: {},
+    group: false,
     help: false,
     version: false,
   }
@@ -182,6 +187,12 @@ export function parseCliArgs(argv: string[]): ParseResult {
     if (error !== null) return { ok: false, error }
   }
 
+  if (config.group && config.format !== "pretty") {
+    return {
+      ok: false,
+      error: "--group only applies to the default pretty output, not --json/--sarif/--junit",
+    }
+  }
   if (targets.length > 1) {
     return { ok: false, error: `expected exactly one target, got ${targets.length}` }
   }

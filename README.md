@@ -66,6 +66,7 @@ Useful flags (see `--help` for all):
 | Flag | Effect |
 | --- | --- |
 | `--json` / `--sarif` / `--junit` | machine-readable report on stdout (SARIF 2.1.0 for code scanning, JUnit XML for CI) |
+| `--group` | one line per rule with a count — for large streams with repeated findings (totals stay exact) |
 | `--rule AGUI105=error`, `--off AGUI902` | per-rule severity overrides |
 | `--features shared-state,...` | declare exercised features (enables e.g. AGUI305) |
 | `--max-warnings 0` | fail CI on any warning |
