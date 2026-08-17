@@ -5,7 +5,7 @@
 
 **Severity:** error · **Group:** Transport · **Checked in:** core · **Since:** 0.x
 
-**Message:** `Unknown event type '{type}' (not in @ag-ui/core v{sdkVersion}, and not RAW or CUSTOM)`
+**Message:** `Unknown event type '{type}' (not in the installed AG-UI SDK v{sdkVersion}, and not RAW or CUSTOM)`
 
 ## Spec grounding
 
@@ -25,4 +25,4 @@ A violating stream from the corpus ([`spec/fixtures/invalid/AGUI503-unknown-even
 
 Expected findings:
 
-- `error` AGUI503 at event 1 — Unknown event type 'AGUI_PING' (not in @ag-ui/core v0.0.58, and not RAW or CUSTOM)
+- `error` AGUI503 at event 1 — Unknown event type 'AGUI_PING' (not in the installed AG-UI SDK v0.0.58, and not RAW or CUSTOM)
