@@ -4,7 +4,7 @@
 // The generated file is checked in so the core stays dependency-free at
 // runtime; test/protocol-drift.test.ts fails when it drifts from the SDK.
 
-import { writeFileSync } from "node:fs"
+import { readFileSync, writeFileSync } from "node:fs"
 import { createRequire } from "node:module"
 import { deriveEventTable } from "./derive-lib.mjs"
 
@@ -12,33 +12,11 @@ const require = createRequire(import.meta.url)
 const core = require("@ag-ui/core")
 const sdkVersion = require("@ag-ui/core/package.json").version
 
-const CATEGORY = {
-  RUN_STARTED: "lifecycle", RUN_FINISHED: "lifecycle", RUN_ERROR: "lifecycle",
-  STEP_STARTED: "lifecycle", STEP_FINISHED: "lifecycle",
-  TEXT_MESSAGE_START: "text", TEXT_MESSAGE_CONTENT: "text",
-  TEXT_MESSAGE_END: "text", TEXT_MESSAGE_CHUNK: "text",
-  TOOL_CALL_START: "toolcall", TOOL_CALL_ARGS: "toolcall", TOOL_CALL_END: "toolcall",
-  TOOL_CALL_CHUNK: "toolcall", TOOL_CALL_RESULT: "toolcall",
-  STATE_SNAPSHOT: "state", STATE_DELTA: "state", MESSAGES_SNAPSHOT: "state",
-  ACTIVITY_SNAPSHOT: "activity", ACTIVITY_DELTA: "activity",
-  REASONING_START: "reasoning", REASONING_MESSAGE_START: "reasoning",
-  REASONING_MESSAGE_CONTENT: "reasoning", REASONING_MESSAGE_END: "reasoning",
-  REASONING_MESSAGE_CHUNK: "reasoning", REASONING_END: "reasoning",
-  REASONING_ENCRYPTED_VALUE: "reasoning",
-  THINKING_START: "thinking", THINKING_END: "thinking",
-  THINKING_TEXT_MESSAGE_START: "thinking", THINKING_TEXT_MESSAGE_CONTENT: "thinking",
-  THINKING_TEXT_MESSAGE_END: "thinking",
-  RAW: "special", CUSTOM: "special",
-}
-
-// @deprecated markers in @ag-ui/core dist/index.d.ts, "Will be removed in 1.0.0".
-const DEPRECATED = {
-  THINKING_START: "REASONING_START",
-  THINKING_END: "REASONING_END",
-  THINKING_TEXT_MESSAGE_START: "REASONING_MESSAGE_START",
-  THINKING_TEXT_MESSAGE_CONTENT: "REASONING_MESSAGE_CONTENT",
-  THINKING_TEXT_MESSAGE_END: "REASONING_MESSAGE_END",
-}
+const eventCategories = JSON.parse(
+  readFileSync(new URL("../../spec/event-categories.json", import.meta.url), "utf8"),
+)
+const CATEGORY = eventCategories.eventCategory
+const DEPRECATED = eventCategories.deprecated
 
 const EVENTS_DOC = "https://docs.ag-ui.com/concepts/events"
 

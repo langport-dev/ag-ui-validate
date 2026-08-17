@@ -102,33 +102,29 @@ source**:
    in kind — pytest plugins register via entry points and hook functions, not a global
    matcher registry. Replaced wholesale by a new pytest plugin module, not translated.
 
-**One cheap change worth making now, before the port, while the derivation logic is
-fresh:** the `CATEGORY` and `DEPRECATED` maps in `generate-event-table.mjs` are
-hand-maintained plain JS objects (wire-type → category string; wire-type → replacement
-name for `@deprecated` markers). These are *data*, not zod-specific logic — exactly the
-kind of language-neutral fact that `spec/` was created in the M0 restructure to hold.
-Hoisting them into `spec/event-categories.json` (or similar) now means the eventual
-Python derivation tool reads the same source of truth instead of a second
-hand-maintained copy drifting from the JS one. This is a small, low-risk PR independent
-of the port itself and is recommended as a follow-up now rather than something to defer.
+**Done, bundled into PM1:** the `CATEGORY` and `DEPRECATED` maps in
+`generate-event-table.mjs` were hand-maintained plain JS objects (wire-type → category
+string; wire-type → replacement name for `@deprecated` markers) — *data*, not
+zod-specific logic, exactly the kind of language-neutral fact `spec/` was created in the
+M0 restructure to hold. They're now [`spec/event-categories.json`](../spec/event-categories.json),
+read by both `generate-event-table.mjs` and the new `py/scripts/generate_event_table.py`
+(§7, PM1), instead of two hand-maintained copies drifting apart. Regenerating
+`event-table.ts` after the hoist produced a byte-identical file — confirmed zero
+behavior change on the TS side.
 
-That same hoist has a second payoff worth recording: `scripts/check-spec-links.mjs`
-(spec-link verification) currently imports `EVENT_TABLE` from the built JS `dist/`
-purely to read each event's `specUrl` — but every one of those URLs is already a
-*deterministic function* of data that would live in the hoist (`EVENTS_DOC` + wire
-type + schema export name + category), not something zod-derived. Once
-`spec/event-categories.json` exists, `check-spec-links.mjs` no longer needs `dist/`
-at all — it becomes exactly as language-neutral as `generate-rule-docs.mjs`, checking
-one set of URLs that both languages cite identically (the docs pages don't change
-per-SDK). At that point it should move out of `js/scripts/` into the root `scripts/`
-alongside `generate-rule-docs.mjs`, and Python never needs its own copy. Until the
-hoist lands, though, it keeps its `dist/` dependency for real, not just by
-convention — moving it now would just make it a root-level file that still reaches
-into `js/../dist/`, which is worse, not more portable. The other five `js/scripts/`
-tools (`build-fixtures.mjs`, `demo.mjs`, `fuzz.mjs`, `e2e-live-server.mjs`, and the
-zod-introspection trio) don't have this out: they each test *this implementation's*
-validator/transport/build against real behavior, so Python will need its own
-independently-written equivalents (per the milestones below), not a shared file.
+That hoist had a second payoff, also landed: `check-spec-links.mjs` used to import
+`EVENT_TABLE` from the built JS `dist/` purely to read each event's `specUrl` — but
+every one of those URLs turned out to be a *deterministic function* of the wire type
+string itself (`EVENTS_DOC` + `wireType.toLowerCase().replace(/_/g, "")`, with a
+category-based override for the deprecated `thinking` group), verified by diffing this
+computation against all 33 entries of the built `EVENT_TABLE` (0 mismatches). So
+`check-spec-links.mjs` no longer needs `dist/`, any SDK, or either language's build
+output at all — it moved to the root [`scripts/`](../scripts/check-spec-links.mjs)
+alongside `generate-rule-docs.mjs`, and Python never needs its own copy. The other five
+`js/scripts/` tools (`build-fixtures.mjs`, `demo.mjs`, `fuzz.mjs`, `e2e-live-server.mjs`,
+and the zod-introspection trio) don't have this out: they each test *this
+implementation's* validator/transport/build against real behavior, so Python needs its
+own independently-written equivalents (per the milestones below), not a shared file.
 
 Everything else genuinely is a straightforward, low-risk translation.
 
@@ -301,7 +297,8 @@ Mirrors the TS build order (M0–M9), each independently shippable:
 | # | Milestone | Ships |
 |---|---|---|
 | PM0 | Scaffold & packaging | **Done.** `py/pyproject.toml` (hatchling), console script stub, and the JS-side relocation (`src/`→`js/src/`, plus `test/`, `tsconfig*.json`, `tsdown.config.mjs`, `vitest.config.ts` moving alongside it) landed ahead of schedule when the PyPI name-reservation placeholder was requested. Two corrections from this plan's original text, discovered during that work: (1) `package.json` and `.changeset/` deliberately did **not** move into `js/` — npm's `files` field cannot reach outside the directory containing `package.json`, so moving it would have required a `prepack` copy-step hack to still ship `spec/` in the npm tarball; `package.json`, `package-lock.json`, `node_modules/`, `dist/`, and `.changeset/` all stay at the repo root. (2) `scripts/` did **not** move wholesale — only the tools that actually depend on the JS build (`dist/`) or `@ag-ui/core`'s zod schemas moved to `js/scripts/`; [`generate-rule-docs.mjs`](../scripts/generate-rule-docs.mjs), which does purely repo-wide, language-neutral work (reads `spec/`, writes `docs/`, touches nothing JS-specific), stays in a `scripts/` folder at the repo root and will keep doing so once a Python implementation exists. `action/` did not move, per the original decision. |
-| PM1 | Protocol grounding | New pydantic-based derivation tool (§2) producing `py/src/ag_ui_validate/protocol/event_table.py`; a drift test re-deriving against the installed `ag-ui-protocol`, mirroring `test/protocol-drift.test.ts`. |
+| PM1 | Protocol grounding | **Done.** `py/scripts/derive_lib.py` (pydantic v2 introspection: unwraps `Annotated`/`Optional`, classifies `Literal`/`Union`/`List`/`Enum`/model types — the pydantic-side counterpart to `derive-lib.mjs`'s zod walking) + `py/scripts/generate_event_table.py`, producing `py/src/ag_ui_validate/protocol/event_table.py` (33 event types, checked in). `py/tests/test_protocol_drift.py` mirrors `test/protocol-drift.test.ts` exactly (enum-order coverage, per-field parametrized comparison, `SDK_VERSION` present) and runs in CI (`.github/workflows/ci.yml`'s `python-tests` job, Python 3.11). Bundled in the same PR: the `spec/event-categories.json` hoist proposed in §2 (resolves open question 6) — `CATEGORY`/`DEPRECATED` now live in one shared, hand-maintained JSON file that both `generate-event-table.mjs` and `generate_event_table.py` read, instead of a second copy that would drift. Verified the JS side is unaffected: regenerating `event-table.ts` after the hoist produced a byte-identical file. A cross-language diff (`EVENT_TABLE` dumped from both a built `dist/index.js` and the new `event_table.py`, deep-compared field-by-field) found the derivations agree on all 33 wire types and every field except one — see the finding below. |
+| — | **Finding: `@ag-ui/core` and `ag-ui-protocol` aren't perfectly in sync.** `ACTIVITY_SNAPSHOT`'s `content` field is `z.record(z.any())` in `@ag-ui/core` v0.0.58 (classified `"object"`) but `typing.Any` in `ag-ui-protocol` v0.1.20 (classified `"any"`) — the Python SDK is looser here, not a derivation bug on either side (confirmed by reading each SDK's actual schema, not just the derived output). This is the first real evidence that the two official SDKs can diverge on a field's strictness even when the wire type itself matches, which has two concrete implications for later milestones: (1) PM3's schema check (`validateSchema`, driven by `EventSpec.fields`) could reject a payload on the TS side that the Python side accepts, for this field specifically — worth a fixture once PM3 lands, not before. (2) §5's parity CI (CLI-to-CLI diff across `spec/fixtures/`) needs to expect this as a known, accepted divergence for any fixture exercising `ACTIVITY_SNAPSHOT.content` with a non-object value, not treat it as a regression. No action taken beyond recording it — each SDK's derivation stays honest to what that SDK actually declares. |
 | PM2 | Rule catalog | `ag_ui_validate/rules/catalog.py` loading the *shared* `spec/catalog.json` directly — trivially small milestone since there's no per-language catalog to write. |
 | PM3 | Core state machine | The bulk of the port: `engine.py` (the `Validator` class) + `rules/checks/*.py`. The biggest milestone by line count (§1), but the lowest-risk given how mechanical the source is. |
 | PM4 | Fixture corpus wired in | First milestone where "matches the TS implementation" becomes a checkable claim — every `spec/fixtures/` entry passes through the Python validator and matches `expected.json`. |
@@ -335,9 +332,15 @@ Mirrors the TS build order (M0–M9), each independently shippable:
 5. **Python version floor policy (§4):** confirmed as "oldest non-EOL CPython at actual
    kickoff time" rather than a number decided now — agree to revisit at kickoff instead
    of locking in 3.11 today?
-6. **`spec/event-categories.json` hoist (§2):** small, independent pre-port cleanup —
-   worth doing now as its own PR, or bundle it into PM1 when the derivation tool is
-   actually being written? Doing it now also unblocks moving
-   `check-spec-links.mjs` out of `js/scripts/` and into the root `scripts/` (§2).
+6. ~~**`spec/event-categories.json` hoist (§2).**~~ **Resolved:** bundled into PM1 (§7)
+   rather than done as an independent pre-port PR, since the derivation tool needed the
+   same data anyway. Also unblocked moving `check-spec-links.mjs` out of `js/scripts/`
+   into the root `scripts/` (§2), also done.
 7. **Parity CI cadence (§5):** PR-path-filtered + nightly backstop as proposed, or a
    stricter/looser policy given the corpus will keep growing?
+
+Note on open question 5 (Python version floor): PM1's CI job (`.github/workflows/ci.yml`,
+`python-tests`) runs on 3.11, matching this doc's own "oldest non-EOL CPython today"
+recommendation — but `py/pyproject.toml`'s declared `requires-python` is still the
+`>=3.9` placeholder from the PyPI name-reservation package, not yet bumped. The CI
+pin doesn't resolve question 5; it just needed *a* version to run PM1's tests on.

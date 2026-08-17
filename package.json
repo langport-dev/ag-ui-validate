@@ -103,7 +103,7 @@
     "demo": "node js/scripts/demo.mjs",
     "fuzz": "node js/scripts/fuzz.mjs",
     "e2e": "node js/scripts/e2e-live-server.mjs",
-    "links:check": "node js/scripts/check-spec-links.mjs",
+    "links:check": "node scripts/check-spec-links.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "prepublishOnly": "npm run build"

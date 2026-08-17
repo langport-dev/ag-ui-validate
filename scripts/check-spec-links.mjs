@@ -1,22 +1,33 @@
-// Verifies every specUrl in the rule catalog and the generated event table:
+// Verifies every specUrl in the rule catalog and the canonical event table:
 // the page must return HTTP 200 and the #anchor must exist in its HTML.
 // Network-dependent, so it is a script rather than a vitest test.
-// Run `npm run build` first, then `npm run links:check`. Exits 1 on breakage.
+// Run `npm run links:check`. Exits 1 on breakage.
+//
+// Reads spec/catalog.json + spec/event-categories.json directly — no
+// dependency on either language's build output. The event-table specUrl is
+// a deterministic function of the wire type and its category (verified
+// against the generated event-table.ts when spec/event-categories.json was
+// introduced), so this needs no SDK, zod, or pydantic introspection either.
 
 import { readFileSync } from "node:fs"
 
-let EVENT_TABLE
-try {
-  ;({ EVENT_TABLE } = await import("../../dist/index.js"))
-} catch {
-  console.error("dist/ not found — run `npm run build` first")
-  process.exit(2)
+const EVENTS_DOC = "https://docs.ag-ui.com/concepts/events"
+
+const catalog = JSON.parse(readFileSync(new URL("../spec/catalog.json", import.meta.url), "utf8"))
+const eventCategories = JSON.parse(
+  readFileSync(new URL("../spec/event-categories.json", import.meta.url), "utf8"),
+)
+
+function eventSpecUrl(wireType, category) {
+  if (category === "thinking") return `${EVENTS_DOC}#thinking-events-deprecated`
+  const anchor = wireType.toLowerCase().replace(/_/g, "")
+  return `${EVENTS_DOC}#${anchor}`
 }
 
-const catalog = JSON.parse(readFileSync(new URL("../../spec/catalog.json", import.meta.url), "utf8"))
-
 const urls = new Set(catalog.rules.map((r) => r.specUrl))
-for (const spec of Object.values(EVENT_TABLE)) urls.add(spec.specUrl)
+for (const [wireType, category] of Object.entries(eventCategories.eventCategory)) {
+  urls.add(eventSpecUrl(wireType, category))
+}
 urls.add("https://docs.ag-ui.com/drafts/meta-events") // AGUI503's draft carve-out
 
 const byPage = new Map()
