@@ -25,6 +25,9 @@ Issues = "https://github.com/langport-dev/ag-ui-validate/issues"
 [project.scripts]
 ag-ui-validate = "ag_ui_validate.cli:main"
 
+[project.entry-points.pytest11]
+ag_ui_validate = "ag_ui_validate.pytest_plugin"
+
 [project.optional-dependencies]
 # Only needed for ag_ui_validate.transport (validate_endpoint/validate_body) and
 # the CLI's URL code path — imported lazily there. The importable core and the
