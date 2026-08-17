@@ -1,5 +1,11 @@
 # ag-ui-validate
 
+## 0.2.0
+
+### Minor Changes
+
+- 37a6b10: New `--group` CLI flag: collapses repeated findings into one line per rule with a count and sample event indexes, for large streams where the same violation repeats. Summary totals and exit codes are unchanged. Also exported as `formatGroupedDiagnostics` from `ag-ui-validate/report`.
+
 ## 0.1.0
 
 ### Minor Changes
