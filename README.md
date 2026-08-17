@@ -173,7 +173,10 @@ import { formatReportSummary, toSarif, toJUnit } from "ag-ui-validate/report"
 
 40 rules, maintained as **data** in
 [src/rules/catalog.json](src/rules/catalog.json) so other implementations
-(Python, Go, …) can share them:
+(Python, Go, …) can share them. Every rule has its own page — spec grounding,
+severity, and a violating example from the corpus — in the
+**[rule index](docs/rules/README.md)** (generated from the catalog,
+drift-checked in CI):
 
 | Group | IDs | Examples |
 |---|---|---|

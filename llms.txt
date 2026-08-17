@@ -1,0 +1,58 @@
+# ag-ui-validate
+
+> Conformance validator for the AG-UI protocol (https://docs.ag-ui.com).
+> Feed it an event stream or endpoint; every violation comes back with a
+> rule ID, a severity, and a link to the governing spec section. The core
+> is a pure function with zero runtime dependencies; transport (SSE and
+> NDJSON clients), a CLI, a Vitest matcher, and a GitHub Action wrap it.
+
+## Docs
+
+- [README](README.md): install, CLI, API, and CI quickstarts
+- [Rule index](docs/rules/README.md): all rules by group with severities
+- [Spec questions](docs/spec-questions.md): tracked ambiguities in the AG-UI spec
+- [Testing guide](docs/TESTING.md): how every layer is verified
+- [Fixture corpus](fixtures/README.md): language-neutral valid/invalid streams and the replay protocol
+
+## Rules
+
+- [AGUI001 — Run does not start with RUN_STARTED](docs/rules/AGUI001.md)
+- [AGUI002 — Multiple RUN_STARTED in one run](docs/rules/AGUI002.md)
+- [AGUI003 — Run not terminated](docs/rules/AGUI003.md)
+- [AGUI004 — Event after terminal event](docs/rules/AGUI004.md)
+- [AGUI005 — RUN_FINISHED and RUN_ERROR are mutually exclusive](docs/rules/AGUI005.md)
+- [AGUI006 — STEP_FINISHED without matching STEP_STARTED](docs/rules/AGUI006.md)
+- [AGUI007 — Step unterminated at run end](docs/rules/AGUI007.md)
+- [AGUI008 — Unstable threadId/runId across the run](docs/rules/AGUI008.md)
+- [AGUI101 — TEXT_MESSAGE_CONTENT without start](docs/rules/AGUI101.md)
+- [AGUI102 — TEXT_MESSAGE_END without start](docs/rules/AGUI102.md)
+- [AGUI103 — Text message unterminated at run end](docs/rules/AGUI103.md)
+- [AGUI104 — Duplicate messageId within a run](docs/rules/AGUI104.md)
+- [AGUI105 — Empty content delta](docs/rules/AGUI105.md)
+- [AGUI106 — Interleaved message streams sharing a messageId](docs/rules/AGUI106.md)
+- [AGUI201 — TOOL_CALL_ARGS without start](docs/rules/AGUI201.md)
+- [AGUI202 — TOOL_CALL_END without start](docs/rules/AGUI202.md)
+- [AGUI203 — Unterminated tool call](docs/rules/AGUI203.md)
+- [AGUI204 — Tool call arguments are not valid JSON](docs/rules/AGUI204.md)
+- [AGUI205 — Duplicate toolCallId within a run](docs/rules/AGUI205.md)
+- [AGUI206 — TOOL_CALL_RESULT before TOOL_CALL_END](docs/rules/AGUI206.md)
+- [AGUI207 — TOOL_CALL_RESULT references unknown toolCallId](docs/rules/AGUI207.md)
+- [AGUI208 — parentMessageId references unknown message](docs/rules/AGUI208.md)
+- [AGUI301 — STATE_DELTA before any STATE_SNAPSHOT](docs/rules/AGUI301.md)
+- [AGUI302 — STATE_DELTA failed to apply](docs/rules/AGUI302.md)
+- [AGUI303 — STATE_DELTA is not a valid RFC 6902 patch document](docs/rules/AGUI303.md)
+- [AGUI304 — Mid-run STATE_SNAPSHOT discards accumulated deltas](docs/rules/AGUI304.md)
+- [AGUI305 — Shared state declared but never established](docs/rules/AGUI305.md)
+- [AGUI401 — REASONING_MESSAGE_CONTENT without start](docs/rules/AGUI401.md)
+- [AGUI402 — Reasoning unterminated at run end](docs/rules/AGUI402.md)
+- [AGUI501 — Malformed SSE framing](docs/rules/AGUI501.md)
+- [AGUI502 — Event payload is not valid JSON](docs/rules/AGUI502.md)
+- [AGUI503 — Unknown event type](docs/rules/AGUI503.md)
+- [AGUI504 — Event fails schema validation for its declared type](docs/rules/AGUI504.md)
+- [AGUI505 — Unexpected Content-Type](docs/rules/AGUI505.md)
+- [AGUI506 — No keepalive frame within the configured window](docs/rules/AGUI506.md)
+- [AGUI507 — Response appears buffered rather than incrementally flushed](docs/rules/AGUI507.md)
+- [AGUI508 — Stream ended without a terminal event](docs/rules/AGUI508.md)
+- [AGUI901 — RAW event wraps a typed AG-UI event](docs/rules/AGUI901.md)
+- [AGUI902 — Events carry no timestamps](docs/rules/AGUI902.md)
+- [AGUI903 — CUSTOM event name is not namespaced](docs/rules/AGUI903.md)

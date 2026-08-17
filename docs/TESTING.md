@@ -119,6 +119,16 @@ so the reporters themselves are covered by the reporter and CLI suites.
 
 ---
 
+## 10. Rule docs + llms.txt (M9)
+
+| What | How |
+|---|---|
+| Pages complete & grounded | `npx vitest run test/docs.test.ts` — every catalog rule has a `docs/rules/AGUI###.md` with title, severity, spec URL, verbatim spec quote (when one exists), an example from the fixture corpus, and its SQ link when the spec is ambiguous; the index and `llms.txt` list all 40 |
+| No drift | `npm run docs:check` — regenerates everything in memory and fails on any byte difference or stray hand-written page (also part of the test above) |
+| Regenerate | `npm run docs:generate` after editing the catalog or fixtures |
+
+---
+
 ## What must never regress
 
 - **The core never throws** on any input (`npm run fuzz`, hostile-object tests
