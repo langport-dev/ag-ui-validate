@@ -16,6 +16,10 @@ npm test           # the full vitest suite (~370 tests)
 Build before test: the CLI integration suite spawns `dist/cli.js` (it skips
 loudly when missing). Scripts under `scripts/` also import from `dist/`.
 
+Building needs Node 22+ (tsdown uses ES2024 APIs); the built output targets
+es2022 and runs on Node 20+, which CI proves by building once on 22 and
+running the test matrix on 20 and 22 against that artifact.
+
 ---
 
 ## 1. Scaffold & packaging (M0)
