@@ -22,6 +22,9 @@ Homepage = "https://github.com/langport-dev/ag-ui-validate"
 Repository = "https://github.com/langport-dev/ag-ui-validate"
 Issues = "https://github.com/langport-dev/ag-ui-validate/issues"
 
+[project.scripts]
+ag-ui-validate = "ag_ui_validate.cli:main"
+
 [project.optional-dependencies]
 # Only needed for ag_ui_validate.transport (validate_endpoint/validate_body) and
 # the CLI's URL code path — imported lazily there. The importable core and the
