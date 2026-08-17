@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatDiagnosticLine, formatReportSummary } from "../../src/report/pretty.js"
+import { formatDiagnosticLine, formatGroupedDiagnostics, formatReportSummary } from "../../src/report/pretty.js"
 import { toJsonReport } from "../../src/report/json.js"
 import { toSarif } from "../../src/report/sarif.js"
 import { toJUnit } from "../../src/report/junit.js"
@@ -84,6 +84,39 @@ describe("pretty", () => {
     const s = formatReportSummary(clean, { color: false })
     expect(s).toContain("no conformance violations")
     expect(s).toContain("61 events")
+  })
+})
+
+describe("pretty grouped", () => {
+  const dup = (i: number): Diagnostic => ({
+    ...d105,
+    message: `TEXT_MESSAGE_CONTENT for messageId 'm${i}' has an empty delta`,
+    eventIndex: i,
+  })
+
+  it("collapses repeats of a rule into one line with a count and sample indexes", () => {
+    const out = formatGroupedDiagnostics([dup(7), dup(12), dup(18), dup(25), dup(31)], { color: false })
+    const lines = out.split("\n").filter((l) => l.includes("AGUI105"))
+    expect(lines).toHaveLength(1)
+    expect(out).toContain("×5")
+    expect(out).toContain("Empty content delta") // catalog title, not one occurrence's message
+    expect(out).toContain("events 7, 12, 18")
+    expect(out).toContain("+2 more")
+    expect(out).toContain(d105.specUrl)
+  })
+
+  it("orders groups by severity, then rule id, and handles stream-level findings", () => {
+    const out = formatGroupedDiagnostics([d902, d105, d203], { color: false })
+    const order = ["AGUI203", "AGUI105", "AGUI902"].map((r) => out.indexOf(r))
+    expect(order).toEqual([...order].sort((a, b) => a - b))
+    expect(out).toContain("×1")
+    expect(out).toMatch(/stream/) // AGUI902 has no event index
+    expect(out).not.toMatch(/\x1b\[/)
+    expect(formatGroupedDiagnostics([d203], { color: true })).toMatch(/\x1b\[/)
+  })
+
+  it("a single occurrence never says 'more'", () => {
+    expect(formatGroupedDiagnostics([d203], { color: false })).not.toContain("more")
   })
 })
 

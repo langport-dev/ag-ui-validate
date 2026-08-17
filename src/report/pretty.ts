@@ -1,5 +1,6 @@
 // Human-readable output. Pure string formatting — the CLI decides where it
 // goes and whether a TTY wants color.
+import { RULES } from "../rules/catalog.js"
 import type { Diagnostic, Report, Severity } from "../types.js"
 
 export interface PrettyOptions {
@@ -23,6 +24,48 @@ export function formatDiagnosticLine(d: Diagnostic, opts: PrettyOptions): string
 
 function count(n: number, noun: string): string {
   return `${n} ${noun}${n === 1 ? "" : "s"}`
+}
+
+const SEVERITY_RANK: Record<Severity, number> = { error: 0, warning: 1, info: 2 }
+const SAMPLE_INDEXES = 3
+
+/**
+ * One line per rule instead of one per occurrence — for large streams where
+ * the same violation repeats. Totals stay honest in the summary; this only
+ * changes what is listed.
+ */
+export function formatGroupedDiagnostics(diagnostics: Diagnostic[], opts: PrettyOptions): string {
+  const groups = new Map<string, Diagnostic[]>()
+  for (const d of diagnostics) {
+    const list = groups.get(d.rule)
+    if (list === undefined) groups.set(d.rule, [d])
+    else list.push(d)
+  }
+
+  const sorted = [...groups.values()].sort((a, b) => {
+    const bySeverity = SEVERITY_RANK[a[0]!.severity] - SEVERITY_RANK[b[0]!.severity]
+    return bySeverity !== 0 ? bySeverity : a[0]!.rule.localeCompare(b[0]!.rule)
+  })
+
+  const lines: string[] = []
+  for (const group of sorted) {
+    const first = group[0]!
+    const title = RULES.get(first.rule)?.title ?? first.message
+    const indexes = group.map((d) => d.eventIndex).filter((i) => i >= 0)
+    let where: string
+    if (indexes.length === 0) {
+      where = "stream-level"
+    } else {
+      const sample = indexes.slice(0, SAMPLE_INDEXES).join(", ")
+      const rest = indexes.length - SAMPLE_INDEXES
+      where = `events ${sample}${rest > 0 ? ` (+${rest} more)` : ""}`
+    }
+    const head = paint(SGR[first.severity], `${SYMBOL[first.severity]} ${first.rule}`, opts.color)
+    const meta = paint("2", `${first.severity.padEnd(7)} ×${group.length}`, opts.color)
+    const cite = paint("2", `  ↳ ${first.specUrl}`, opts.color)
+    lines.push(`${head}  ${meta}  ${title} — ${where}`, cite)
+  }
+  return lines.join("\n")
 }
 
 export function formatReportSummary(report: Report, opts: PrettyOptions): string {

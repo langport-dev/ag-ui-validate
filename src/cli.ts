@@ -7,7 +7,7 @@ import { createReadStream, readFileSync, writeFileSync } from "node:fs"
 import process from "node:process"
 import { decideExitCode, parseCliArgs, USAGE } from "./cli-args.js"
 import type { CliConfig } from "./cli-args.js"
-import { formatDiagnosticLine, formatReportSummary, toJsonReport, toJUnit, toSarif } from "./report/index.js"
+import { formatDiagnosticLine, formatGroupedDiagnostics, formatReportSummary, toJsonReport, toJUnit, toSarif } from "./report/index.js"
 import { TransportError, validateBody, validateEndpoint } from "./transport/index.js"
 import type { TransportOptions, TransportResult } from "./transport/index.js"
 import type { Diagnostic, ValidatorOptions } from "./types.js"
@@ -62,8 +62,9 @@ async function main(): Promise<number> {
 
   // Pretty mode streams findings as they are detected; machine formats emit
   // one document at the end, so nothing else may touch stdout before it.
+  // --group defers everything to one collapsed block after the run.
   let printed = 0
-  const onDiagnostic = pretty
+  const onDiagnostic = pretty && !config.group
     ? (d: Diagnostic): void => {
         printed += 1
         process.stdout.write(`${formatDiagnosticLine(d, { color })}\n`)
@@ -116,7 +117,11 @@ async function main(): Promise<number> {
   }
 
   if (pretty) {
-    if (printed > 0) process.stdout.write("\n")
+    if (config.group && report.diagnostics.length > 0) {
+      process.stdout.write(`${formatGroupedDiagnostics(report.diagnostics, { color })}\n\n`)
+    } else if (printed > 0) {
+      process.stdout.write("\n")
+    }
     process.stdout.write(`${formatReportSummary(report, { color })}\n`)
   } else if (config.format === "json") {
     const doc = toJsonReport(report, { tool: { name: TOOL_NAME, version }, target: targetLabel })

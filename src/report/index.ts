@@ -1,6 +1,6 @@
 // ag-ui-validate/report: pure reporters over a core Report. No I/O — callers
 // decide where the strings go.
-export { formatDiagnosticLine, formatReportSummary } from "./pretty.js"
+export { formatDiagnosticLine, formatGroupedDiagnostics, formatReportSummary } from "./pretty.js"
 export type { PrettyOptions } from "./pretty.js"
 export { toJsonReport } from "./json.js"
 export type { JsonReportDocument, JsonReportOptions } from "./json.js"

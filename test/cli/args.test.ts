@@ -88,6 +88,15 @@ describe("parseCliArgs", () => {
     expect(ok(["-"]).color).toBeNull() // auto
   })
 
+  it("--group is a pretty-output flag", () => {
+    expect(ok(["-", "--group"]).group).toBe(true)
+    expect(ok(["-"]).group).toBe(false)
+    expect(err(["-", "--group", "--json"])).toMatch(/pretty/i)
+    expect(err(["-", "--json", "--group"])).toMatch(/pretty/i) // order-independent
+    // file outputs are unaffected: full reports still go to the files
+    expect(ok(["-", "--group", "--sarif-file", "o.sarif"]).group).toBe(true)
+  })
+
   it("file-output flags store paths and combine with any stdout format", () => {
     const c = ok(["-", "--sarif-file", "out.sarif", "--junit-file=out.xml", "--json-file", "r.json"])
     expect(c.sarifFile).toBe("out.sarif")
@@ -107,7 +116,7 @@ describe("parseCliArgs", () => {
   })
 
   it("USAGE mentions every flag", () => {
-    for (const flag of ["--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off", "--features", "--timeout", "--header", "--no-color", "--sarif-file", "--junit-file", "--json-file"]) {
+    for (const flag of ["--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off", "--features", "--timeout", "--header", "--no-color", "--group", "--sarif-file", "--junit-file", "--json-file"]) {
       expect(USAGE).toContain(flag)
     }
   })
