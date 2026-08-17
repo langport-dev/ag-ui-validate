@@ -140,7 +140,7 @@ Three cases were named as likely-hard; a fourth turned out to be the real hard o
 | RFC 6902 JSON Patch application | **Vendor / hand-port, zero-dep** | `src/protocol/jsonpatch.ts` is ~220 lines of plain recursive dict/list traversal with no JS-specific behavior (see §1) — a direct, low-risk hand-port, same as the TS side chose. |
 | SSE frame parsing | **Vendor / hand-port, zero-dep** | Python's `codecs.getincrementaldecoder("utf-8")` covers `TextDecoder(..., {stream:true})`; async generators are native. No library needed. |
 | JSON Schema validation | **N/A — not actually used** | The TS "schema" check (`validateSchema` in `src/index.ts`, driven by `EventSpec.fields`) is a hand-rolled subset (`kind`/`required`/`enum`), not real JSON Schema — no `$ref`, `oneOf`, `allOf`, etc. It ports directly with zero dependencies; there is nothing here to replace. |
-| **Async HTTP client for `validateEndpoint`** | **Real dependency: recommend `httpx`, scoped narrowly** | Not one of the three named cases, but the actual hard one. Node/browsers ship `fetch` as a *platform global* — that's why `src/transport/index.ts` has zero added runtime dependencies today; it's an accident of platform, not a discipline the TS code enforces. Python's standard library has no async, streaming-capable HTTP client. `httpx` (`requires_python >=3.8`) exposes `response.aiter_bytes()`, giving access to raw chunk boundaries as they arrive — exactly what AGUI506 (keepalive gaps) and AGUI507 (buffered/unflushed responses) need to measure. Recommendation: depend on `httpx` for `ag_ui_validate.transport` (and lazily, only on the URL code path, in `ag_ui_validate.cli`), while keeping the importable core (`ag_ui_validate` itself) and the pytest plugin's *recorded-stream* path (the primary pytest-plugin use case — asserting on captured events, not live endpoints) fully dependency-free. This is the single most important open question in this plan (§8) — it's a real, not cosmetic, parity gap with the TS side's "zero deps" claim. |
+| **Async HTTP client for `validateEndpoint`** | **Real dependency, resolved: `httpx`, as an optional `[transport]` extra** | Not one of the three named cases, but the actual hard one. Node/browsers ship `fetch` as a *platform global* — that's why `src/transport/index.ts` has zero added runtime dependencies today; it's an accident of platform, not a discipline the TS code enforces. Python's standard library has no async, streaming-capable HTTP client. `httpx` exposes `response.aiter_bytes()`, giving access to raw chunk boundaries as they arrive — exactly what AGUI506 (keepalive gaps) and AGUI507 (buffered/unflushed responses) need to measure. Decided (§8, resolved before PM5 started): depend on `httpx` for `ag_ui_validate.transport` and the CLI's URL path, imported lazily, scoped to `pip install ag-ui-validate[transport]` rather than a required dependency — the importable core and the pytest plugin's *recorded-stream* path (the primary pytest-plugin use case — asserting on captured events, not live endpoints) stay genuinely dependency-free on a bare install. This is a real, not cosmetic, parity gap with the TS side's "zero deps" claim, and the one place it can't be closed like-for-like. |
 
 Devlopment-only dependencies (mirroring `@ag-ui/core`/`vitest`/`tsdown`/`typescript` as
 devDependencies on the TS side — never shipped):
@@ -326,11 +326,15 @@ Mirrors the TS build order (M0–M9), each independently shippable:
 
 ## 8. Open questions
 
-1. **The `httpx` dependency (§3).** Accept a real runtime dependency for
-   `ag_ui_validate.transport` (and the CLI's URL path only), while keeping the core
-   validator and the pytest plugin's recorded-stream helpers dependency-free? This is
-   the one place "zero runtime dependencies" cannot be matched for a like-for-like
-   reason (Python has no `fetch` platform global) rather than a shortcut.
+1. ~~**The `httpx` dependency (§3).**~~ **Resolved, before PM5 started:** `httpx`
+   (over `aiohttp` or hand-rolling streaming HTTP over stdlib `urllib`), and scoped to
+   an **optional extra** — `pip install ag-ui-validate[transport]` — rather than a
+   required dependency of the whole package. `ag_ui_validate.transport` and the CLI's
+   URL code path import it lazily with a clear error if it's missing; the core
+   validator and the pytest plugin's recorded-stream helpers (the primary pytest-plugin
+   use case, per the decision that Python is where most non-conformant emitters live)
+   stay genuinely dependency-free even after `pip install ag-ui-validate` with no
+   extras. Mirrors the TS side's own `vitest` peer dependency, marked optional.
 2. **Type checker:** `pyright` (closer in spirit/tooling-lineage to `tsc`, same vendor
    many editors already run) or `mypy` (more the Python-ecosystem-standard choice)?
 3. **CLI flag parity (§1, `cli-args.ts` row):** hand-roll the Python arg parser to

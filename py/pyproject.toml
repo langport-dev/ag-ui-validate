@@ -23,11 +23,18 @@ Repository = "https://github.com/langport-dev/ag-ui-validate"
 Issues = "https://github.com/langport-dev/ag-ui-validate/issues"
 
 [project.optional-dependencies]
+# Only needed for ag_ui_validate.transport (validate_endpoint/validate_body) and
+# the CLI's URL code path — imported lazily there. The importable core and the
+# pytest plugin's recorded-stream helpers stay dependency-free without this.
+transport = [
+  "httpx>=0.27",
+]
 dev = [
   # Official pydantic-based AG-UI SDK — devDependency only, mirrors @ag-ui/core's
   # role on the TS side (protocol derivation + drift tests). Never a runtime dep.
   "ag-ui-protocol>=0.1.0",
   "pytest>=8.0.0",
+  "ag-ui-validate[transport]",
 ]
 
 [tool.hatch.build.targets.wheel]
