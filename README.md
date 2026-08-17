@@ -124,7 +124,7 @@ const { diagnostics, summary, features, skipped } = v.report()
 ```
 
 The core is a pure function over an event sequence: zero I/O, zero runtime
-dependencies, isomorphic across Node 20+, browsers, Deno, and Workers.
+dependencies, isomorphic across Node 22+, browsers, Deno, and Workers.
 
 ### Validate a live endpoint
 
