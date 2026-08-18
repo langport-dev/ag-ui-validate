@@ -11,6 +11,8 @@ Mirrors js/src/rules/checks/transport.ts.
 
 from __future__ import annotations
 
+from typing import Tuple
+
 from ..catalog import CATALOG
 
 TRANSPORT_SKIP_REASON = (
@@ -18,4 +20,4 @@ TRANSPORT_SKIP_REASON = (
     "(validated by ag_ui_validate.transport)"
 )
 
-TRANSPORT_RULE_IDS: tuple = tuple(r.id for r in CATALOG.rules if r.checked_in == "transport")
+TRANSPORT_RULE_IDS: Tuple[str, ...] = tuple(r.id for r in CATALOG.rules if r.checked_in == "transport")

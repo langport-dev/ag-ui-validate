@@ -4,6 +4,8 @@ js/test/validator/engine.test.ts.
 
 from __future__ import annotations
 
+from typing import Any, Dict
+
 from ag_ui_validate.engine import create_validator
 from ag_ui_validate.types import ValidatorOptions
 
@@ -28,7 +30,7 @@ class TestInputHandlingNeverThrows:
             assert "AGUI502" in rules_of(diags), repr(garbage)
 
     def test_survives_hostile_objects(self):
-        cyclic: dict = {"type": "RUN_STARTED", "threadId": "t", "runId": "r"}
+        cyclic: Dict[str, Any] = {"type": "RUN_STARTED", "threadId": "t", "runId": "r"}
         cyclic["self"] = cyclic
         v = create_validator()
         v.feed(cyclic)

@@ -14,7 +14,7 @@ import re
 from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple
 
 Severity = Literal["error", "warning", "info"]
 SeverityOrOff = Literal["error", "warning", "info", "off"]
@@ -52,10 +52,10 @@ class RuleDefinition:
 class Catalog:
     catalog_version: str
     spec: str
-    rules: tuple
+    rules: Tuple[RuleDefinition, ...]
 
 
-def _rule_from_json(data: dict) -> RuleDefinition:
+def _rule_from_json(data: Dict[str, Any]) -> RuleDefinition:
     return RuleDefinition(
         id=data.get("id") or "",
         severity=data.get("severity") or "",
@@ -76,8 +76,8 @@ def validate_catalog(data: Any) -> Catalog:
     if not isinstance(data, dict) or not isinstance(data.get("rules"), list):
         raise ValueError("rule catalog: expected an object with a rules array")
 
-    problems: list = []
-    seen: set = set()
+    problems: List[str] = []
+    seen: Set[str] = set()
     rules = []
     for raw in data["rules"]:
         rule = _rule_from_json(raw)
@@ -114,12 +114,18 @@ def validate_catalog(data: Any) -> Catalog:
     )
 
 
-def _find_spec_dir():
+def _find_spec_dir() -> Any:
     """Locate the shared spec/ directory: the packaged copy (force-included
     into the wheel via pyproject.toml) for real installs, or the repo-root
     one for editable installs — hatchling's editable mode points straight at
     `src/ag_ui_validate` without materializing force-include, so the packaged
-    path doesn't exist until a real wheel is built."""
+    path doesn't exist until a real wheel is built.
+
+    Return type is Any rather than the precise
+    importlib.resources.abc.Traversable | pathlib.Path union: both support
+    the `/` and `.is_dir()`/`.read_text()` calls used on the result, but
+    aren't related by a common typed protocol worth spelling out here.
+    """
     packaged = resources.files("ag_ui_validate") / "spec"
     if packaged.is_dir():
         return packaged
@@ -137,13 +143,13 @@ def _load_catalog_json() -> Any:
 
 CATALOG: Catalog = validate_catalog(_load_catalog_json())
 
-RULES: dict = {r.id: r for r in CATALOG.rules}
+RULES: Dict[str, RuleDefinition] = {r.id: r for r in CATALOG.rules}
 
 
-def format_message(rule: RuleDefinition, params: dict) -> str:
+def format_message(rule: RuleDefinition, params: Dict[str, Any]) -> str:
     """Fills a rule's messageTemplate. Unknown placeholders are left intact."""
 
-    def repl(m: re.Match) -> str:
+    def repl(m: "re.Match[str]") -> str:
         key = m.group(1)
         return str(params[key]) if key in params else m.group(0)
 

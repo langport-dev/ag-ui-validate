@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Tuple, Union
 
 _OPS = {"add", "remove", "replace", "move", "copy", "test"}
 _ARRAY_INDEX_RE = re.compile(r"^(0|[1-9]\d*)$")
@@ -94,12 +94,12 @@ def _deep_equal(a: Any, b: Any) -> bool:
     if isinstance(a, bool) != isinstance(b, bool):
         return False
     if isinstance(a, list) and isinstance(b, list):
-        return len(a) == len(b) and all(_deep_equal(x, y) for x, y in zip(a, b))
+        return bool(len(a) == len(b) and all(_deep_equal(x, y) for x, y in zip(a, b)))
     if isinstance(a, dict) and isinstance(b, dict):
-        return a.keys() == b.keys() and all(_deep_equal(a[k], b[k]) for k in a)
+        return bool(a.keys() == b.keys() and all(_deep_equal(a[k], b[k]) for k in a))
     if isinstance(a, (list, dict)) or isinstance(b, (list, dict)):
         return False
-    return a == b
+    return bool(a == b)
 
 
 def _array_index(token: str, length: int, allow_append: bool) -> Optional[int]:
@@ -157,8 +157,12 @@ def apply_patch(doc: Any, patch: Any) -> PatchResult:
     result_box = [_clone(doc)]
     ops = patch
 
-    def get_at(pointer: str):
-        loc = _locate(result_box[0], parse_pointer(pointer), False)
+    def get_at(pointer: str) -> Tuple[Any, Optional[str]]:
+        tokens = parse_pointer(pointer)
+        # Reachable only for already-shape-validated patches (see apply_patch
+        # above), so parse_pointer never returns None here.
+        assert tokens is not None
+        loc = _locate(result_box[0], tokens, False)
         if isinstance(loc, str):
             return None, f"{pointer}: {loc}"
         if not loc.exists:
@@ -167,6 +171,7 @@ def apply_patch(doc: Any, patch: Any) -> PatchResult:
 
     def set_at(pointer: str, value: Any, must_exist: bool) -> Optional[str]:
         tokens = parse_pointer(pointer)
+        assert tokens is not None
         if len(tokens) == 0:
             result_box[0] = value
             return None
@@ -176,6 +181,7 @@ def apply_patch(doc: Any, patch: Any) -> PatchResult:
         if must_exist and not loc.exists:
             return f"{pointer} does not exist"
         if isinstance(loc.parent, list):
+            assert isinstance(loc.key, int)
             if must_exist:
                 loc.parent[loc.key] = value
             else:
@@ -184,8 +190,9 @@ def apply_patch(doc: Any, patch: Any) -> PatchResult:
             loc.parent[loc.key] = value
         return None
 
-    def remove_at(pointer: str):
+    def remove_at(pointer: str) -> Tuple[Any, Optional[str]]:
         tokens = parse_pointer(pointer)
+        assert tokens is not None
         if len(tokens) == 0:
             return None, "cannot remove the whole document"
         loc = _locate(result_box[0], tokens, False)
@@ -194,6 +201,7 @@ def apply_patch(doc: Any, patch: Any) -> PatchResult:
         if not loc.exists:
             return None, f"{pointer} does not exist"
         if isinstance(loc.parent, list):
+            assert isinstance(loc.key, int)
             del loc.parent[loc.key]
         else:
             del loc.parent[loc.key]

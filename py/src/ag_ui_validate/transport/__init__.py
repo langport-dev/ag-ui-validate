@@ -191,7 +191,9 @@ async def validate_body(
     keepalive_window = opts.keepalive_window_ms or _DEFAULT_KEEPALIVE_MS
     recorded = opts.recorded is True
 
-    def emit_transport(rule: str, params: Optional[Dict[str, Any]] = None, extra: Optional[Dict[str, Any]] = None):
+    def emit_transport(
+        rule: str, params: Optional[Dict[str, Any]] = None, extra: Optional[Dict[str, Any]] = None
+    ) -> Optional[Diagnostic]:
         d = v.emit_external(rule, params, extra)
         if d is not None and opts.on_diagnostic is not None:
             opts.on_diagnostic(d)

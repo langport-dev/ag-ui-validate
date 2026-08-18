@@ -9,20 +9,21 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any, Dict, List
 
 import ag_ui.core as core
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
 FIXTURES = Path(__file__).resolve().parents[2] / "spec" / "fixtures"
-_EVENT = TypeAdapter(core.Event)
+_EVENT: TypeAdapter[Any] = TypeAdapter(core.Event)
 
 
-def _lines(path: Path) -> list:
+def _lines(path: Path) -> List[str]:
     return [line for line in path.read_text().splitlines() if line.strip()]
 
 
-def _sdk_accepts(raw: dict) -> bool:
+def _sdk_accepts(raw: Dict[str, Any]) -> bool:
     try:
         _EVENT.validate_python(raw)
         return True
@@ -40,7 +41,7 @@ def test_every_event_in_valid_fixture_parses_with_the_sdk(file):
         assert _sdk_accepts(raw), f"SDK rejects {file}: {line[:80]}"
 
 
-def _event_at(dir_name: str, index: int) -> dict:
+def _event_at(dir_name: str, index: int) -> Any:
     return json.loads(_lines(FIXTURES / "invalid" / dir_name / "stream.jsonl")[index])
 
 

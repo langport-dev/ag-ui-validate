@@ -25,7 +25,9 @@ Python (from `py/`):
 
 ```bash
 pip install -e ".[dev]"   # editable install; dev extra pulls in pytest,
-                           # pytest-asyncio, httpx, and ag-ui-protocol
+                           # pytest-asyncio, httpx, mypy, and ag-ui-protocol
+mypy src tests             # strict on src/, real-error-checked (not annotation-
+                           # mandated) on tests/ — see py/pyproject.toml
 pytest                     # the full pytest suite (~310 tests)
 ```
 
@@ -77,8 +79,9 @@ since PM1).
 
 | What | How |
 |---|---|
-| Reproducible from a clean venv | `python3 -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]" && pytest` |
-| Real wheel builds correctly | `pip wheel . -w dist --no-deps` — **not** `python -m build`; that goes through an sdist which can't see the `../spec` force-include (see the port plan's PM5 finding) |
+| Reproducible from a clean venv | `python3 -m venv .venv && source .venv/bin/activate && pip install -e ".[dev]" && mypy src tests && pytest` |
+| Static types | `mypy src tests` — strict on `src/` (mirrors `js/tsconfig.json`'s `strict: true`); test files are checked too (real errors still caught) but not required to annotate every `def test_x():` — see the `[tool.mypy]` overrides comment in `py/pyproject.toml` for why. `scripts/` is intentionally excluded, matching `js/tsconfig.json`'s own `include` list (which omits `js/scripts/` too) |
+| Real wheel builds correctly | `pip wheel . -w dist --no-deps` or `python -m build` — both work (the `py/spec` symlink fixed `python -m build`'s sdist round-trip; see the port plan's PM5 finding and its follow-up fix) |
 | Packaged install works, force-include resolves | Install the built wheel into a scratch venv: `pip install dist/ag_ui_validate-*.whl` then `python -c "from ag_ui_validate.rules.catalog import RULES; print(len(RULES))"` — the editable install and the packaged install exercise two different code paths in `catalog.py`'s `_find_spec_dir()`, so both are worth checking after any packaging change |
 | Bare install stays dependency-free | In a scratch venv, `pip install dist/ag_ui_validate-*.whl` (no `[transport]` extra) then confirm `import ag_ui_validate` and `ag_ui_validate.pytest_plugin.assert_valid_agui(...)` work with `httpx` absent; `ag_ui_validate.transport.validate_endpoint(...)` should raise a clean `TransportError`, not `ImportError` |
 

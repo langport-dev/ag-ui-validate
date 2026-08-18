@@ -33,6 +33,8 @@ jobs:
           python-version: "3.11"
       - run: pip install -e ".[dev]"
         working-directory: py
+      - run: mypy src tests
+        working-directory: py
       - run: pytest
         working-directory: py
 

@@ -28,7 +28,7 @@ def frame(o: Any) -> str:
 
 
 def bytes_(*parts: str) -> AsyncGenerator[bytes, None]:
-    async def gen():
+    async def gen() -> AsyncGenerator[bytes, None]:
         for p in parts:
             yield p.encode("utf-8")
 

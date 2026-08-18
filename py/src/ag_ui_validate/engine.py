@@ -20,7 +20,15 @@ from typing import Any, Dict, List, Optional
 
 from .protocol.event_table import DRAFT_EVENT_TYPES, EVENT_TABLE, EVENT_TYPES, SDK_VERSION
 from .rules.catalog import RULES, format_message
-from .rules.checks.context import CheckApi, RunState, StreamState, Terminal, new_run_state, str_field
+from .rules.checks.context import (
+    CheckApi,
+    EmitFn,
+    RunState,
+    StreamState,
+    Terminal,
+    new_run_state,
+    str_field,
+)
 from .rules.checks.lifecycle import check_run_id_stability, end_of_run_steps, handle_step_event
 from .rules.checks.reasoning import close_reasoning_chunk, end_of_run_reasoning, handle_reasoning_event
 from .rules.checks.state import handle_state_event
@@ -59,7 +67,7 @@ def _describe_value(v: Any) -> str:
     return type(v).__name__
 
 
-def _validate_schema(type_: str, spec: Dict[str, Any], ev: Dict[str, Any], emit) -> None:
+def _validate_schema(type_: str, spec: Dict[str, Any], ev: Dict[str, Any], emit: EmitFn) -> None:
     for field_name, fs in spec["fields"].items():
         if field_name not in ev:
             if fs.get("required"):
@@ -117,7 +125,7 @@ class Validator:
         self._run: Optional[RunState] = None
         self._finalized = False
 
-    def _make_emit(self, batch: List[Diagnostic], current: Optional[Dict[str, Any]]):
+    def _make_emit(self, batch: List[Diagnostic], current: Optional[Dict[str, Any]]) -> EmitFn:
         def emit(rule_id: str, params: Dict[str, Any], extra: Optional[Dict[str, Any]] = None) -> None:
             extra = extra or {}
             rule = RULES.get(rule_id)
@@ -145,7 +153,7 @@ class Validator:
                 event_index=event_index,
                 spec_url=spec_url,
             )
-            if about_current_event:
+            if about_current_event and current is not None:
                 diag.event_type = current["type"]
             if "pointer" in extra:
                 diag.pointer = extra["pointer"]
@@ -156,7 +164,7 @@ class Validator:
 
         return emit
 
-    def _close_chunks(self, r: RunState, emit, at_index: int, except_: Optional[str] = None) -> None:
+    def _close_chunks(self, r: RunState, emit: EmitFn, at_index: int, except_: Optional[str] = None) -> None:
         """Chunk streams close implicitly on any event of a different type."""
         if except_ != "TEXT_MESSAGE_CHUNK":
             close_text_chunk(r, at_index)
@@ -165,7 +173,7 @@ class Validator:
         if except_ != "REASONING_MESSAGE_CHUNK":
             close_reasoning_chunk(r)
 
-    def _end_of_run_checks(self, r: RunState, emit, at_index: int) -> None:
+    def _end_of_run_checks(self, r: RunState, emit: EmitFn, at_index: int) -> None:
         """Unterminated-at-run-end rules. Only on a *clean* end (RUN_FINISHED
         or a stream that just stops): after RUN_ERROR, open streams are
         expected debris of the failure, and flagging them would manufacture
@@ -175,7 +183,7 @@ class Validator:
         end_of_run_steps(r, emit, at_index)
         end_of_run_reasoning(r, emit, at_index)
 
-    def _ensure_run(self, index: int, type_: str, emit) -> RunState:
+    def _ensure_run(self, index: int, type_: str, emit: EmitFn) -> RunState:
         """Opens the implicit run scope for streams that never announced one."""
         if self._run is None:
             if not self._stream.agui001_fired:
@@ -184,7 +192,7 @@ class Validator:
             self._run = new_run_state(run_id=None, thread_id=None, start_index=index, implicit=True)
         return self._run
 
-    def _api(self, index: int, type_: str, event: Dict[str, Any], r: RunState, emit) -> CheckApi:
+    def _api(self, index: int, type_: str, event: Dict[str, Any], r: RunState, emit: EmitFn) -> CheckApi:
         return CheckApi(
             index=index,
             type=type_,

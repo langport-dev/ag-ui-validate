@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional, Tuple
 
 from .rules.catalog import Severity, SeverityOrOff
 
@@ -54,7 +54,7 @@ CanonicalFeature = Literal[
     "predictive-state-updates",
 ]
 
-CANONICAL_FEATURES: tuple = (
+CANONICAL_FEATURES: Tuple[CanonicalFeature, ...] = (
     "agentic-chat",
     "backend-tool-rendering",
     "human-in-the-loop",
