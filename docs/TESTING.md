@@ -26,7 +26,7 @@ Python (from `py/`):
 ```bash
 pip install -e ".[dev]"   # editable install; dev extra pulls in pytest,
                            # pytest-asyncio, httpx, and ag-ui-protocol
-pytest                     # the full pytest suite (~275 tests)
+pytest                     # the full pytest suite (~310 tests)
 ```
 
 No build step: everything runs directly against `src/ag_ui_validate/`. The
@@ -59,8 +59,8 @@ bare `npx vitest`, since vitest needs `js/vitest.config.ts` to find
 
 Node 22+ throughout: tsdown (the build tool) uses ES2024 APIs, and `engines`
 declares `>=22` since Node 20 reached end-of-life in April 2026. Python:
-3.11 in CI today; `py/pyproject.toml`'s `requires-python` is still a
-placeholder (see the port plan's §8 open question 5).
+3.11+ (`py/pyproject.toml`'s `requires-python`, matching what CI has run on
+since PM1).
 
 ---
 
@@ -104,9 +104,7 @@ whether new event types need catalog rules, run the drift test.
 |---|---|
 | Table matches the installed SDK | `pytest tests/test_protocol_drift.py` — re-derives from `ag-ui-protocol` and deep-compares |
 | Regeneration is deterministic | `python scripts/generate_event_table.py && git diff --exit-code src/ag_ui_validate/protocol/event_table.py` |
-
-There is no Python equivalent of `sdk-alignment.test.ts` yet — see the
-"What must never regress" section below for the known gap.
+| Our validity = the SDK's validity | `pytest tests/test_sdk_alignment.py` — every `spec/fixtures/valid/` event must parse with `ag-ui-protocol`'s own `Event` discriminated union (via a `pydantic.TypeAdapter`); schema-violation fixtures must be rejected by it; sequencing-violation fixtures must be accepted by it. Mirrors `test/sdk-alignment.test.ts`. |
 
 ## 3. Rule catalog (M2 / PM2)
 
@@ -141,9 +139,12 @@ version to run.
 |---|---|
 | Per-rule-group behavior | `pytest tests/test_engine.py tests/test_jsonpatch.py` — `test_engine.py` covers the same groups as the TS `test/validator/` directory in one file (`TestInputHandlingNeverThrows`, `TestAgui503UnknownEventType`, `TestAgui504SchemaValidation`, `TestHygieneRules`, `TestSeverityOverrides`, `TestReport`, `TestFinalize`, `TestMultiRunStreams`) |
 | One group only | e.g. `pytest tests/test_engine.py -k HygieneRules` |
+| Never-throws invariant | `python scripts/fuzz.py` — 50k seeded hostile inputs, same generator algorithm as `fuzz.mjs` (LCG, event-type/value pools, reset-every-500 cadence). Exits 1 on any throw or internal error. Vary the seed: `python py/scripts/fuzz.py 1234` |
+| Isomorphism / purity | `pytest tests/test_purity.py` — statically bans network, clocks, randomness, subprocess/env access, and file I/O from the core (everything except `transport/` and `cli.py`), with one documented exception (`rules/catalog.py`'s one-time resource load — Python has no build-time-JSON-import equivalent to `tsc`'s inlining). |
 
-There is no Python equivalent of `fuzz.mjs`, `purity.test.ts`, or
-`demo.mjs` yet — see "What must never regress" below.
+There is no Python equivalent of `demo.mjs` yet (an "eyeball it" pretty-printed
+demo run) — a nice-to-have, not a correctness gap; see "What must never
+regress" below for gaps that matter.
 
 ## 5. Fixture corpus (M4 / PM4)
 
@@ -192,12 +193,14 @@ HTTP bodies as timed byte chunks with a simulated clock — see
 | NDJSON splitter | `pytest tests/transport/test_ndjson.py` |
 | Orchestration with mocks | `pytest tests/transport/test_endpoint.py tests/transport/test_recorded.py` |
 | Against your own agent | `python -c "import asyncio; from ag_ui_validate.transport import validate_endpoint; print(asyncio.run(validate_endpoint('http://localhost:8000/agui')).report.summary)"` |
+| **Real HTTP, no mocks** | `python scripts/e2e_live_server.py` — starts a loopback `http.server.ThreadingHTTPServer` with the same eight endpoint personalities as `e2e-live-server.mjs` (clean SSE, clean NDJSON, missing prefix, wrong content-type, buffered single-write, mid-run socket drop via `SO_LINGER(0)`, live protocol bug, HTTP 503) and asserts `validate_endpoint` produces exactly the expected findings for each. Also validates the `RunAgentInput` we POST against `ag-ui-protocol`'s own schema. Exits 1 on any mismatch. |
 
-There is no committed Python equivalent of `npm run e2e` (a real-socket,
-no-mocks server) — the port was manually verified once against a hand-rolled
-`asyncio` HTTP server with the same eight endpoint personalities during
-PM5's review, but that script was not committed. Worth promoting to a real
-`py/scripts/e2e_live_server.py` if the port continues to evolve.
+Both `fuzz.py` and `e2e_live_server.py` are dev/pre-release scripts, not
+wired into CI — same as their TS counterparts (`npm run fuzz`, `npm run
+e2e` aren't in `ci.yml` either). `test_purity.py` and `test_sdk_alignment.py`
+are ordinary pytest files, so they run automatically as part of `pytest`
+(the `python-tests` CI job), same as `purity.test.ts`/`sdk-alignment.test.ts`
+running automatically as part of `npm test`.
 
 ## 7. CLI (M6 / PM6)
 
@@ -315,22 +318,25 @@ that gap ever actually causes a missed regression.
 - **The core never throws** on any input. TS: `npm run fuzz`, hostile-object
   tests in `engine.test.ts`. Python: every event is fed through a
   try/except in `Validator.feed()`/`finalize()` (`engine.py`), covered by
-  `TestInputHandlingNeverThrows` in `test_engine.py` and the malformed-JSON
-  fixtures in `test_fixtures.py` — but there is no seeded-fuzz corpus script
-  (`fuzz.mjs`'s equivalent) ported yet. A known, honest gap, not a silent
-  one.
+  `TestInputHandlingNeverThrows` in `test_engine.py`, the malformed-JSON
+  fixtures in `test_fixtures.py`, and `python py/scripts/fuzz.py` — 50k
+  seeded hostile inputs, same generator algorithm as `fuzz.mjs`.
 - **The core stays pure** — zero runtime deps, zero I/O, no clocks
   (`js/test/purity.test.ts` + `js/tsconfig.src.json`). `js/src/cli.ts` is the
   one deliberate Node-only file; the purity test asserts nothing else imports
-  it. Python has no equivalent static purity check yet — the `transport/`
-  and `cli.py` modules are the only ones with I/O by construction (the same
-  boundary as the TS side), but nothing currently *enforces* that a future
-  change to `engine.py` or `rules/checks/*.py` can't accidentally import
-  something like `asyncio` or `httpx`.
+  it. Python's `py/tests/test_purity.py` statically bans network, clocks,
+  randomness, subprocess/env access, and file I/O from everything except
+  `transport/` and `cli.py`, plus asserts no other file imports `cli.py` —
+  the same two-module I/O boundary as the TS side, now enforced rather than
+  just documented. One narrow, documented exception:
+  `rules/catalog.py` reads `catalog.json` from disk once at import time
+  (Python has no build-time-JSON-import equivalent to `tsc`'s inlining of
+  `catalog.ts`'s `import catalogJson from "../../../spec/catalog.json"`).
 - **Every diagnostic cites the spec** (`js/test/catalog.test.ts` /
   `py/tests/test_catalog.py`, `npm run links:check`).
 - **Every rule has corpus coverage** (`js/test/catalog.test.ts` /
   `py/tests/test_catalog.py` meta-test).
-- **Valid means valid to the SDK too** — TS only
-  (`js/test/sdk-alignment.test.ts`); no Python equivalent exists against
-  `ag-ui-protocol`'s own schemas yet.
+- **Valid means valid to the SDK too**
+  (`js/test/sdk-alignment.test.ts` / `py/tests/test_sdk_alignment.py`, the
+  latter via a `pydantic.TypeAdapter(ag_ui.core.Event)` in place of zod's
+  `EventSchemas.safeParse`).
