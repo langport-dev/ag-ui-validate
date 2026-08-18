@@ -1,18 +1,21 @@
 name: Publish to PyPI
 
 # Publishes the Python package (py/) to PyPI when a GitHub release tagged
-# "python-vX.Y.Z" is published. Auth is PyPI Trusted Publishing (OIDC): no
-# token secret — pypi.org has a pending publisher configured (one-time,
-# scoped to this repo + this workflow filename, no environment) that will
-# activate on this workflow's first successful run, minting a short-lived
-# credential per run.
+# "vX.Y.Z" is published — the SAME tag publish.yml (npm) triggers on. Auth
+# is PyPI Trusted Publishing (OIDC): no token secret — pypi.org has a
+# pending publisher configured (one-time, scoped to this repo + this
+# workflow filename, no environment) that will activate on this workflow's
+# first successful run, minting a short-lived credential per run.
 #
-# Deliberately its own tag prefix rather than sharing plain "vX.Y.Z" with
-# publish.yml (npm): the JS and Python packages version independently (the
-# JS package is already well past 0.0.x; this one is a name-reservation
-# placeholder today), so an ordinary npm release must not also attempt a
-# PyPI publish of an unrelated version. The `if:` below makes that a clean
-# no-op rather than a failed job on every npm release.
+# The JS and Python packages are versioned in lockstep from v0.3.0 onward:
+# one release, one tag, both packages publish together. The version-match
+# check below is what makes that safe rather than assumed — if py's
+# declared version ever drifts from the tag (e.g. someone bumps only one
+# package.json/pyproject.toml), this job fails loudly instead of silently
+# publishing a mismatched version. (Earlier revisions of this workflow used
+# a distinct "python-v" tag prefix, back when the two packages versioned
+# independently and Python was still a 0.0.x placeholder — no longer the
+# case.)
 on:
   release:
     types: [published]
@@ -23,7 +26,6 @@ permissions:
 
 jobs:
   publish:
-    if: startsWith(github.event.release.tag_name, 'python-v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +37,7 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: |
-          PKG="python-v$(python -c "import re; print(re.search(r'(?m)^version = \"([^\"]+)\"', open('py/pyproject.toml').read()).group(1))")"
+          PKG="v$(python -c "import re; print(re.search(r'(?m)^version = \"([^\"]+)\"', open('py/pyproject.toml').read()).group(1))")"
           if [ "$TAG" != "$PKG" ]; then
             echo "::error::release tag $TAG does not match py/pyproject.toml $PKG — bump the version, merge, then re-tag"
             exit 1
