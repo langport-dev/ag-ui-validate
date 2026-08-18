@@ -13,7 +13,10 @@ import ag_ui.core.events as events
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from derive_lib import derive_event_table  # noqa: E402
+# scripts/ is intentionally outside mypy's checked set (mirrors js/tsconfig.json's
+# own include list, which omits js/scripts/ too) — mypy can't resolve this
+# sys.path-based import statically.
+from derive_lib import derive_event_table  # type: ignore[import-not-found]  # noqa: E402
 
 from ag_ui_validate.protocol.event_table import EVENT_TABLE, EVENT_TYPES, SDK_VERSION
 

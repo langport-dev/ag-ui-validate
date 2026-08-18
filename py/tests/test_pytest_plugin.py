@@ -48,10 +48,10 @@ class TestAssertValidAgui:
 
     def test_raises_typeerror_on_a_received_value_that_is_neither_a_list_nor_a_string(self):
         with pytest.raises(TypeError, match="(?i)array|jsonl"):
-            assert_valid_agui(42)
+            assert_valid_agui(42)  # type: ignore[arg-type]  # deliberate misuse, asserting the runtime guard
         # a single event dict must be wrapped in a list
         with pytest.raises(TypeError, match="(?i)array|jsonl"):
-            assert_valid_agui(started())
+            assert_valid_agui(started())  # type: ignore[arg-type]  # deliberate misuse, asserting the runtime guard
 
 
 class TestValidateAgui:

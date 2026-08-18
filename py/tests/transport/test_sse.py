@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import List
 
-from ag_ui_validate.transport.sse import SseComment, SseEvent, SseProblem, sse_items
+from ag_ui_validate.transport.sse import SseComment, SseEvent, SseItem, SseProblem, sse_items
 
 
 async def _chunks(*parts: str):
@@ -12,7 +12,7 @@ async def _chunks(*parts: str):
         yield p.encode("utf-8")
 
 
-async def _collect(*parts: str) -> List[object]:
+async def _collect(*parts: str) -> List[SseItem]:
     out = []
     async for item in sse_items(_chunks(*parts)):
         out.append(item)

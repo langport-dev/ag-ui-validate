@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
@@ -21,7 +22,7 @@ FIXTURES = ROOT / "spec" / "fixtures"
 _BIN = shutil.which("ag-ui-validate") or str(Path(sys.executable).parent / "ag-ui-validate")
 
 
-def cli(args, stdin: str = None):
+def cli(args, stdin: Optional[str] = None):
     result = subprocess.run(
         [_BIN, *args],
         input=stdin,

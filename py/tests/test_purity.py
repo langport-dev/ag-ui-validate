@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import List
 
 import pytest
 
@@ -58,11 +59,11 @@ CLI_IMPORT = re.compile(
 )
 
 
-def _all_files() -> list:
+def _all_files() -> List[Path]:
     return sorted(SRC.rglob("*.py"))
 
 
-def _core_files() -> list:
+def _core_files() -> List[Path]:
     return [
         f
         for f in _all_files()

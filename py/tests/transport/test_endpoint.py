@@ -23,7 +23,7 @@ def frame(o: Any) -> str:
 
 
 def body(*parts: str) -> AsyncGenerator[bytes, None]:
-    async def gen():
+    async def gen() -> AsyncGenerator[bytes, None]:
         for p in parts:
             yield p.encode("utf-8")
 
@@ -38,7 +38,7 @@ class _Headers:
         return self._content_type if name.lower() == "content-type" else None
 
 
-def mock_fetch(status: int, content_type: Optional[str], body_gen, captured: Optional[dict] = None):
+def mock_fetch(status: int, content_type: Optional[str], body_gen, captured: Optional[Dict[str, Any]] = None):
     from ag_ui_validate.transport import TransportResponseLike
 
     async def impl(url, *, method, headers, body, timeout_s):
@@ -153,7 +153,7 @@ async def test_non_2xx_responses_raise_transporterror():
 
 
 async def test_posts_a_valid_minimal_runagentinput_by_default_and_merges_headers():
-    captured: dict = {}
+    captured: Dict[str, Any] = {}
     await validate_endpoint(
         "http://agent.test/agui",
         TransportOptions(

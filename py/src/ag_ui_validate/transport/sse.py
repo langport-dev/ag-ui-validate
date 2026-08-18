@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import codecs
 from dataclasses import dataclass, field
-from typing import AsyncGenerator, AsyncIterable, List, Optional, Tuple, Union
+from typing import AsyncGenerator, AsyncIterable, List, Literal, Optional, Tuple, Union
 
 
 @dataclass
@@ -23,20 +23,20 @@ class SseEvent:
     data: str = ""
     event: Optional[str] = None
     id: Optional[str] = None
-    kind: str = field(default="event", init=False)
+    kind: Literal["event"] = field(default="event", init=False)
 
 
 @dataclass
 class SseComment:
     text: str
-    kind: str = field(default="comment", init=False)
+    kind: Literal["comment"] = field(default="comment", init=False)
 
 
 @dataclass
 class SseProblem:
     code: str  # "json-line-without-data-prefix" | "truncated-frame"
     detail: str
-    kind: str = field(default="problem", init=False)
+    kind: Literal["problem"] = field(default="problem", init=False)
 
 
 SseItem = Union[SseEvent, SseComment, SseProblem]

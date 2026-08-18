@@ -4,6 +4,8 @@ handling. Mirrors js/src/rules/checks/text.ts.
 
 from __future__ import annotations
 
+from typing import Any, Dict
+
 from .context import CheckApi, EmitFn, OpenMessage, RunState, TextChunk, str_field
 
 
@@ -43,7 +45,7 @@ def handle_text_event(api: CheckApi) -> None:
             return
         open_ = run.open_messages.get(message_id)
         if open_ is None:
-            extra = {"pointer": "/messageId"}
+            extra: Dict[str, Any] = {"pointer": "/messageId"}
             closed_at = run.closed_messages.get(message_id)
             if closed_at is not None:
                 extra["relatedEventIndex"] = closed_at

@@ -68,7 +68,7 @@ def _stream_lines(path: Path) -> List[str]:
     return [line for line in path.read_text().split("\n") if line.strip() != ""]
 
 
-def _options_from_json(data: dict) -> ValidatorOptions:
+def _options_from_json(data: Dict[str, Any]) -> ValidatorOptions:
     return ValidatorOptions(
         spec=data.get("spec"),
         features=data.get("features"),
@@ -85,7 +85,7 @@ def _run_fixture(lines: List[str], options: Optional[ValidatorOptions] = None) -
     return [_diag_to_dict(d) for d in v.report().diagnostics]
 
 
-async def _run_scenario(scenario: dict) -> List[Dict[str, Any]]:
+async def _run_scenario(scenario: Dict[str, Any]) -> List[Dict[str, Any]]:
     clock = {"t": 0}
 
     async def chunks() -> AsyncGenerator[bytes, None]:

@@ -41,6 +41,7 @@ dev = [
   "ag-ui-protocol>=0.1.0",
   "pytest>=8.0.0",
   "pytest-asyncio>=0.23.0",
+  "mypy>=1.14",
   "ag-ui-validate[transport]",
 ]
 
@@ -52,3 +53,26 @@ packages = ["src/ag_ui_validate"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+strict = true
+
+[[tool.mypy.overrides]]
+# Test files: bodies still checked (catches real errors — wrong argument
+# types, API misuse — strict's own check_untyped_defs still applies), but
+# not required to annotate every `def test_x():`. mypy's disallow_*_defs
+# trio has no real TS equivalent for test files — TS infers signatures from
+# usage; mypy cannot infer a function's own parameter/return types the same
+# way, so mirroring TS's actual behavior (real errors caught, no blanket
+# annotation mandate) means turning off just the annotation-mandate flags.
+# (Note: putting `strict = true` directly in an override, instead of at the
+# top level like above, does NOT work as "strict for this module only" —
+# mypy warns some of strict's flags are global-only and applies them
+# globally regardless of module scoping, silently defeating the override.)
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_decorators = false
+disallow_untyped_calls = false

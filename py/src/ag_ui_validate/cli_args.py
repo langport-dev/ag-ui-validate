@@ -8,7 +8,10 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Literal, Optional, Union
+
+if TYPE_CHECKING:
+    from .types import Summary
 
 CliFormat = str  # "pretty" | "json" | "sarif" | "junit"
 
@@ -42,13 +45,13 @@ class CliConfig:
 @dataclass
 class ParseOk:
     config: CliConfig
-    ok: bool = field(default=True, init=False)
+    ok: Literal[True] = field(default=True, init=False)
 
 
 @dataclass
 class ParseErr:
     error: str
-    ok: bool = field(default=False, init=False)
+    ok: Literal[False] = field(default=False, init=False)
 
 
 ParseResult = Union[ParseOk, ParseErr]
@@ -255,7 +258,7 @@ def parse_cli_args(argv: List[str]) -> ParseResult:
     return ParseOk(config)
 
 
-def decide_exit_code(summary, max_warnings: Optional[int] = None) -> int:
+def decide_exit_code(summary: "Summary", max_warnings: Optional[int] = None) -> int:
     if summary.errors > 0:
         return 1
     if max_warnings is not None and summary.warnings > max_warnings:
