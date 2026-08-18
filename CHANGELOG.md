@@ -1,5 +1,15 @@
 # ag-ui-validate
 
+## 0.3.0
+
+### Minor Changes
+
+- 489d18c: Require Node 22+ (`engines` bumped from `>=20`). Node 20 reached end-of-life in April 2026 and its CI leg has been removed; existing releases remain installable on Node 20.
+
+### Patch Changes
+
+- 72f3c10: AGUI503's message no longer hardcodes `@ag-ui/core` — it now reads "not in the installed AG-UI SDK v{version}" instead of "not in @ag-ui/core v{version}". Surfaced by the Python port sharing the same catalog: the old wording was misleading coming from a validator built on a different SDK.
+
 ## 0.2.0
 
 ### Minor Changes
