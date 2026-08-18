@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ag-ui-validate"
-version = "0.0.1"
-description = "Conformance validator for the AG-UI protocol (name reserved — native Python port not yet released)"
+version = "0.3.0"
+description = "Conformance validator for the AG-UI protocol"
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Faraz" }]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
-  "Development Status :: 1 - Planning",
+  "Development Status :: 4 - Beta",
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
