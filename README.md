@@ -75,15 +75,17 @@ Useful flags (see `--help` for all):
 ### Validate in CI (GitHub Action)
 
 ```yaml
-- uses: langport-dev/ag-ui-validate/action@main
+- uses: langport-dev/ag-ui-validate-action@v1
   with:
     target: http://localhost:8000/agui   # or a recorded .jsonl file
     sarif-file: agui.sarif               # optional: upload via codeql-action
 ```
 
-The step fails on error-severity findings, writes a findings table to the job
-summary, and exposes `errors`/`warnings`/`info` outputs — see
-[action/README.md](action/README.md).
+The step fails on error-severity findings, writes a findings table (with a
+counts-by-category breakdown) to the job summary, annotates the PR inline
+with `::error`/`::warning` for each finding, and exposes
+`errors`/`warnings`/`info`/`sarif-path`/`report-path` outputs — see
+[langport-dev/ag-ui-validate-action](https://github.com/langport-dev/ag-ui-validate-action).
 
 ### Test your agent in Vitest
 

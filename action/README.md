@@ -1,4 +1,21 @@
-# ag-ui-validate action
+# ag-ui-validate action (deprecated location)
+
+> **This action has moved to
+> [langport-dev/ag-ui-validate-action](https://github.com/langport-dev/ag-ui-validate-action).**
+> Subdirectory actions can't be listed on GitHub Marketplace, so the action
+> now lives in its own repo with `action.yml` at the root. Update your
+> workflow:
+>
+> ```diff
+> -- uses: langport-dev/ag-ui-validate/action@main
+> +- uses: langport-dev/ag-ui-validate-action@v1
+> ```
+>
+> This directory still works as-is (`langport-dev/ag-ui-validate/action@main`)
+> and will keep working for one more release cycle, but takes no new
+> features — the new repo has PR annotations, a category-grouped job
+> summary, and a `fail-on` input this one doesn't. It will be removed after
+> that cycle.
 
 Validate an AG-UI agent endpoint or recorded event stream for protocol
 conformance in CI. A thin wrapper around the
