@@ -7,14 +7,16 @@ Same rule catalog, same fixture corpus, byte-identical CLI flags and
 JSON/SARIF/JUnit output as the TypeScript implementation — checked against
 it on every PR by Parity CI.
 
-**Not yet published as a functional PyPI release** — only a
-name-reservation placeholder (`0.0.1`) is live today. Install from source
-until a real release ships:
+```bash
+pip install ag-ui-validate   # or "ag-ui-validate[transport]" for just the endpoint-validating extras
+```
+
+To install from source instead:
 
 ```bash
 git clone https://github.com/langport-dev/ag-ui-validate
 cd ag-ui-validate/py
-pip install -e ".[dev]"   # or ".[transport]" for just the endpoint-validating extras
+pip install -e ".[dev]"
 ```
 
 ## CLI

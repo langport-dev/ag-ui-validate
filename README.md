@@ -15,10 +15,9 @@ spec section.
 2 errors, 0 warnings, 1 info — 3 of 7 AG-UI features exercised
 ```
 
-> **Status:** the TypeScript implementation is released to npm
-> (`npm install ag-ui-validate`). A native Python port — same rule catalog,
-> same fixture corpus, byte-identical CLI — is fully implemented and tested
-> but not yet published to PyPI as a functional release; see
+> **Status:** released to both npm (`npm install ag-ui-validate`) and PyPI
+> (`pip install ag-ui-validate`). Both packages version in lockstep — same
+> rule catalog, same fixture corpus, byte-identical CLI; see
 > [Python](#python) below.
 
 ## Why
@@ -175,18 +174,14 @@ import { formatReportSummary, toSarif, toJUnit } from "ag-ui-validate/report"
 
 A native Python port ships in [py/](py/) — the same rule catalog, the same
 fixture corpus, and a CLI with byte-identical flags, error messages, and
-JSON/SARIF/JUnit output to the TypeScript one above. It's fully implemented
-and tested, and checked against the TypeScript implementation on every PR
-by Parity CI (see [docs/TESTING.md](docs/TESTING.md) for how, and
+JSON/SARIF/JUnit output to the TypeScript one above. It's checked against
+the TypeScript implementation on every PR by Parity CI (see
+[docs/TESTING.md](docs/TESTING.md) for how, and
 [docs/PYTHON-PORT-PLAN.md](docs/PYTHON-PORT-PLAN.md) for the port's full
-milestone history). **Not yet published to PyPI as a functional release**
-— only a name-reservation placeholder (`0.0.1`) is live today.
-Install from source until a real release ships:
+milestone history).
 
 ```bash
-git clone https://github.com/langport-dev/ag-ui-validate
-cd ag-ui-validate/py
-pip install -e ".[dev]"   # or ".[transport]" for just the endpoint-validating extras
+pip install ag-ui-validate   # or "ag-ui-validate[transport]" for just the endpoint-validating extras
 ```
 
 ### CLI
