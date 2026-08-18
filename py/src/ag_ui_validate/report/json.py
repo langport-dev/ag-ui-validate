@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from ..rules.catalog import RULES
 from ..types import Diagnostic, Report
 
 
@@ -23,6 +24,9 @@ def _diagnostic_to_dict(d: Diagnostic) -> Dict[str, Any]:
     if d.related_event_index is not None:
         out["relatedEventIndex"] = d.related_event_index
     out["specUrl"] = d.spec_url
+    catalog = RULES.get(d.rule)
+    if catalog is not None:
+        out["category"] = catalog.category
     return out
 
 

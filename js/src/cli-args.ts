@@ -3,6 +3,7 @@
 import type { Severity } from "./types.js"
 
 export type CliFormat = "pretty" | "json" | "sarif" | "junit"
+export type FailOn = "error" | "warning" | "none"
 
 export interface CliConfig {
   /** URL, file path, or "-" for stdin. Empty only with --help/--version. */
@@ -11,6 +12,8 @@ export interface CliConfig {
   /** true/false forced; null = auto-detect from TTY. */
   color: boolean | null
   maxWarnings?: number
+  /** Severity threshold for a nonzero exit. Unset behaves like "error", today's default. */
+  failOn?: FailOn
   timeoutMs?: number
   /** Header names lowercased. */
   headers: Record<string, string>
@@ -50,6 +53,7 @@ Rules:
   --off AGUI###                   shorthand for --rule AGUI###=off
   --features <a,b,...>            declare exercised features (enables e.g. AGUI305)
   --max-warnings <n>              exit 1 when warnings exceed n
+  --fail-on <error|warning|none>  severity that triggers a nonzero exit (default: error)
 
 Endpoint options:
   --header "Name: value"          extra request header (repeatable)
@@ -59,6 +63,7 @@ Exit codes: 0 clean, 1 findings at error level (or warnings over --max-warnings)
 `
 
 const SEVERITIES = new Set(["error", "warning", "info", "off"])
+const FAIL_ON_VALUES = new Set<FailOn>(["error", "warning", "none"])
 const RULE_ID = /^AGUI\d{3}$/
 
 interface Flag {
@@ -103,6 +108,14 @@ const FLAGS: Record<string, Flag> = {
       const n = Number(v)
       if (!Number.isInteger(n) || n < 0) return `--max-warnings expects a non-negative integer, got '${v}'`
       c.maxWarnings = n
+      return null
+    },
+  },
+  "--fail-on": {
+    takesValue: true,
+    apply: (c, v) => {
+      if (!FAIL_ON_VALUES.has(v as FailOn)) return `--fail-on expects error, warning, or none, got '${v}'`
+      c.failOn = v as FailOn
       return null
     },
   },
@@ -206,8 +219,11 @@ export function parseCliArgs(argv: string[]): ParseResult {
 export function decideExitCode(
   summary: { errors: number; warnings: number; info: number },
   maxWarnings?: number,
+  failOn: FailOn = "error",
 ): 0 | 1 {
+  if (failOn === "none") return 0
   if (summary.errors > 0) return 1
+  if (failOn === "warning" && summary.warnings > 0) return 1
   if (maxWarnings !== undefined && summary.warnings > maxWarnings) return 1
   return 0
 }

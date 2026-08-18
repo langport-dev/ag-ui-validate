@@ -72,6 +72,21 @@ describe.skipIf(!existsSync(CLI))("cli integration (dist/cli.js)", () => {
     expect(r.code).toBe(0)
   })
 
+  it("--fail-on none reports findings but exits 0", async () => {
+    const r = await cli([
+      fixture("invalid/AGUI203-unterminated-tool-call/stream.jsonl"),
+      "--fail-on",
+      "none",
+    ])
+    expect(r.code).toBe(0)
+    expect(r.stdout).toContain("AGUI203")
+  })
+
+  it("--fail-on warning exits 1 on a warning-only stream that otherwise exits 0", async () => {
+    const r = await cli([fixture("invalid/AGUI105-empty-content-delta/stream.jsonl"), "--fail-on", "warning"])
+    expect(r.code).toBe(1)
+  })
+
   it("a missing file is a tool failure: exit 2", async () => {
     const r = await cli([fixture("does-not-exist.jsonl")])
     expect(r.code).toBe(2)

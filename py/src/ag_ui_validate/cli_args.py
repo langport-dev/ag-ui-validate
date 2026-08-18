@@ -14,8 +14,10 @@ if TYPE_CHECKING:
     from .types import Summary
 
 CliFormat = str  # "pretty" | "json" | "sarif" | "junit"
+FailOn = str  # "error" | "warning" | "none"
 
 _SEVERITIES = {"error", "warning", "info", "off"}
+_FAIL_ON_VALUES = {"error", "warning", "none"}
 _RULE_ID = re.compile(r"^AGUI\d{3}$")
 
 
@@ -27,6 +29,8 @@ class CliConfig:
     # true/false forced; None = auto-detect from TTY.
     color: Optional[bool] = None
     max_warnings: Optional[int] = None
+    # Severity threshold for a nonzero exit. None behaves like "error", today's default.
+    fail_on: Optional[str] = None
     timeout_ms: Optional[int] = None
     # Header names lowercased.
     headers: Dict[str, str] = field(default_factory=dict)
@@ -78,6 +82,7 @@ Rules:
   --off AGUI###                   shorthand for --rule AGUI###=off
   --features <a,b,...>            declare exercised features (enables e.g. AGUI305)
   --max-warnings <n>              exit 1 when warnings exceed n
+  --fail-on <error|warning|none>  severity that triggers a nonzero exit (default: error)
 
 Endpoint options:
   --header "Name: value"          extra request header (repeatable)
@@ -129,6 +134,13 @@ def _apply_max_warnings(c: CliConfig, v: str) -> Optional[str]:
     if not n.is_integer() or n < 0:
         return f"--max-warnings expects a non-negative integer, got '{v}'"
     c.max_warnings = int(n)
+    return None
+
+
+def _apply_fail_on(c: CliConfig, v: str) -> Optional[str]:
+    if v not in _FAIL_ON_VALUES:
+        return f"--fail-on expects error, warning, or none, got '{v}'"
+    c.fail_on = v
     return None
 
 
@@ -202,6 +214,7 @@ _FLAGS: Dict[str, _Flag] = {
     "--off": _Flag(True, _apply_off),
     "--rule": _Flag(True, _apply_rule),
     "--max-warnings": _Flag(True, _apply_max_warnings),
+    "--fail-on": _Flag(True, _apply_fail_on),
     "--timeout": _Flag(True, _apply_timeout),
     "--header": _Flag(True, _apply_header),
     "--sarif-file": _Flag(True, _apply_sarif_file),
@@ -258,8 +271,14 @@ def parse_cli_args(argv: List[str]) -> ParseResult:
     return ParseOk(config)
 
 
-def decide_exit_code(summary: "Summary", max_warnings: Optional[int] = None) -> int:
+def decide_exit_code(
+    summary: "Summary", max_warnings: Optional[int] = None, fail_on: str = "error"
+) -> int:
+    if fail_on == "none":
+        return 0
     if summary.errors > 0:
+        return 1
+    if fail_on == "warning" and summary.warnings > 0:
         return 1
     if max_warnings is not None and summary.warnings > max_warnings:
         return 1

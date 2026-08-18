@@ -115,8 +115,16 @@ describe("parseCliArgs", () => {
     expect(err(["-", "--rule"])).toMatch(/value/i)
   })
 
+  it("--fail-on takes error, warning, or none", () => {
+    expect(ok(["-", "--fail-on", "error"]).failOn).toBe("error")
+    expect(ok(["-", "--fail-on", "warning"]).failOn).toBe("warning")
+    expect(ok(["-", "--fail-on", "none"]).failOn).toBe("none")
+    expect(ok(["-"]).failOn).toBeUndefined() // unset means "error", the historical default
+    expect(err(["-", "--fail-on", "info"])).toMatch(/error, warning, or none/i)
+  })
+
   it("USAGE mentions every flag", () => {
-    for (const flag of ["--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off", "--features", "--timeout", "--header", "--no-color", "--group", "--sarif-file", "--junit-file", "--json-file"]) {
+    for (const flag of ["--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off", "--features", "--timeout", "--header", "--no-color", "--group", "--sarif-file", "--junit-file", "--json-file", "--fail-on"]) {
       expect(USAGE).toContain(flag)
     }
   })
@@ -132,5 +140,18 @@ describe("decideExitCode", () => {
   it("1 when warnings exceed --max-warnings", () => {
     expect(decideExitCode({ errors: 0, warnings: 3, info: 0 }, 2)).toBe(1)
     expect(decideExitCode({ errors: 0, warnings: 2, info: 0 }, 2)).toBe(0)
+  })
+
+  it("fail-on defaults to 'error': unchanged from today", () => {
+    expect(decideExitCode({ errors: 1, warnings: 0, info: 0 })).toBe(1)
+    expect(decideExitCode({ errors: 0, warnings: 3, info: 0 }, 2)).toBe(1)
+  })
+  it("fail-on 'warning' also fails on any warning, independent of --max-warnings", () => {
+    expect(decideExitCode({ errors: 0, warnings: 1, info: 0 }, undefined, "warning")).toBe(1)
+    expect(decideExitCode({ errors: 0, warnings: 0, info: 5 }, undefined, "warning")).toBe(0)
+    expect(decideExitCode({ errors: 1, warnings: 0, info: 0 }, undefined, "warning")).toBe(1)
+  })
+  it("fail-on 'none' never fails on findings, including errors and --max-warnings", () => {
+    expect(decideExitCode({ errors: 5, warnings: 5, info: 0 }, 0, "none")).toBe(0)
   })
 })

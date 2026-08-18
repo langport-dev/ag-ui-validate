@@ -68,6 +68,19 @@ class TestCliIntegration:
         )
         assert code == 0
 
+    def test_fail_on_none_reports_findings_but_exits_0(self):
+        code, out, err = cli(
+            [str(FIXTURES / "invalid/AGUI203-unterminated-tool-call/stream.jsonl"), "--fail-on", "none"]
+        )
+        assert code == 0
+        assert "AGUI203" in out
+
+    def test_fail_on_warning_exits_1_on_a_warning_only_stream_that_otherwise_exits_0(self):
+        code, out, err = cli(
+            [str(FIXTURES / "invalid/AGUI105-empty-content-delta/stream.jsonl"), "--fail-on", "warning"]
+        )
+        assert code == 1
+
     def test_a_missing_file_is_a_tool_failure_exit_2(self):
         code, out, err = cli([str(FIXTURES / "does-not-exist.jsonl")])
         assert code == 2

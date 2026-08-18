@@ -71,6 +71,50 @@ def test_rejects_a_catalog_with_a_missing_spec_url():
         )
 
 
+_CATEGORIES = {"lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"}
+
+
+def test_rejects_a_catalog_with_an_unknown_category():
+    with pytest.raises(ValueError, match="category"):
+        validate_catalog(
+            {
+                "catalogVersion": "0",
+                "spec": "0.x",
+                "rules": [
+                    {
+                        "id": "AGUI999",
+                        "severity": "error",
+                        "title": "x",
+                        "messageTemplate": "x",
+                        "specUrl": "https://docs.ag-ui.com/x",
+                        "since": "0.x",
+                        "checkedIn": "core",
+                        "category": "nonsense",
+                    }
+                ],
+            }
+        )
+
+
+@pytest.mark.parametrize("rule", CATALOG.rules, ids=lambda r: r.id)
+def test_has_a_known_category(rule):
+    assert rule.category in _CATEGORIES
+
+
+def test_category_matches_the_rule_id_hundreds_digit_grouping():
+    expected_by_prefix = {
+        "0": "lifecycle",
+        "1": "text",
+        "2": "toolcall",
+        "3": "state",
+        "4": "reasoning",
+        "5": "transport",
+        "9": "hygiene",
+    }
+    for rule in CATALOG.rules:
+        assert rule.category == expected_by_prefix[rule.id[4]], rule.id
+
+
 def test_every_rule_has_an_invalid_fixture_directory_whose_expected_json_fires_it():
     root = ROOT / "spec" / "fixtures" / "invalid"
     dirs = [d.name for d in root.iterdir() if d.is_dir()]

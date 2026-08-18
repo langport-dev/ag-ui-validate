@@ -153,7 +153,7 @@ async def _run(argv: List[str]) -> int:
     else:
         sys.stdout.write(to_junit(report, name=target_label))
 
-    return decide_exit_code(report.summary, config.max_warnings)
+    return decide_exit_code(report.summary, config.max_warnings, config.fail_on or "error")
 
 
 def main() -> None:

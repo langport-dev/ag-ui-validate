@@ -25,6 +25,7 @@ def to_sarif(report: Report, tool_version: str, artifact_uri: Optional[str] = No
         if catalog is not None:
             entry["shortDescription"] = {"text": catalog.title}
             entry["defaultConfiguration"] = {"level": _LEVEL[catalog.severity]}
+            entry["properties"] = {"tags": [catalog.category]}
         rules[d.rule] = entry
 
     results = []
