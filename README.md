@@ -15,10 +15,11 @@ spec section.
 2 errors, 0 warnings, 1 info — 3 of 7 AG-UI features exercised
 ```
 
-> **Status: pre-release.** The core validator, the language-neutral fixture
-> corpus, and the transport layer are implemented and tested. The CLI
-> (`npx ag-ui-validate <url|->`), the Vitest matcher, and SARIF/JUnit
-> reporters are in progress.
+> **Status:** the TypeScript implementation is released to npm
+> (`npm install ag-ui-validate`). A native Python port — same rule catalog,
+> same fixture corpus, byte-identical CLI — is fully implemented and tested
+> but not yet published to PyPI as a functional release; see
+> [Python](#python) below.
 
 ## Why
 
@@ -170,12 +171,71 @@ import { formatReportSummary, toSarif, toJUnit } from "ag-ui-validate/report"
 }
 ```
 
+## Python
+
+A native Python port ships in [py/](py/) — the same rule catalog, the same
+fixture corpus, and a CLI with byte-identical flags, error messages, and
+JSON/SARIF/JUnit output to the TypeScript one above. It's fully implemented
+and tested, and checked against the TypeScript implementation on every PR
+by Parity CI (see [docs/TESTING.md](docs/TESTING.md) for how, and
+[docs/PYTHON-PORT-PLAN.md](docs/PYTHON-PORT-PLAN.md) for the port's full
+milestone history). **Not yet published to PyPI as a functional release**
+— only a name-reservation placeholder (`0.0.1`) is live today.
+Install from source until a real release ships:
+
+```bash
+git clone https://github.com/langport-dev/ag-ui-validate
+cd ag-ui-validate/py
+pip install -e ".[dev]"   # or ".[transport]" for just the endpoint-validating extras
+```
+
+### CLI
+
+```bash
+ag-ui-validate http://localhost:8000/agui   # live endpoint (POSTs a RunAgentInput)
+ag-ui-validate run.jsonl                    # recorded stream (NDJSON/JSONL or SSE capture)
+cat run.jsonl | ag-ui-validate -            # stdin
+```
+
+Same exit codes and the same flags as the [CLI](#cli) above (see
+`ag-ui-validate --help`) — the Python argument parser is a direct,
+hand-rolled port of the TypeScript one rather than `argparse`/`click`,
+specifically to keep both CLIs' invocation and error messages
+byte-for-byte identical.
+
+### Test your agent in pytest
+
+```python
+from ag_ui_validate.pytest_plugin import assert_valid_agui
+
+def test_my_agent_stream(captured_events):
+    assert_valid_agui(captured_events, features=["shared-state"], max_warnings=0)
+```
+
+`assert_valid_agui` accepts a list of events (dicts or JSON strings) or a
+whole JSONL capture as one string, and raises `AssertionError` with every
+finding's rule ID and spec link on failure. It registers automatically as a
+pytest plugin on install — no `conftest.py` setup needed. An async
+counterpart validates a live endpoint directly from a test:
+
+```python
+from ag_ui_validate.pytest_plugin import assert_valid_agui_endpoint
+
+async def test_my_live_agent():
+    await assert_valid_agui_endpoint("http://localhost:8000/agui", max_warnings=0)
+```
+
+`assert_valid_agui` has zero runtime dependencies; only the
+endpoint-validating helpers (`assert_valid_agui_endpoint`,
+`validate_agui_endpoint`) pull in `httpx`
+(`pip install ag-ui-validate[transport]`).
+
 ## The rule catalog
 
 40 rules, maintained as **data** in
-[spec/catalog.json](spec/catalog.json) so other implementations
-(Python, Go, …) can share them. Every rule has its own page — spec grounding,
-severity, and a violating example from the corpus — in the
+[spec/catalog.json](spec/catalog.json), shared by both implementations in
+this repo ([TypeScript](.) and [Python](py/)) rather than duplicated.
+Every rule has its own page — spec grounding,
 **[rule index](docs/rules/README.md)** (generated from the catalog,
 drift-checked in CI):
 
