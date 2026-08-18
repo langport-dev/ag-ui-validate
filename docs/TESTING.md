@@ -272,6 +272,44 @@ language-specific content.
 
 ---
 
+## 11. Parity CI — TS vs Python, direct CLI diff
+
+Sections 1–10 above each independently assert, in their own language's test
+suite, that their diagnostics equal `spec/fixtures/*/expected.json`. That's
+*necessary* but not the strongest possible check on its own — it never
+exercises either shipped CLI, only each language's internal validator call.
+[`.github/workflows/parity-ci.yml`](../.github/workflows/parity-ci.yml) runs
+[`scripts/parity-check.mjs`](../scripts/parity-check.mjs) as a stronger,
+direct check: it runs the fixture corpus through **both real shipped
+CLIs** — the built `dist/cli.js` and a real installed Python wheel, not
+either language's test internals — and deep-diffs the resulting `--json`
+`diagnostics` arrays.
+
+| What | How |
+|---|---|
+| Run it locally | `npm run build && (cd py && pip wheel . -w dist --no-deps && pip install dist/*.whl) && node scripts/parity-check.mjs` |
+| Scope | `spec/fixtures/valid/*.jsonl` + `spec/fixtures/invalid/*/stream.jsonl` — 42 of the 47 fixtures |
+| Comparison | every diagnostic field compared exactly (`rule`, `severity`, `eventIndex`, `pointer`, `relatedEventIndex`, `specUrl`), except `message` for `AGUI204`/`AGUI502`/`AGUI503`, which permanently differ between languages (native JSON-parser error text, and the installed SDK's version number) — the same tolerance `test_fixtures.py` already uses |
+| On mismatch | fails the job and writes a per-fixture markdown table (fixture → what differed) to the GitHub Actions job summary |
+
+**Out of scope, on purpose:** the 5 transport-scenario fixtures
+(`spec/fixtures/invalid/AGUI50*/scenario.json`) need timed byte-chunk
+delivery with an injected clock to trigger (keepalive gaps, buffered
+responses, mid-stream drops); neither shipped CLI exposes a flag for that
+kind of replay, so those 5 stay covered only by each language's own
+`test/fixtures.test.ts` / `py/tests/test_fixtures.py` — not by this job.
+
+**Trigger:** pull requests touching `spec/**`, `js/src/**`, or `py/**` only
+— no nightly run. A cross-language regression introduced outside a
+path-filtered PR (e.g. an `@ag-ui/core` bump landing via the separate
+[`sdk-drift.yml`](../.github/workflows/sdk-drift.yml) without touching
+`spec/**`) would not be caught until the next relevant PR runs this job,
+rather than within 24h via a nightly backstop. An accepted, deliberate
+tradeoff (see `docs/PYTHON-PORT-PLAN.md` §8, open question 7) — revisit if
+that gap ever actually causes a missed regression.
+
+---
+
 ## What must never regress
 
 - **The core never throws** on any input. TS: `npm run fuzz`, hostile-object

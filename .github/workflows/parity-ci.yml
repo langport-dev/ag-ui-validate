@@ -1,0 +1,51 @@
+name: Parity CI
+
+# Both implementations independently assert, in their own native test
+# suites, that their diagnostics equal spec/fixtures/*/expected.json — that
+# is necessary but not the strongest possible check, since it never
+# exercises either shipped CLI. This job instead runs the fixture corpus
+# through BOTH real CLIs (built dist/cli.js, and a real installed Python
+# wheel) with --json and deep-diffs the results. See
+# docs/PYTHON-PORT-PLAN.md §5 for the full design, and
+# scripts/parity-check.mjs for the diff logic and its documented,
+# permanent exceptions (AGUI204/AGUI502/AGUI503 message text).
+#
+# Cadence (§8 open question 7, resolved): PR-triggered only, path-filtered
+# to spec/**, js/src/**, and py/** so unrelated doc/README PRs don't pay for
+# it. No nightly backstop — accepted tradeoff: drift introduced outside a
+# path-filtered PR (e.g. an SDK bump landing via the separate sdk-drift.yml
+# job without touching spec/**) would not be caught until the next relevant
+# PR runs this job.
+
+on:
+  pull_request:
+    paths:
+      - "spec/**"
+      - "js/src/**"
+      - "py/**"
+
+jobs:
+  parity-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Build and install the Python wheel
+        working-directory: py
+        run: |
+          python -m pip install --upgrade pip
+          pip wheel . -w dist --no-deps
+          pip install dist/*.whl
+
+      - name: Diff both shipped CLIs across the fixture corpus
+        run: node scripts/parity-check.mjs
