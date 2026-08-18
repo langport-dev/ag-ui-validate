@@ -52,6 +52,49 @@ describe("rule catalog", () => {
     ).toThrow(/specUrl/)
   })
 
+  const CATEGORIES = ["lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"]
+
+  it("rejects a catalog with an unknown category", () => {
+    expect(() =>
+      validateCatalog({
+        catalogVersion: "0",
+        spec: "0.x",
+        rules: [
+          {
+            id: "AGUI999",
+            severity: "error",
+            title: "x",
+            messageTemplate: "x",
+            specUrl: "https://docs.ag-ui.com/x",
+            since: "0.x",
+            checkedIn: "core",
+            category: "nonsense",
+          },
+        ],
+      }),
+    ).toThrow(/category/)
+  })
+
+  it.each(CATALOG.rules.map((r) => [r.id, r] as const))("%s has a known category", (_id, rule) => {
+    expect(CATEGORIES).toContain(rule.category)
+  })
+
+  it("category matches the rule ID's hundreds-digit grouping", () => {
+    const expectedByPrefix: Record<string, string> = {
+      "0": "lifecycle",
+      "1": "text",
+      "2": "toolcall",
+      "3": "state",
+      "4": "reasoning",
+      "5": "transport",
+      "9": "hygiene",
+    }
+    for (const rule of CATALOG.rules) {
+      const prefix = rule.id[4] ?? ""
+      expect(rule.category, rule.id).toBe(expectedByPrefix[prefix])
+    }
+  })
+
   it("every rule has an invalid fixture directory whose expected.json fires it", () => {
     const root = fileURLToPath(new URL("../../spec/fixtures/invalid/", import.meta.url))
     const dirs = readdirSync(root)

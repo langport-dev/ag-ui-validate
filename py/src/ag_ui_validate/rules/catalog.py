@@ -21,6 +21,7 @@ SeverityOrOff = Literal["error", "warning", "info", "off"]
 
 _SEVERITIES = {"error", "warning", "info"}
 _LAYERS = {"core", "transport"}
+_CATEGORIES = {"lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"}
 _ID_RE = re.compile(r"^AGUI\d{3}$")
 _PLACEHOLDER_RE = re.compile(r"\{(\w+)\}")
 
@@ -30,6 +31,8 @@ class RuleDefinition:
     id: str
     severity: str
     title: str
+    # Which part of the protocol this rule governs, e.g. "toolcall".
+    category: str
     # Human template with {placeholder} slots filled per diagnostic.
     message_template: str
     # Governing spec section. Mandatory: rules that cannot cite one don't ship.
@@ -60,6 +63,7 @@ def _rule_from_json(data: Dict[str, Any]) -> RuleDefinition:
         id=data.get("id") or "",
         severity=data.get("severity") or "",
         title=data.get("title") or "",
+        category=data.get("category") or "",
         message_template=data.get("messageTemplate") or "",
         spec_url=data.get("specUrl") or "",
         since=data.get("since") or "",
@@ -91,6 +95,8 @@ def validate_catalog(data: Any) -> Catalog:
             problems.append(f"{where}: bad severity '{rule.severity}'")
         if not rule.title:
             problems.append(f"{where}: missing title")
+        if rule.category not in _CATEGORIES:
+            problems.append(f"{where}: bad category '{rule.category}'")
         if not rule.message_template:
             problems.append(f"{where}: missing messageTemplate")
         if not rule.spec_url.startswith("https://"):

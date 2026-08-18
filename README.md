@@ -56,10 +56,10 @@ npx ag-ui-validate run.jsonl                    # recorded stream (NDJSON/JSONL 
 cat run.jsonl | npx ag-ui-validate -            # stdin
 ```
 
-Exit codes: `0` clean, `1` findings at error level (or warnings over
-`--max-warnings`), `2` tool failure. Timing-based transport rules are
-meaningless for recordings, so they are reported as *skipped with a reason*
-rather than risking false positives.
+Exit codes: `0` clean, `1` findings at or above the `--fail-on` threshold
+(`error` by default, or warnings over `--max-warnings`), `2` tool failure.
+Timing-based transport rules are meaningless for recordings, so they are
+reported as *skipped with a reason* rather than risking false positives.
 
 Useful flags (see `--help` for all):
 
@@ -70,6 +70,7 @@ Useful flags (see `--help` for all):
 | `--rule AGUI105=error`, `--off AGUI902` | per-rule severity overrides |
 | `--features shared-state,...` | declare exercised features (enables e.g. AGUI305) |
 | `--max-warnings 0` | fail CI on any warning |
+| `--fail-on <error\|warning\|none>` | severity that triggers a nonzero exit (default `error`; `none` for report-only runs) |
 | `--header "Authorization: Bearer …"`, `--timeout 30` | endpoint options |
 
 ### Validate in CI (GitHub Action)

@@ -108,11 +108,18 @@ class TestParseCliArgs:
     def test_flags_needing_values_reject_a_missing_value(self):
         assert "value" in _err(["-", "--rule"]).lower()
 
+    def test_fail_on_takes_error_warning_or_none(self):
+        assert _ok(["-", "--fail-on", "error"]).fail_on == "error"
+        assert _ok(["-", "--fail-on", "warning"]).fail_on == "warning"
+        assert _ok(["-", "--fail-on", "none"]).fail_on == "none"
+        assert _ok(["-"]).fail_on is None  # unset means "error", the historical default
+        assert "error, warning, or none" in _err(["-", "--fail-on", "info"]).lower()
+
     def test_usage_mentions_every_flag(self):
         for flag in [
             "--json", "--sarif", "--junit", "--max-warnings", "--rule", "--off",
             "--features", "--timeout", "--header", "--no-color", "--group",
-            "--sarif-file", "--junit-file", "--json-file",
+            "--sarif-file", "--junit-file", "--json-file", "--fail-on",
         ]:
             assert flag in USAGE
 
@@ -127,3 +134,15 @@ class TestDecideExitCode:
     def test_1_when_warnings_exceed_max_warnings(self):
         assert decide_exit_code(Summary(errors=0, warnings=3, info=0), 2) == 1
         assert decide_exit_code(Summary(errors=0, warnings=2, info=0), 2) == 0
+
+    def test_fail_on_defaults_to_error_unchanged_from_today(self):
+        assert decide_exit_code(Summary(errors=1, warnings=0, info=0)) == 1
+        assert decide_exit_code(Summary(errors=0, warnings=3, info=0), 2) == 1
+
+    def test_fail_on_warning_also_fails_on_any_warning_independent_of_max_warnings(self):
+        assert decide_exit_code(Summary(errors=0, warnings=1, info=0), None, "warning") == 1
+        assert decide_exit_code(Summary(errors=0, warnings=0, info=5), None, "warning") == 0
+        assert decide_exit_code(Summary(errors=1, warnings=0, info=0), None, "warning") == 1
+
+    def test_fail_on_none_never_fails_on_findings_including_errors_and_max_warnings(self):
+        assert decide_exit_code(Summary(errors=5, warnings=5, info=0), 0, "none") == 0

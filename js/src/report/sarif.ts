@@ -34,12 +34,7 @@ export interface SarifLog {
         name: string
         version: string
         informationUri: string
-        rules: Array<{
-          id: string
-          helpUri: string
-          shortDescription?: { text: string }
-          defaultConfiguration?: { level: SarifLevel }
-        }>
+        rules: SarifRule[]
       }
     }
     results: SarifResult[]
@@ -57,6 +52,7 @@ type SarifRule = {
   helpUri: string
   shortDescription?: { text: string }
   defaultConfiguration?: { level: SarifLevel }
+  properties?: { tags: string[] }
 }
 
 export function toSarif(report: Report, opts: SarifOptions): SarifLog {
@@ -68,6 +64,7 @@ export function toSarif(report: Report, opts: SarifOptions): SarifLog {
     if (catalog !== undefined) {
       entry.shortDescription = { text: catalog.title }
       entry.defaultConfiguration = { level: LEVEL[catalog.severity] }
+      entry.properties = { tags: [catalog.category] }
     }
     rules.set(d.rule, entry)
   }

@@ -127,6 +127,13 @@ class TestJson:
         assert len(out["diagnostics"]) == 3
         assert json_module.loads(json_module.dumps(out)) == out  # JSON-safe
 
+    def test_enriches_each_diagnostic_with_its_catalog_category(self):
+        out = to_json_report(REPORT, tool={"name": "ag-ui-validate", "version": "1.2.3"})
+        by_rule = {d["rule"]: d.get("category") for d in out["diagnostics"]}
+        assert by_rule["AGUI203"] == "toolcall"
+        assert by_rule["AGUI105"] == "text"
+        assert by_rule["AGUI902"] == "hygiene"
+
 
 class TestSarif:
     def test_emits_valid_sarif_structure_with_level_mapping_and_rule_metadata(self):
@@ -144,6 +151,9 @@ class TestSarif:
         assert meta["defaultConfiguration"]["level"] == "error"
         info = next(r for r in run["tool"]["driver"]["rules"] if r["id"] == "AGUI902")
         assert info["defaultConfiguration"]["level"] == "note"
+        # category surfaces as a SARIF tag, GitHub code scanning's grouping mechanism
+        assert "toolcall" in meta["properties"]["tags"]
+        assert "hygiene" in info["properties"]["tags"]
         # line-based location for line-oriented input: eventIndex 42 -> line 43
         assert run["results"][0]["locations"][0]["physicalLocation"]["region"]["startLine"] == 43
         # stream-level findings carry no location

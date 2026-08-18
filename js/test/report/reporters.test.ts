@@ -130,6 +130,14 @@ describe("json", () => {
     expect(out.diagnostics).toHaveLength(3)
     expect(JSON.parse(JSON.stringify(out))).toEqual(out) // JSON-safe
   })
+
+  it("enriches each diagnostic with its catalog category", () => {
+    const out = toJsonReport(report, { tool: { name: "ag-ui-validate", version: "1.2.3" } })
+    const byRule = Object.fromEntries(out.diagnostics.map((d) => [d.rule, d.category]))
+    expect(byRule.AGUI203).toBe("toolcall")
+    expect(byRule.AGUI105).toBe("text")
+    expect(byRule.AGUI902).toBe("hygiene")
+  })
 })
 
 describe("sarif", () => {
@@ -149,6 +157,9 @@ describe("sarif", () => {
     expect(meta.defaultConfiguration?.level).toBe("error")
     const info = run.tool.driver.rules.find((r) => r.id === "AGUI902")!
     expect(info.defaultConfiguration?.level).toBe("note")
+    // category surfaces as a SARIF tag, GitHub code scanning's grouping mechanism
+    expect(meta.properties?.tags).toContain("toolcall")
+    expect(info.properties?.tags).toContain("hygiene")
     // line-based location for line-oriented input: eventIndex 42 -> line 43
     expect(run.results[0]!.locations[0]!.physicalLocation.region.startLine).toBe(43)
     // stream-level findings carry no location

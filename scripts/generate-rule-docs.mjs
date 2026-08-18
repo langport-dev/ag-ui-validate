@@ -11,16 +11,17 @@ import { fileURLToPath } from "node:url"
 const ROOT = fileURLToPath(new URL("..", import.meta.url))
 const catalog = JSON.parse(readFileSync(join(ROOT, "spec/catalog.json"), "utf8"))
 
+// Display label per catalog `category` value. Order here is doc order.
 const GROUPS = {
-  0: "Lifecycle",
-  1: "Text messages",
-  2: "Tool calls",
-  3: "State",
-  4: "Reasoning",
-  5: "Transport",
-  9: "Protocol hygiene",
+  lifecycle: "Lifecycle",
+  text: "Text messages",
+  toolcall: "Tool calls",
+  state: "State",
+  reasoning: "Reasoning",
+  transport: "Transport",
+  hygiene: "Protocol hygiene",
 }
-const groupOf = (id) => GROUPS[Number(id[4])] ?? "Other"
+const groupOf = (rule) => GROUPS[rule.category] ?? "Other"
 
 const fixtureDirs = readdirSync(join(ROOT, "spec/fixtures/invalid"))
 const fixtureFor = (id) => {
@@ -76,7 +77,7 @@ function rulePage(rule) {
     "<!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.",
     "     Do not edit by hand; run `npm run docs:generate`. -->",
     "",
-    `**Severity:** ${rule.severity} · **Group:** ${groupOf(rule.id)} · **Checked in:** ${rule.checkedIn} · **Since:** ${rule.since}`,
+    `**Severity:** ${rule.severity} · **Group:** ${groupOf(rule)} · **Checked in:** ${rule.checkedIn} · **Since:** ${rule.since}`,
     "",
     `**Message:** \`${rule.messageTemplate}\``,
     "",
@@ -125,7 +126,7 @@ function index() {
     "",
   ]
   for (const groupName of Object.values(GROUPS)) {
-    const rules = catalog.rules.filter((r) => groupOf(r.id) === groupName)
+    const rules = catalog.rules.filter((r) => groupOf(r) === groupName)
     if (rules.length === 0) continue
     lines.push(`## ${groupName}`, "", "| Rule | Severity | Layer | Title |", "|---|---|---|---|")
     for (const r of rules) {

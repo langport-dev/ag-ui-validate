@@ -132,7 +132,7 @@ async function main(): Promise<number> {
     process.stdout.write(toJUnit(report, { name: targetLabel }))
   }
 
-  return decideExitCode(report.summary, config.maxWarnings)
+  return decideExitCode(report.summary, config.maxWarnings, config.failOn)
 }
 
 main().then(

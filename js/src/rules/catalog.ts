@@ -13,12 +13,15 @@ export type SeverityOrOff = Severity | "off"
 
 const SEVERITIES: readonly string[] = ["error", "warning", "info"]
 const LAYERS: readonly string[] = ["core", "transport"]
+export const CATEGORIES: readonly string[] = ["lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"]
 
 export interface RuleDefinition {
   /** e.g. "AGUI203" */
   id: string
   severity: Severity
   title: string
+  /** Which part of the protocol this rule governs, e.g. "toolcall". */
+  category: string
   /** Human template with {placeholder} slots filled per diagnostic. */
   messageTemplate: string
   /** Governing spec section. Mandatory: rules that cannot cite one don't ship. */
@@ -58,6 +61,7 @@ export function validateCatalog(data: unknown): Catalog {
     seen.add(rule.id)
     if (!SEVERITIES.includes(rule.severity)) problems.push(`${where}: bad severity '${rule.severity}'`)
     if (!rule.title) problems.push(`${where}: missing title`)
+    if (!CATEGORIES.includes(rule.category)) problems.push(`${where}: bad category '${rule.category}'`)
     if (!rule.messageTemplate) problems.push(`${where}: missing messageTemplate`)
     if (!rule.specUrl?.startsWith("https://")) problems.push(`${where}: specUrl must be an https URL`)
     if (!rule.since) problems.push(`${where}: missing since`)
