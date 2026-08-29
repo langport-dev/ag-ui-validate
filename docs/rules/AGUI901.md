@@ -18,9 +18,9 @@ Source: <https://docs.ag-ui.com/concepts/events#raw>
 A violating stream from the corpus ([`spec/fixtures/invalid/AGUI901-raw-wraps-typed-event`](../../spec/fixtures/invalid/AGUI901-raw-wraps-typed-event)):
 
 ```jsonl
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019900}
-{"type":"RAW","event":{"type":"TOOL_CALL_RESULT","toolCallId":"call_001","content":"wrapped"},"timestamp":1755300020000}
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300020100}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021700}
+{"type":"RAW","event":{"type":"TOOL_CALL_RESULT","toolCallId":"call_001","content":"wrapped"},"timestamp":1755300021800}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300021900}
 ```
 
 Expected findings:

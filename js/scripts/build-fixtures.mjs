@@ -352,6 +352,49 @@ const INVALID = {
     intent: ["AGUI402"],
     events: [start(), { type: "REASONING_START", messageId: "rsn_001", timestamp: t() }, finish()],
   },
+  "AGUI601-duplicate-subagent-started": {
+    intent: ["AGUI601"],
+    events: [
+      start(),
+      { type: "SUBAGENT_STARTED", subagentRunId: "sub_001", name: "researcher", timestamp: t() },
+      { type: "SUBAGENT_STARTED", subagentRunId: "sub_001", name: "researcher", timestamp: t() },
+      { type: "SUBAGENT_FINISHED", subagentRunId: "sub_001", timestamp: t() },
+      finish(),
+    ],
+  },
+  "AGUI602-finished-without-start": {
+    intent: ["AGUI602"],
+    events: [
+      start(),
+      { type: "SUBAGENT_FINISHED", subagentRunId: "sub_ghost", timestamp: t() },
+      finish(),
+    ],
+  },
+  "AGUI603-error-without-start": {
+    intent: ["AGUI603"],
+    events: [
+      start(),
+      { type: "SUBAGENT_ERROR", subagentRunId: "sub_ghost", message: "boom", timestamp: t() },
+      finish(),
+    ],
+  },
+  "AGUI604-subagent-unterminated": {
+    intent: ["AGUI604"],
+    events: [
+      start(),
+      { type: "SUBAGENT_STARTED", subagentRunId: "sub_001", name: "researcher", timestamp: t() },
+      finish(),
+    ],
+  },
+  "AGUI605-unknown-parent-subagent-run-id": {
+    intent: ["AGUI605"],
+    events: [
+      start(),
+      { type: "SUBAGENT_STARTED", subagentRunId: "sub_001", name: "researcher", parentSubagentRunId: "sub_ghost", timestamp: t() },
+      { type: "SUBAGENT_FINISHED", subagentRunId: "sub_001", timestamp: t() },
+      finish(),
+    ],
+  },
   "AGUI502-payload-not-json": {
     intent: ["AGUI502"],
     events: [start(), '{"type": broken json', finish()],

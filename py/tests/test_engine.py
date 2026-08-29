@@ -219,6 +219,129 @@ class TestFinalize:
         assert v.finalize() == []
 
 
+def _started_sub(**over: Any) -> Dict[str, Any]:
+    return {"type": "SUBAGENT_STARTED", "subagentRunId": "sub_1", "name": "researcher", **over}
+
+
+def _finished_sub(**over: Any) -> Dict[str, Any]:
+    return {"type": "SUBAGENT_FINISHED", "subagentRunId": "sub_1", **over}
+
+
+class TestSubagentLifecycle:
+    """AGUI601-AGUI605 edge cases: suspension/resumption and nesting, not
+    otherwise covered by the shared fixture corpus. Mirrors
+    js/test/validator/subagents.test.ts.
+    """
+
+    def test_clean_started_finished_pair_is_silent(self):
+        diags, _ = validate(in_run(_started_sub(), _finished_sub()))
+        assert diags == []
+
+    def test_clean_started_errored_pair_is_silent(self):
+        diags, _ = validate(in_run(_started_sub(), {"type": "SUBAGENT_ERROR", "subagentRunId": "sub_1", "message": "boom"}))
+        assert diags == []
+
+    def test_tracks_concurrent_subagents_independently(self):
+        diags, _ = validate(
+            in_run(
+                _started_sub(subagentRunId="sub_1"),
+                _started_sub(subagentRunId="sub_2"),
+                _finished_sub(subagentRunId="sub_1"),
+                _finished_sub(subagentRunId="sub_2"),
+            )
+        )
+        assert diags == []
+
+    def test_agui601_fires_when_reopening_an_open_id(self):
+        diags, _ = validate(in_run(_started_sub(), _started_sub(), _finished_sub()))
+        assert len(only(diags, "AGUI601")) == 1
+
+    def test_agui601_fires_when_reusing_an_id_after_a_plain_success_close(self):
+        diags, _ = validate(in_run(_started_sub(), _finished_sub(), _started_sub(), _finished_sub()))
+        assert len(only(diags, "AGUI601")) == 1
+
+    def test_agui601_fires_when_reusing_an_id_after_subagent_error(self):
+        diags, _ = validate(
+            in_run(_started_sub(), {"type": "SUBAGENT_ERROR", "subagentRunId": "sub_1", "message": "boom"}, _started_sub())
+        )
+        assert len(only(diags, "AGUI601")) == 1
+
+    def test_agui601_does_not_fire_when_a_suspended_subagent_id_is_resumed(self):
+        diags, _ = validate(
+            in_run(
+                _started_sub(),
+                _finished_sub(outcome={"type": "suspended", "interruptIds": ["int_1"]}),
+                _started_sub(),
+                _finished_sub(),
+            )
+        )
+        assert "AGUI601" not in rules_of(diags)
+
+    def test_agui601_still_detects_a_genuine_duplicate_after_a_resumed_subagent_closes(self):
+        diags, _ = validate(
+            in_run(
+                _started_sub(),
+                _finished_sub(outcome={"type": "suspended"}),
+                _started_sub(),
+                _finished_sub(),
+                _started_sub(),
+            )
+        )
+        assert len(only(diags, "AGUI601")) == 1
+
+    def test_agui602_fires_for_finished_with_no_open_start(self):
+        diags, _ = validate(in_run(_finished_sub()))
+        assert len(only(diags, "AGUI602")) == 1
+
+    def test_agui603_fires_for_error_with_no_open_start(self):
+        diags, _ = validate(in_run({"type": "SUBAGENT_ERROR", "subagentRunId": "sub_1", "message": "boom"}))
+        assert len(only(diags, "AGUI603")) == 1
+
+    def test_agui602_fires_for_a_second_finished_on_an_already_closed_subagent(self):
+        diags, _ = validate(in_run(_started_sub(), _finished_sub(), _finished_sub()))
+        assert len(only(diags, "AGUI602")) == 1
+
+    def test_agui604_fires_at_the_terminal_event_and_points_back_to_the_start(self):
+        diags, _ = validate(in_run(_started_sub()))
+        hits = only(diags, "AGUI604")
+        assert len(hits) == 1
+        assert hits[0].related_event_index == 1
+
+    def test_agui604_does_not_fire_after_run_error(self):
+        diags, _ = validate([{"type": "RUN_STARTED", "threadId": "t", "runId": "r"}, _started_sub(), {"type": "RUN_ERROR", "message": "boom"}])
+        assert "AGUI604" not in rules_of(diags)
+
+    def test_agui604_does_not_fire_for_a_suspended_subagent(self):
+        diags, _ = validate(in_run(_started_sub(), _finished_sub(outcome={"type": "suspended"})))
+        assert "AGUI604" not in rules_of(diags)
+
+    def test_agui605_fires_when_the_parent_id_was_never_observed(self):
+        diags, _ = validate(in_run(_started_sub(parentSubagentRunId="ghost"), _finished_sub()))
+        assert len(only(diags, "AGUI605")) == 1
+
+    def test_agui605_does_not_fire_when_the_parent_was_started_earlier_even_if_already_finished(self):
+        diags, _ = validate(
+            in_run(
+                _started_sub(subagentRunId="parent"),
+                _finished_sub(subagentRunId="parent"),
+                _started_sub(subagentRunId="child", parentSubagentRunId="parent"),
+                _finished_sub(subagentRunId="child"),
+            )
+        )
+        assert "AGUI605" not in rules_of(diags)
+
+    def test_agui605_does_not_fire_when_the_parent_is_still_open(self):
+        diags, _ = validate(
+            in_run(
+                _started_sub(subagentRunId="parent"),
+                _started_sub(subagentRunId="child", parentSubagentRunId="parent"),
+                _finished_sub(subagentRunId="child"),
+                _finished_sub(subagentRunId="parent"),
+            )
+        )
+        assert "AGUI605" not in rules_of(diags)
+
+
 class TestMultiRunStreams:
     def test_validates_each_run_independently_and_accepts_parent_run_id_branching(self):
         diags, _ = validate(

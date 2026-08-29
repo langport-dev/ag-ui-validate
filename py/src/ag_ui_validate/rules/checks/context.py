@@ -41,6 +41,20 @@ class OpenStep:
 
 
 @dataclass
+class OpenSubagent:
+    start_index: int
+
+
+@dataclass
+class ClosedSubagent:
+    index: int
+    # True only when closed via SUBAGENT_FINISHED with outcome.type ==
+    # "suspended" - the one case where a later SUBAGENT_STARTED reusing this
+    # id is a legitimate continuation, not a duplicate (AGUI601).
+    resumable: bool = False
+
+
+@dataclass
 class StateInfo:
     # True once a STATE_SNAPSHOT established an observable base (SQ-1).
     known: bool = False
@@ -92,6 +106,11 @@ class RunState:
 
     # step_name -> re-entrant open count (SQ-10) and first-open index.
     open_steps: Dict[str, OpenStep] = field(default_factory=dict)
+
+    open_subagents: Dict[str, OpenSubagent] = field(default_factory=dict)
+    closed_subagents: Dict[str, ClosedSubagent] = field(default_factory=dict)
+    # Every subagentRunId ever started (open or closed), for parentSubagentRunId checks.
+    known_subagent_run_ids: Set[str] = field(default_factory=set)
 
     open_reasoning_blocks: Dict[str, int] = field(default_factory=dict)
     open_reasoning_messages: Dict[str, int] = field(default_factory=dict)

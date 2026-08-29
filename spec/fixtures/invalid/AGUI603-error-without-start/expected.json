@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AGUI603",
+    "severity": "error",
+    "message": "SUBAGENT_ERROR references subagentRunId 'sub_ghost', which was never started",
+    "eventIndex": 1,
+    "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+    "eventType": "SUBAGENT_ERROR",
+    "pointer": "/subagentRunId"
+  }
+]

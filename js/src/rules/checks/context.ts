@@ -48,6 +48,14 @@ export interface RunState {
   /** stepName -> re-entrant open count (SQ-10) and first-open index. */
   openSteps: Map<string, { count: number; firstIndex: number }>
 
+  openSubagents: Map<string, { startIndex: number }>
+  /** Closed via SUBAGENT_FINISHED (resumable only when outcome.type ===
+   * "suspended" - the one case where a later SUBAGENT_STARTED reusing this
+   * id is a legitimate continuation, not a duplicate, AGUI601) or SUBAGENT_ERROR. */
+  closedSubagents: Map<string, { index: number; resumable: boolean }>
+  /** Every subagentRunId ever started (open or closed), for parentSubagentRunId checks. */
+  knownSubagentRunIds: Set<string>
+
   openReasoningBlocks: Map<string, number>
   openReasoningMessages: Map<string, number>
 
@@ -82,6 +90,9 @@ export function newRunState(init: {
     closedToolCalls: new Map(),
     knownToolCallIds: new Set(),
     openSteps: new Map(),
+    openSubagents: new Map(),
+    closedSubagents: new Map(),
+    knownSubagentRunIds: new Set(),
     openReasoningBlocks: new Map(),
     openReasoningMessages: new Map(),
     state: { known: false, value: undefined, deltasSinceSnapshot: 0, snapshotSeen: false, agui301Fired: false },

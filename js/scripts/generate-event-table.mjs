@@ -22,6 +22,8 @@ const EVENTS_DOC = "https://docs.ag-ui.com/concepts/events"
 
 function docsUrl(wireType, schemaExport) {
   if (CATEGORY[wireType] === "thinking") return `${EVENTS_DOC}#thinking-events-deprecated`
+  // Subagent events share one heading with no individual anchors.
+  if (CATEGORY[wireType] === "subagent") return `${EVENTS_DOC}#subagent-events`
   // Anchor is the lowercased PascalCase event name, e.g. ToolCallStartEventSchema
   // -> #toolcallstart. Verified against the rendered page's heading ids.
   return `${EVENTS_DOC}#${schemaExport.replace(/EventSchema$/, "").toLowerCase()}`
@@ -77,6 +79,7 @@ export type EventCategory =
   | "reasoning"
   | "thinking"
   | "special"
+  | "subagent"
 
 export interface FieldSpec {
   kind: FieldKind

@@ -32,6 +32,7 @@ from .rules.checks.context import (
 from .rules.checks.lifecycle import check_run_id_stability, end_of_run_steps, handle_step_event
 from .rules.checks.reasoning import close_reasoning_chunk, end_of_run_reasoning, handle_reasoning_event
 from .rules.checks.state import handle_state_event
+from .rules.checks.subagents import end_of_run_subagents, handle_subagent_event
 from .rules.checks.text import close_text_chunk, end_of_run_text, handle_text_event
 from .rules.checks.toolcalls import close_tool_chunk, end_of_run_tool_calls, handle_tool_call_event
 from .rules.checks.transport import TRANSPORT_RULE_IDS, TRANSPORT_SKIP_REASON
@@ -182,6 +183,7 @@ class Validator:
         end_of_run_tool_calls(r, emit, at_index)
         end_of_run_steps(r, emit, at_index)
         end_of_run_reasoning(r, emit, at_index)
+        end_of_run_subagents(r, emit, at_index)
 
     def _ensure_run(self, index: int, type_: str, emit: EmitFn) -> RunState:
         """Opens the implicit run scope for streams that never announced one."""
@@ -348,6 +350,8 @@ class Validator:
             pass
         elif category == "activity":
             pass  # No activity rules in the catalog yet.
+        elif category == "subagent":
+            handle_subagent_event(a)
         elif category == "special":
             if type_ == "RAW":
                 wrapped = ev.get("event")

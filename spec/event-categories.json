@@ -8,7 +8,8 @@
     "activity",
     "reasoning",
     "thinking",
-    "special"
+    "special",
+    "subagent"
   ],
   "eventCategory": {
     "RUN_STARTED": "lifecycle",
@@ -43,7 +44,10 @@
     "THINKING_TEXT_MESSAGE_CONTENT": "thinking",
     "THINKING_TEXT_MESSAGE_END": "thinking",
     "RAW": "special",
-    "CUSTOM": "special"
+    "CUSTOM": "special",
+    "SUBAGENT_STARTED": "subagent",
+    "SUBAGENT_FINISHED": "subagent",
+    "SUBAGENT_ERROR": "subagent"
   },
   "$deprecatedComment": "@deprecated markers in @ag-ui/core's type definitions, 'Will be removed in 1.0.0'. Maps a deprecated wire type to its replacement.",
   "deprecated": {

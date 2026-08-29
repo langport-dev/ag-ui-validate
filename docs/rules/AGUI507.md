@@ -31,7 +31,7 @@ protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
   "chunks": [
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300021800}\n\ndata: {\"type\":\"TEXT_MESSAGE_START\",\"messageId\":\"msg_001\",\"role\":\"assistant\",\"timestamp\":1755300021900}\n\ndata: {\"type\":\"TEXT_MESSAGE_CONTENT\",\"messageId\":\"msg_001\",\"delta\":\"All good here.\",\"timestamp\":1755300022000}\n\ndata: {\"type\":\"TEXT_MESSAGE_END\",\"messageId\":\"msg_001\",\"timestamp\":1755300022100}\n\ndata: {\"type\":\"RUN_FINISHED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"outcome\":{\"type\":\"success\"},\"timestamp\":1755300022200}\n\n"
+      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300023600}\n\ndata: {\"type\":\"TEXT_MESSAGE_START\",\"messageId\":\"msg_001\",\"role\":\"assistant\",\"timestamp\":1755300023700}\n\ndata: {\"type\":\"TEXT_MESSAGE_CONTENT\",\"messageId\":\"msg_001\",\"delta\":\"All good here.\",\"timestamp\":1755300023800}\n\ndata: {\"type\":\"TEXT_MESSAGE_END\",\"messageId\":\"msg_001\",\"timestamp\":1755300023900}\n\ndata: {\"type\":\"RUN_FINISHED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"outcome\":{\"type\":\"success\"},\"timestamp\":1755300024000}\n\n"
     }
   ]
 }

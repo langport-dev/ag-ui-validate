@@ -18,6 +18,7 @@ const GROUPS = {
   toolcall: "Tool calls",
   state: "State",
   reasoning: "Reasoning",
+  subagent: "Subagents",
   transport: "Transport",
   hygiene: "Protocol hygiene",
 }
