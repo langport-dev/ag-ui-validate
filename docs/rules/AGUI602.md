@@ -5,7 +5,7 @@
 
 **Severity:** error · **Group:** Subagents · **Checked in:** core · **Since:** 0.x
 
-**Message:** `SUBAGENT_FINISHED references subagentRunId '{subagentRunId}', which was never started`
+**Message:** `SUBAGENT_FINISHED for subagentRunId '{subagentRunId}' with no open SUBAGENT_STARTED`
 
 ## Spec grounding
 
@@ -25,4 +25,4 @@ A violating stream from the corpus ([`spec/fixtures/invalid/AGUI602-finished-wit
 
 Expected findings:
 
-- `error` AGUI602 at event 1 — SUBAGENT_FINISHED references subagentRunId 'sub_ghost', which was never started
+- `error` AGUI602 at event 1 — SUBAGENT_FINISHED for subagentRunId 'sub_ghost' with no open SUBAGENT_STARTED

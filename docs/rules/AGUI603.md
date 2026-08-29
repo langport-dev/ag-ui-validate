@@ -5,7 +5,7 @@
 
 **Severity:** error · **Group:** Subagents · **Checked in:** core · **Since:** 0.x
 
-**Message:** `SUBAGENT_ERROR references subagentRunId '{subagentRunId}', which was never started`
+**Message:** `SUBAGENT_ERROR for subagentRunId '{subagentRunId}' with no open SUBAGENT_STARTED`
 
 ## Spec grounding
 
@@ -25,4 +25,4 @@ A violating stream from the corpus ([`spec/fixtures/invalid/AGUI603-error-withou
 
 Expected findings:
 
-- `error` AGUI603 at event 1 — SUBAGENT_ERROR references subagentRunId 'sub_ghost', which was never started
+- `error` AGUI603 at event 1 — SUBAGENT_ERROR for subagentRunId 'sub_ghost' with no open SUBAGENT_STARTED
