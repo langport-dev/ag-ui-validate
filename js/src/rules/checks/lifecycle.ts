@@ -3,7 +3,7 @@
 // the step pairing and the RUN_FINISHED id-stability check.
 
 import type { CheckApi, RunState, EmitFn } from "./context.js"
-import { str } from "./context.js"
+import { checkOwnerConsistency, str } from "./context.js"
 
 export function handleStepEvent(api: CheckApi): void {
   const { type, event, run, emit, index } = api
@@ -15,7 +15,9 @@ export function handleStepEvent(api: CheckApi): void {
     if (open !== undefined) {
       open.count += 1 // re-entrant same-name steps are tolerated (SQ-10)
     } else {
-      run.openSteps.set(stepName, { count: 1, firstIndex: index })
+      // Owner is fixed by whoever opens the step first; a re-entrant reopen
+      // does not change it ("steps are scoped to the agent that opened them").
+      run.openSteps.set(stepName, { count: 1, firstIndex: index, owner: str(event, "subagentRunId") })
     }
     return
   }
@@ -26,6 +28,7 @@ export function handleStepEvent(api: CheckApi): void {
       emit("AGUI006", { stepName }, { pointer: "/stepName" })
       return
     }
+    checkOwnerConsistency(emit, type, "stepName", stepName, event, open.owner)
     open.count -= 1
     if (open.count === 0) run.openSteps.delete(stepName)
   }

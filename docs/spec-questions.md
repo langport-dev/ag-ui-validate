@@ -187,3 +187,21 @@ convention, not a spec requirement.
 
 **Question for upstream:** should CUSTOM event names be namespaced
 (reverse-DNS or `vendor.name`)?
+
+## SQ-15: Subagent attribution on `*_CHUNK` forms — open
+
+[concepts/subagents](https://docs.ag-ui.com/concepts/subagents#concurrency-and-the-chunk-shorthand)
+says a chunk that omits its id means "the same as the previous one", and
+"under concurrency, 'previous' is only meaningful **per subagent**" — the
+shorthand resolves within the sending subagent's own stream, not across the
+whole run. That requires tracking one open chunk stream *per subagent* rather
+than one per run.
+
+**Validator behaviour:** `TEXT_MESSAGE_CHUNK`/`TOOL_CALL_CHUNK`/
+`REASONING_MESSAGE_CHUNK` keep the single per-run chunk slot from before
+subagent support existed (see SQ-9). AGUI606 (a continuation event's
+`subagentRunId` must agree with its entity's owner) is therefore only checked
+against the explicit Start/Content/End forms, not chunks; two subagents
+chunk-streaming concurrently with omitted ids is not flagged as a conflict
+even though attribution would in fact be ambiguous per the spec's own
+description.

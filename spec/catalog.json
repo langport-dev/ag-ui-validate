@@ -489,6 +489,18 @@
       "checkedIn": "core"
     },
     {
+      "id": "AGUI606",
+      "severity": "warning",
+      "title": "Continuation event's subagentRunId disagrees with its entity's owner",
+      "category": "subagent",
+      "messageTemplate": "{type} declares subagentRunId '{actual}', but {entityType} '{entityId}' was opened under {expected}",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+      "specQuote": "Continuation and close events agree with the owner their entity was created under.",
+      "since": "0.x",
+      "specQuestion": "SQ-15",
+      "checkedIn": "core"
+    },
+    {
       "id": "AGUI901",
       "severity": "info",
       "title": "RAW event wraps a typed AG-UI event",

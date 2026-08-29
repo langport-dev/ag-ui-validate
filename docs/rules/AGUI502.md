@@ -18,9 +18,9 @@ Source: <https://docs.ag-ui.com/concepts/events#base-event-properties>
 A violating stream from the corpus ([`spec/fixtures/invalid/AGUI502-payload-not-json`](../../spec/fixtures/invalid/AGUI502-payload-not-json)):
 
 ```jsonl
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300020800}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021400}
 {"type": broken json
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300020900}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300021500}
 ```
 
 Expected findings:

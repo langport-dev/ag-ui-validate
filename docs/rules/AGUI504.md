@@ -18,10 +18,10 @@ Source: <https://docs.ag-ui.com/concepts/events#base-event-properties>
 A violating stream from the corpus ([`spec/fixtures/invalid/AGUI504-schema-violation`](../../spec/fixtures/invalid/AGUI504-schema-violation)):
 
 ```jsonl
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021300}
-{"type":"TOOL_CALL_START","toolCallId":"call_001","timestamp":1755300021400}
-{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300021500}
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300021600}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021900}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","timestamp":1755300022000}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300022100}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300022200}
 ```
 
 Expected findings:

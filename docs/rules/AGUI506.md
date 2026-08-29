@@ -31,23 +31,23 @@ protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
   "chunks": [
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300023100}\n\n"
+      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300023700}\n\n"
     },
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"TEXT_MESSAGE_START\",\"messageId\":\"msg_001\",\"role\":\"assistant\",\"timestamp\":1755300023200}\n\n"
+      "text": "data: {\"type\":\"TEXT_MESSAGE_START\",\"messageId\":\"msg_001\",\"role\":\"assistant\",\"timestamp\":1755300023800}\n\n"
     },
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"TEXT_MESSAGE_CONTENT\",\"messageId\":\"msg_001\",\"delta\":\"Thinking very hard…\",\"timestamp\":1755300023300}\n\n"
+      "text": "data: {\"type\":\"TEXT_MESSAGE_CONTENT\",\"messageId\":\"msg_001\",\"delta\":\"Thinking very hard…\",\"timestamp\":1755300023900}\n\n"
     },
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"TEXT_MESSAGE_END\",\"messageId\":\"msg_001\",\"timestamp\":1755300023400}\n\n"
+      "text": "data: {\"type\":\"TEXT_MESSAGE_END\",\"messageId\":\"msg_001\",\"timestamp\":1755300024000}\n\n"
     },
     {
       "gapMs": 47000,
-      "text": "data: {\"type\":\"RUN_FINISHED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"outcome\":{\"type\":\"success\"},\"timestamp\":1755300023500}\n\n"
+      "text": "data: {\"type\":\"RUN_FINISHED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"outcome\":{\"type\":\"success\"},\"timestamp\":1755300024100}\n\n"
     }
   ]
 }

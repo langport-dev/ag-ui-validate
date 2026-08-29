@@ -58,6 +58,7 @@
 - [AGUI603 — SUBAGENT_ERROR without matching SUBAGENT_STARTED](docs/rules/AGUI603.md)
 - [AGUI604 — Subagent unterminated at run end](docs/rules/AGUI604.md)
 - [AGUI605 — parentSubagentRunId references a subagent never started](docs/rules/AGUI605.md)
+- [AGUI606 — Continuation event's subagentRunId disagrees with its entity's owner](docs/rules/AGUI606.md)
 - [AGUI901 — RAW event wraps a typed AG-UI event](docs/rules/AGUI901.md)
 - [AGUI902 — Events carry no timestamps](docs/rules/AGUI902.md)
 - [AGUI903 — CUSTOM event name is not namespaced](docs/rules/AGUI903.md)

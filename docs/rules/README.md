@@ -3,7 +3,7 @@
 <!-- Generated from spec/catalog.json by scripts/generate-rule-docs.mjs.
      Do not edit by hand; run `npm run docs:generate`. -->
 
-All 45 conformance rules, grouped by the part of the
+All 46 conformance rules, grouped by the part of the
 protocol they guard. Every diagnostic links to the spec section it is
 grounded in; ambiguous spec behavior is capped at `info` severity and
 tracked in [spec-questions.md](../spec-questions.md).
@@ -71,6 +71,7 @@ tracked in [spec-questions.md](../spec-questions.md).
 | [AGUI603](AGUI603.md) | error | core | SUBAGENT_ERROR without matching SUBAGENT_STARTED |
 | [AGUI604](AGUI604.md) | error | core | Subagent unterminated at run end |
 | [AGUI605](AGUI605.md) | warning | core | parentSubagentRunId references a subagent never started |
+| [AGUI606](AGUI606.md) | warning | core | Continuation event's subagentRunId disagrees with its entity's owner |
 
 ## Transport
 

@@ -26,7 +26,7 @@ protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
   "chunks": [
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300024100}\n\n"
+      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300024700}\n\n"
     }
   ],
   "abnormalEof": true

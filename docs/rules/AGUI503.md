@@ -18,9 +18,9 @@ Source: <https://docs.ag-ui.com/concepts/events#event-types-overview>
 A violating stream from the corpus ([`spec/fixtures/invalid/AGUI503-unknown-event-type`](../../spec/fixtures/invalid/AGUI503-unknown-event-type)):
 
 ```jsonl
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021000}
-{"type":"AGUI_PING","timestamp":1755300021100}
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300021200}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021600}
+{"type":"AGUI_PING","timestamp":1755300021700}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300021800}
 ```
 
 Expected findings:

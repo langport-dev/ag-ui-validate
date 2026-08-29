@@ -6,7 +6,7 @@ js/src/rules/checks/lifecycle.ts.
 
 from __future__ import annotations
 
-from .context import CheckApi, EmitFn, OpenStep, RunState, str_field
+from .context import CheckApi, EmitFn, OpenStep, RunState, check_owner_consistency, str_field
 
 
 def handle_step_event(api: CheckApi) -> None:
@@ -19,7 +19,11 @@ def handle_step_event(api: CheckApi) -> None:
         if open_ is not None:
             open_.count += 1  # re-entrant same-name steps are tolerated (SQ-10)
         else:
-            api.run.open_steps[step_name] = OpenStep(count=1, first_index=api.index)
+            # Owner is fixed by whoever opens the step first; a re-entrant
+            # reopen does not change it ("steps are scoped to the agent that
+            # opened them").
+            owner = str_field(api.event, "subagentRunId")
+            api.run.open_steps[step_name] = OpenStep(count=1, first_index=api.index, owner=owner)
         return
 
     if api.type == "STEP_FINISHED":
@@ -27,6 +31,7 @@ def handle_step_event(api: CheckApi) -> None:
         if open_ is None:
             api.emit("AGUI006", {"stepName": step_name}, {"pointer": "/stepName"})
             return
+        check_owner_consistency(api.emit, api.type, "stepName", step_name, api.event, open_.owner)
         open_.count -= 1
         if open_.count == 0:
             del api.run.open_steps[step_name]

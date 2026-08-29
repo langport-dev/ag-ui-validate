@@ -342,6 +342,124 @@ class TestSubagentLifecycle:
         assert "AGUI605" not in rules_of(diags)
 
 
+class TestSubagentOwnershipConsistency:
+    """AGUI606: a continuation/close event's subagentRunId must agree with
+    its entity's owner. Fixture coverage (spec/fixtures/invalid/AGUI606-*)
+    exercises the text-message case; these cover the toolcall/step variants
+    and the documented exceptions (TOOL_CALL_RESULT, omitted tags,
+    parentMessageId inheritance). Mirrors
+    js/test/validator/subagent-ownership.test.ts.
+    """
+
+    def test_does_not_fire_when_the_continuation_omits_subagent_run_id(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TEXT_MESSAGE_START", "messageId": "m1", "role": "assistant", "subagentRunId": "sub_1"},
+                {"type": "TEXT_MESSAGE_CONTENT", "messageId": "m1", "delta": "hi"},
+                {"type": "TEXT_MESSAGE_END", "messageId": "m1"},
+            )
+        )
+        assert "AGUI606" not in rules_of(diags)
+
+    def test_does_not_fire_when_the_continuation_repeats_the_same_tag(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TEXT_MESSAGE_START", "messageId": "m1", "role": "assistant", "subagentRunId": "sub_1"},
+                {"type": "TEXT_MESSAGE_END", "messageId": "m1", "subagentRunId": "sub_1"},
+            )
+        )
+        assert "AGUI606" not in rules_of(diags)
+
+    def test_fires_when_a_message_opened_under_the_run_is_continued_under_a_subagent(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TEXT_MESSAGE_START", "messageId": "m1", "role": "assistant"},
+                {"type": "TEXT_MESSAGE_CONTENT", "messageId": "m1", "delta": "hi", "subagentRunId": "sub_1"},
+            )
+        )
+        hits = only(diags, "AGUI606")
+        assert len(hits) == 1
+        assert "the run" in hits[0].message
+
+    def test_fires_when_tool_call_end_disagrees_with_start(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TOOL_CALL_START", "toolCallId": "c1", "toolCallName": "t", "subagentRunId": "sub_1"},
+                {"type": "TOOL_CALL_END", "toolCallId": "c1", "subagentRunId": "sub_2"},
+            )
+        )
+        assert len(only(diags, "AGUI606")) == 1
+
+    def test_untagged_tool_call_inherits_parent_messages_owner(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TEXT_MESSAGE_START", "messageId": "m1", "role": "assistant", "subagentRunId": "sub_1"},
+                {"type": "TEXT_MESSAGE_END", "messageId": "m1", "subagentRunId": "sub_1"},
+                {"type": "TOOL_CALL_START", "toolCallId": "c1", "toolCallName": "t", "parentMessageId": "m1"},
+                {"type": "TOOL_CALL_END", "toolCallId": "c1", "subagentRunId": "sub_1"},
+            )
+        )
+        assert "AGUI606" not in rules_of(diags)
+
+    def test_flags_a_tool_call_continuation_that_contradicts_the_inherited_owner(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TEXT_MESSAGE_START", "messageId": "m1", "role": "assistant", "subagentRunId": "sub_1"},
+                {"type": "TEXT_MESSAGE_END", "messageId": "m1", "subagentRunId": "sub_1"},
+                {"type": "TOOL_CALL_START", "toolCallId": "c1", "toolCallName": "t", "parentMessageId": "m1"},
+                {"type": "TOOL_CALL_END", "toolCallId": "c1", "subagentRunId": "sub_2"},
+            )
+        )
+        assert len(only(diags, "AGUI606")) == 1
+
+    def test_explicit_owner_on_tool_call_start_overrides_inheritance(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TEXT_MESSAGE_START", "messageId": "m1", "role": "assistant", "subagentRunId": "sub_1"},
+                {"type": "TEXT_MESSAGE_END", "messageId": "m1", "subagentRunId": "sub_1"},
+                {
+                    "type": "TOOL_CALL_START",
+                    "toolCallId": "c1",
+                    "toolCallName": "t",
+                    "parentMessageId": "m1",
+                    "subagentRunId": "sub_2",
+                },
+                {"type": "TOOL_CALL_END", "toolCallId": "c1", "subagentRunId": "sub_2"},
+            )
+        )
+        assert "AGUI606" not in rules_of(diags)
+
+    def test_tool_call_result_is_exempt(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "TOOL_CALL_START", "toolCallId": "c1", "toolCallName": "t", "subagentRunId": "sub_1"},
+                {"type": "TOOL_CALL_RESULT", "messageId": "tm1", "toolCallId": "c1", "content": "ok", "subagentRunId": "sub_2"},
+                {"type": "TOOL_CALL_END", "toolCallId": "c1", "subagentRunId": "sub_1"},
+            )
+        )
+        assert "AGUI606" not in rules_of(diags)
+
+    def test_fires_when_step_finished_disagrees_with_the_owner_step_started_recorded(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "STEP_STARTED", "stepName": "plan", "subagentRunId": "sub_1"},
+                {"type": "STEP_FINISHED", "stepName": "plan", "subagentRunId": "sub_2"},
+            )
+        )
+        assert len(only(diags, "AGUI606")) == 1
+
+    def test_a_reentrant_step_started_does_not_change_the_recorded_owner(self):
+        diags, _ = validate(
+            in_run(
+                {"type": "STEP_STARTED", "stepName": "plan", "subagentRunId": "sub_1"},
+                {"type": "STEP_STARTED", "stepName": "plan", "subagentRunId": "sub_2"},
+                {"type": "STEP_FINISHED", "stepName": "plan", "subagentRunId": "sub_2"},
+                {"type": "STEP_FINISHED", "stepName": "plan", "subagentRunId": "sub_1"},
+            )
+        )
+        assert len(only(diags, "AGUI606")) == 1
+
+
 class TestMultiRunStreams:
     def test_validates_each_run_independently_and_accepts_parent_run_id_branching(self):
         diags, _ = validate(

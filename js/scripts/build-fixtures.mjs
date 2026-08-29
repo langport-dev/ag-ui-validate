@@ -395,6 +395,17 @@ const INVALID = {
       finish(),
     ],
   },
+  "AGUI606-continuation-owner-mismatch": {
+    intent: ["AGUI606"],
+    events: [
+      start(),
+      { type: "SUBAGENT_STARTED", subagentRunId: "sub_1", name: "researcher", timestamp: t() },
+      { type: "TEXT_MESSAGE_START", messageId: "msg_1", role: "assistant", subagentRunId: "sub_1", timestamp: t() },
+      { type: "TEXT_MESSAGE_END", messageId: "msg_1", subagentRunId: "sub_2", timestamp: t() },
+      { type: "SUBAGENT_FINISHED", subagentRunId: "sub_1", timestamp: t() },
+      finish(),
+    ],
+  },
   "AGUI502-payload-not-json": {
     intent: ["AGUI502"],
     events: [start(), '{"type": broken json', finish()],

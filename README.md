@@ -29,7 +29,7 @@ section*. This project is that tool — the AG-UI analogue of what
 
 Three design commitments make it trustworthy:
 
-- **Every diagnostic cites the spec.** Each of the 45 rules carries a
+- **Every diagnostic cites the spec.** Each of the 46 rules carries a
   `specUrl` (and where possible an exact `specQuote`) pointing at the
   governing section of [docs.ag-ui.com](https://docs.ag-ui.com) or the WHATWG
   SSE spec. Behaviour the spec doesn't clearly govern is reported at `info`
@@ -230,7 +230,7 @@ endpoint-validating helpers (`assert_valid_agui_endpoint`,
 
 ## The rule catalog
 
-45 rules, maintained as **data** in
+46 rules, maintained as **data** in
 [spec/catalog.json](spec/catalog.json), shared by both implementations in
 this repo ([TypeScript](.) and [Python](py/)) rather than duplicated.
 Every rule has its own page — spec grounding,
@@ -245,7 +245,7 @@ drift-checked in CI):
 | State | AGUI301–305 | RFC 6902 patch validity, deltas that fail to apply to reconstructed state |
 | Reasoning | AGUI401–402 | reasoning content without an open reasoning message |
 | Transport | AGUI501–508 | SSE framing, Content-Type, keepalive gaps, buffering, dropped connections |
-| Subagents | AGUI601–605 | duplicate/unmatched `SUBAGENT_STARTED`/`FINISHED`/`ERROR`, unterminated subagents, unknown `parentSubagentRunId` |
+| Subagents | AGUI601–606 | duplicate/unmatched `SUBAGENT_STARTED`/`FINISHED`/`ERROR`, unterminated subagents, unknown `parentSubagentRunId`, continuation events that disagree with their entity's owner |
 | Hygiene | AGUI901–903 | `RAW`-wrapping typed events, missing timestamps, un-namespaced `CUSTOM` names |
 
 The event taxonomy itself (36 wire types, field schemas) is derived from
@@ -256,7 +256,7 @@ drift-tested against the installed SDK on every run.
 
 [spec/fixtures/](spec/fixtures/README.md) is a language-neutral conformance corpus:
 7 valid streams (one per canonical AG-UI feature — the false-positive guards)
-and 45 invalid fixtures (one per rule) with exact expected diagnostics. Any
+and 46 invalid fixtures (one per rule) with exact expected diagnostics. Any
 validator implementation that consumes the shared catalog can be tested
 against it; the replay protocol is documented in the corpus README.
 

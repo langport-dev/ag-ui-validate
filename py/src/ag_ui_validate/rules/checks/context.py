@@ -21,6 +21,10 @@ class OpenToolCall:
     start_index: int
     args: str = ""
     saw_args: bool = False
+    # subagentRunId this call belongs to (explicit, or inherited from the
+    # parentMessageId's owner - AGUI606's "an untagged tool call inherits the
+    # parent message's owner"). None means it belongs to the run itself.
+    owner: Optional[str] = None
 
 
 @dataclass
@@ -32,12 +36,19 @@ class Terminal:
 @dataclass
 class OpenMessage:
     start_index: int
+    # subagentRunId this message belongs to (AGUI606). None means it belongs
+    # to the run itself.
+    owner: Optional[str] = None
 
 
 @dataclass
 class OpenStep:
     count: int
     first_index: int
+    # subagentRunId recorded from the first STEP_STARTED (AGUI606); a
+    # re-entrant reopen does not change it - "steps are scoped to the agent
+    # that opened them".
+    owner: Optional[str] = None
 
 
 @dataclass
@@ -98,6 +109,10 @@ class RunState:
     closed_messages: Dict[str, int] = field(default_factory=dict)
     # Every message id observed (starts, chunks, snapshots, tool results).
     known_message_ids: Set[str] = field(default_factory=set)
+    # message_id -> owning subagentRunId (or None for the run), for AGUI606's
+    # tool-call-inherits-its-parent-message's-owner resolution. Persists past
+    # the message closing, unlike open_messages/closed_messages.
+    message_owner: Dict[str, Optional[str]] = field(default_factory=dict)
 
     open_tool_calls: Dict[str, OpenToolCall] = field(default_factory=dict)
     closed_tool_calls: Dict[str, int] = field(default_factory=dict)
@@ -155,3 +170,21 @@ def str_field(event: Dict[str, Any], field_name: str) -> Optional[str]:
     """Reads a field only if it is a string (schema problems already reported)."""
     v = event.get(field_name)
     return v if isinstance(v, str) else None
+
+
+def check_owner_consistency(
+    emit: EmitFn, type_: str, entity_type: str, entity_id: str, event: Dict[str, Any], owner: Optional[str]
+) -> None:
+    """AGUI606 - a continuation/close event's explicit subagentRunId must
+    agree with the owner recorded when its entity opened. Only compared when
+    the event explicitly tags itself; omitting the field is never flagged
+    (SQ-15). Shared by text/toolcalls/lifecycle - not the *_CHUNK forms or
+    TOOL_CALL_RESULT, which are independently attributed by spec."""
+    actual = str_field(event, "subagentRunId")
+    if actual is not None and actual != owner:
+        expected = f"'{owner}'" if owner is not None else "the run"
+        emit(
+            "AGUI606",
+            {"type": type_, "actual": actual, "entityType": entity_type, "entityId": entity_id, "expected": expected},
+            {"pointer": "/subagentRunId"},
+        )
