@@ -71,7 +71,7 @@ def test_rejects_a_catalog_with_a_missing_spec_url():
         )
 
 
-_CATEGORIES = {"lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"}
+_CATEGORIES = {"lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene", "subagent"}
 
 
 def test_rejects_a_catalog_with_an_unknown_category():
@@ -109,6 +109,7 @@ def test_category_matches_the_rule_id_hundreds_digit_grouping():
         "3": "state",
         "4": "reasoning",
         "5": "transport",
+        "6": "subagent",
         "9": "hygiene",
     }
     for rule in CATALOG.rules:

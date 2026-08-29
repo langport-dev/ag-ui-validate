@@ -1,7 +1,7 @@
 // Text message rules: AGUI101–AGUI106, plus TEXT_MESSAGE_CHUNK stream handling.
 
 import type { CheckApi, RunState, EmitFn } from "./context.js"
-import { str } from "./context.js"
+import { checkOwnerConsistency, str } from "./context.js"
 
 export function handleTextEvent(api: CheckApi): void {
   const { type, event, run, emit, index } = api
@@ -25,8 +25,10 @@ export function handleTextEvent(api: CheckApi): void {
         })
         return
       }
-      run.openMessages.set(id, { startIndex: index })
+      const owner = str(event, "subagentRunId")
+      run.openMessages.set(id, { startIndex: index, owner })
       run.knownMessageIds.add(id)
+      run.messageOwner.set(id, owner)
       return
     }
 
@@ -45,16 +47,19 @@ export function handleTextEvent(api: CheckApi): void {
       if (event.delta === "") {
         emit("AGUI105", { messageId: id }, { pointer: "/delta", relatedEventIndex: open.startIndex })
       }
+      checkOwnerConsistency(emit, type, "messageId", id, event, open.owner)
       return
     }
 
     case "TEXT_MESSAGE_END": {
       const id = str(event, "messageId")
       if (id === undefined) return
-      if (!run.openMessages.has(id)) {
+      const open = run.openMessages.get(id)
+      if (open === undefined) {
         emit("AGUI102", { messageId: id }, { pointer: "/messageId" })
         return
       }
+      checkOwnerConsistency(emit, type, "messageId", id, event, open.owner)
       run.openMessages.delete(id)
       run.closedMessages.set(id, index)
       return
@@ -86,6 +91,9 @@ export function handleTextEvent(api: CheckApi): void {
       }
       run.textChunk = { messageId: id, startIndex: index }
       run.knownMessageIds.add(id)
+      // Chunk attribution consistency is a known gap (SQ-15); still record
+      // the owner so a TOOL_CALL_START.parentMessageId can inherit it.
+      run.messageOwner.set(id, str(event, "subagentRunId"))
       return
     }
   }

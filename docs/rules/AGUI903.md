@@ -22,9 +22,9 @@ accordingly (false positives are worse than false negatives).
 A violating stream from the corpus ([`spec/fixtures/invalid/AGUI903-custom-name-not-namespaced`](../../spec/fixtures/invalid/AGUI903-custom-name-not-namespaced)):
 
 ```jsonl
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300020200}
-{"type":"CUSTOM","name":"update","value":{"x":1},"timestamp":1755300020300}
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300020400}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300022600}
+{"type":"CUSTOM","name":"update","value":{"x":1},"timestamp":1755300022700}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300022800}
 ```
 
 Expected findings:

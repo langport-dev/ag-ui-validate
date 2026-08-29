@@ -18,11 +18,11 @@ Source: <https://docs.ag-ui.com/concepts/events#event-types-overview>
 A violating stream from the corpus ([`spec/fixtures/invalid/AGUI503-unknown-event-type`](../../spec/fixtures/invalid/AGUI503-unknown-event-type)):
 
 ```jsonl
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019200}
-{"type":"AGUI_PING","timestamp":1755300019300}
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300019400}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021600}
+{"type":"AGUI_PING","timestamp":1755300021700}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300021800}
 ```
 
 Expected findings:
 
-- `error` AGUI503 at event 1 — Unknown event type 'AGUI_PING' (not in the installed AG-UI SDK v0.0.58, and not RAW or CUSTOM)
+- `error` AGUI503 at event 1 — Unknown event type 'AGUI_PING' (not in the installed AG-UI SDK v0.0.59, and not RAW or CUSTOM)

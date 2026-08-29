@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from .context import CheckApi, EmitFn, OpenMessage, RunState, TextChunk, str_field
+from .context import CheckApi, EmitFn, OpenMessage, RunState, TextChunk, check_owner_consistency, str_field
 
 
 def handle_text_event(api: CheckApi) -> None:
@@ -35,8 +35,10 @@ def handle_text_event(api: CheckApi) -> None:
                 {"pointer": "/messageId", "relatedEventIndex": run.closed_messages[message_id]},
             )
             return
-        run.open_messages[message_id] = OpenMessage(start_index=index)
+        owner = str_field(event, "subagentRunId")
+        run.open_messages[message_id] = OpenMessage(start_index=index, owner=owner)
         run.known_message_ids.add(message_id)
+        run.message_owner[message_id] = owner
         return
 
     if type_ == "TEXT_MESSAGE_CONTENT":
@@ -57,15 +59,18 @@ def handle_text_event(api: CheckApi) -> None:
                 {"messageId": message_id},
                 {"pointer": "/delta", "relatedEventIndex": open_.start_index},
             )
+        check_owner_consistency(emit, type_, "messageId", message_id, event, open_.owner)
         return
 
     if type_ == "TEXT_MESSAGE_END":
         message_id = str_field(event, "messageId")
         if message_id is None:
             return
-        if message_id not in run.open_messages:
+        open_ = run.open_messages.get(message_id)
+        if open_ is None:
             emit("AGUI102", {"messageId": message_id}, {"pointer": "/messageId"})
             return
+        check_owner_consistency(emit, type_, "messageId", message_id, event, open_.owner)
         del run.open_messages[message_id]
         run.closed_messages[message_id] = index
         return
@@ -98,6 +103,9 @@ def handle_text_event(api: CheckApi) -> None:
             return
         run.text_chunk = TextChunk(message_id=message_id, start_index=index)
         run.known_message_ids.add(message_id)
+        # Chunk attribution consistency is a known gap (SQ-15); still record
+        # the owner so a TOOL_CALL_START.parentMessageId can inherit it.
+        run.message_owner[message_id] = str_field(event, "subagentRunId")
         return
 
 

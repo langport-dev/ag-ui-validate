@@ -13,7 +13,7 @@ export type SeverityOrOff = Severity | "off"
 
 const SEVERITIES: readonly string[] = ["error", "warning", "info"]
 const LAYERS: readonly string[] = ["core", "transport"]
-export const CATEGORIES: readonly string[] = ["lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"]
+export const CATEGORIES: readonly string[] = ["lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene", "subagent"]
 
 export interface RuleDefinition {
   /** e.g. "AGUI203" */

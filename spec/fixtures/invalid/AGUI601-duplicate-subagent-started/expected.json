@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AGUI601",
+    "severity": "error",
+    "message": "SUBAGENT_STARTED reuses subagentRunId 'sub_001', which is already in use this run",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+    "eventType": "SUBAGENT_STARTED",
+    "pointer": "/subagentRunId",
+    "relatedEventIndex": 1
+  }
+]

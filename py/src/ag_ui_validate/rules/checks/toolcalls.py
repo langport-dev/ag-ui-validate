@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import json
 
-from .context import CheckApi, EmitFn, OpenToolCall, RunState, ToolChunk, str_field
+from .context import CheckApi, EmitFn, OpenToolCall, RunState, ToolChunk, check_owner_consistency, str_field
 
 
 def handle_tool_call_event(api: CheckApi) -> None:
@@ -26,8 +26,14 @@ def handle_tool_call_event(api: CheckApi) -> None:
             related = open_.start_index if open_ is not None else run.closed_tool_calls[tool_call_id]
             emit("AGUI205", {"toolCallId": tool_call_id}, {"pointer": "/toolCallId", "relatedEventIndex": related})
             return
-        run.open_tool_calls[tool_call_id] = OpenToolCall(start_index=index)
         parent = str_field(event, "parentMessageId")
+        # An untagged call inherits its parent message's owner (AGUI606's
+        # "an untagged tool call inherits the parent message's owner");
+        # ToolCallResult is deliberately exempt - it states its own owner.
+        owner = str_field(event, "subagentRunId")
+        if owner is None and parent is not None:
+            owner = run.message_owner.get(parent)
+        run.open_tool_calls[tool_call_id] = OpenToolCall(start_index=index, owner=owner)
         if parent is not None and parent not in run.known_message_ids:
             emit("AGUI208", {"parentMessageId": parent}, {"pointer": "/parentMessageId"})
         return
@@ -44,6 +50,7 @@ def handle_tool_call_event(api: CheckApi) -> None:
         if delta is not None:
             open_.args += delta
             open_.saw_args = True
+        check_owner_consistency(emit, type_, "toolCallId", tool_call_id, event, open_.owner)
         return
 
     if type_ == "TOOL_CALL_END":
@@ -54,6 +61,7 @@ def handle_tool_call_event(api: CheckApi) -> None:
         if open_ is None:
             emit("AGUI202", {"toolCallId": tool_call_id}, {"pointer": "/toolCallId"})
             return
+        check_owner_consistency(emit, type_, "toolCallId", tool_call_id, event, open_.owner)
         del run.open_tool_calls[tool_call_id]
         run.closed_tool_calls[tool_call_id] = index
         _check_args_json(tool_call_id, open_, emit, index)

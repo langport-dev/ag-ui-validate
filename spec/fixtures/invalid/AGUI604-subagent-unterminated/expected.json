@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "AGUI604",
+    "severity": "error",
+    "message": "SUBAGENT_STARTED subagentRunId 'sub_001' never closed with SUBAGENT_FINISHED or SUBAGENT_ERROR",
+    "eventIndex": 2,
+    "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+    "relatedEventIndex": 1
+  }
+]

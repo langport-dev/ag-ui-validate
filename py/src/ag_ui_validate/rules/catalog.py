@@ -21,7 +21,7 @@ SeverityOrOff = Literal["error", "warning", "info", "off"]
 
 _SEVERITIES = {"error", "warning", "info"}
 _LAYERS = {"core", "transport"}
-_CATEGORIES = {"lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"}
+_CATEGORIES = {"lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene", "subagent"}
 _ID_RE = re.compile(r"^AGUI\d{3}$")
 _PLACEHOLDER_RE = re.compile(r"\{(\w+)\}")
 

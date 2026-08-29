@@ -1,6 +1,6 @@
 {
   "$comment": "AG-UI conformance rule catalog. Data, not code: a Python/Go implementation shares these rules. Severities follow the working agreement that behaviour the spec does not clearly govern is at most 'info' — entries with 'specQuestion' were downgraded accordingly; see docs/spec-questions.md.",
-  "catalogVersion": "0.2.0",
+  "catalogVersion": "0.3.0",
   "spec": "0.x",
   "rules": [
     {
@@ -432,6 +432,73 @@
       "specQuote": "Every run terminates with either RunFinished or RunError.",
       "since": "0.x",
       "checkedIn": "transport"
+    },
+    {
+      "id": "AGUI601",
+      "severity": "error",
+      "title": "Duplicate SUBAGENT_STARTED for a subagentRunId",
+      "category": "subagent",
+      "messageTemplate": "SUBAGENT_STARTED reuses subagentRunId '{subagentRunId}', which is already in use this run",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+      "specQuote": "a subagent is not started twice within a run",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI602",
+      "severity": "error",
+      "title": "SUBAGENT_FINISHED without matching SUBAGENT_STARTED",
+      "category": "subagent",
+      "messageTemplate": "SUBAGENT_FINISHED for subagentRunId '{subagentRunId}' with no open SUBAGENT_STARTED",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+      "specQuote": "SubagentFinished and SubagentError name a subagent that is currently active",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI603",
+      "severity": "error",
+      "title": "SUBAGENT_ERROR without matching SUBAGENT_STARTED",
+      "category": "subagent",
+      "messageTemplate": "SUBAGENT_ERROR for subagentRunId '{subagentRunId}' with no open SUBAGENT_STARTED",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+      "specQuote": "SubagentFinished and SubagentError name a subagent that is currently active",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI604",
+      "severity": "error",
+      "title": "Subagent unterminated at run end",
+      "category": "subagent",
+      "messageTemplate": "SUBAGENT_STARTED subagentRunId '{subagentRunId}' never closed with SUBAGENT_FINISHED or SUBAGENT_ERROR",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+      "specQuote": "Every started subagent is closed before RunFinished.",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI605",
+      "severity": "warning",
+      "title": "parentSubagentRunId references a subagent never started",
+      "category": "subagent",
+      "messageTemplate": "SUBAGENT_STARTED parentSubagentRunId '{parentSubagentRunId}' matches no subagent observed in this stream",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#nesting-and-concurrency",
+      "specQuote": "parentSubagentRunId need only name a subagent that has been started, not one still active",
+      "since": "0.x",
+      "checkedIn": "core"
+    },
+    {
+      "id": "AGUI606",
+      "severity": "warning",
+      "title": "Continuation event's subagentRunId disagrees with its entity's owner",
+      "category": "subagent",
+      "messageTemplate": "{type} declares subagentRunId '{actual}', but {entityType} '{entityId}' was opened under {expected}",
+      "specUrl": "https://docs.ag-ui.com/concepts/subagents#rules-clients-enforce",
+      "specQuote": "Continuation and close events agree with the owner their entity was created under.",
+      "since": "0.x",
+      "specQuestion": "SQ-15",
+      "checkedIn": "core"
     },
     {
       "id": "AGUI901",

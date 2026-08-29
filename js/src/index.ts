@@ -14,6 +14,7 @@ import { newRunState, str } from "./rules/checks/context.js"
 import { checkRunIdStability, endOfRunSteps, handleStepEvent } from "./rules/checks/lifecycle.js"
 import { closeReasoningChunk, endOfRunReasoning, handleReasoningEvent } from "./rules/checks/reasoning.js"
 import { handleStateEvent } from "./rules/checks/state.js"
+import { endOfRunSubagents, handleSubagentEvent } from "./rules/checks/subagents.js"
 import { closeTextChunk, endOfRunText, handleTextEvent } from "./rules/checks/text.js"
 import { closeToolChunk, endOfRunToolCalls, handleToolCallEvent } from "./rules/checks/toolcalls.js"
 import { TRANSPORT_RULE_IDS, TRANSPORT_SKIP_REASON } from "./rules/checks/transport.js"
@@ -156,6 +157,7 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
     endOfRunToolCalls(r, emit, atIndex)
     endOfRunSteps(r, emit, atIndex)
     endOfRunReasoning(r, emit, atIndex)
+    endOfRunSubagents(r, emit, atIndex)
   }
 
   /** Opens the implicit run scope for streams that never announced one. */
@@ -324,6 +326,9 @@ export function createValidator(opts: ValidatorOptions = {}): Validator {
         break
       case "activity":
         // No activity rules in the catalog yet.
+        break
+      case "subagent":
+        handleSubagentEvent(a)
         break
       case "special":
         if (type === "RAW") {

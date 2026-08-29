@@ -27,15 +27,15 @@ protocol in [spec/fixtures/README.md](../../spec/fixtures/README.md):
   "chunks": [
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300020500}\n\n"
+      "text": "data: {\"type\":\"RUN_STARTED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"timestamp\":1755300022900}\n\n"
     },
     {
       "gapMs": 0,
-      "text": "{\"type\":\"CUSTOM\",\"name\":\"acme.ping\",\"value\":1,\"timestamp\":1755300020600}\n\n"
+      "text": "{\"type\":\"CUSTOM\",\"name\":\"acme.ping\",\"value\":1,\"timestamp\":1755300023000}\n\n"
     },
     {
       "gapMs": 0,
-      "text": "data: {\"type\":\"RUN_FINISHED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"outcome\":{\"type\":\"success\"},\"timestamp\":1755300020700}\n\n"
+      "text": "data: {\"type\":\"RUN_FINISHED\",\"threadId\":\"thread_001\",\"runId\":\"run_001\",\"outcome\":{\"type\":\"success\"},\"timestamp\":1755300023100}\n\n"
     }
   ]
 }

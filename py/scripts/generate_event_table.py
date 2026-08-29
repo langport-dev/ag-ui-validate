@@ -31,6 +31,9 @@ DEPRECATED = categories["deprecated"]
 def docs_url(wire_type: str, class_name: str) -> str:
     if CATEGORY.get(wire_type) == "thinking":
         return f"{EVENTS_DOC}#thinking-events-deprecated"
+    # Subagent events share one heading with no individual anchors.
+    if CATEGORY.get(wire_type) == "subagent":
+        return f"{EVENTS_DOC}#subagent-events"
     # Anchor is the lowercased event name with the "Event" suffix stripped,
     # e.g. ToolCallStartEvent -> #toolcallstart. Matches the TS side exactly
     # (there it strips "EventSchema" off the zod export name instead).
@@ -86,7 +89,7 @@ from typing import Any
 
 # FieldKind: "string" | "number" | "boolean" | "object" | "array" | "any"
 # EventCategory: "lifecycle" | "text" | "toolcall" | "state" | "activity"
-#                | "reasoning" | "thinking" | "special"
+#                | "reasoning" | "thinking" | "special" | "subagent"
 # FieldSpec: {{"kind": FieldKind, "required": bool, "enum": list[str] (optional)}}
 # EventSpec: {{"category": EventCategory, "deprecated": str (optional),
 #              "specUrl": str, "fields": dict[str, FieldSpec]}}

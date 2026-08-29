@@ -1,0 +1,5 @@
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019000}
+{"type":"SUBAGENT_STARTED","subagentRunId":"sub_001","name":"researcher","timestamp":1755300019100}
+{"type":"SUBAGENT_STARTED","subagentRunId":"sub_001","name":"researcher","timestamp":1755300019200}
+{"type":"SUBAGENT_FINISHED","subagentRunId":"sub_001","timestamp":1755300019300}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300019400}

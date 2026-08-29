@@ -1,7 +1,7 @@
 // Tool call rules: AGUI201–AGUI208, plus TOOL_CALL_CHUNK stream handling.
 
 import type { CheckApi, RunState, EmitFn } from "./context.js"
-import { str } from "./context.js"
+import { checkOwnerConsistency, str } from "./context.js"
 
 export function handleToolCallEvent(api: CheckApi): void {
   const { type, event, run, emit, index } = api
@@ -16,8 +16,12 @@ export function handleToolCallEvent(api: CheckApi): void {
         emit("AGUI205", { toolCallId: id }, { pointer: "/toolCallId", relatedEventIndex: related })
         return
       }
-      run.openToolCalls.set(id, { startIndex: index, args: "", sawArgs: false })
       const parent = str(event, "parentMessageId")
+      // An untagged call inherits its parent message's owner (AGUI606's "an
+      // untagged tool call inherits the parent message's owner");
+      // ToolCallResult is deliberately exempt — it states its own owner.
+      const owner = str(event, "subagentRunId") ?? (parent !== undefined ? run.messageOwner.get(parent) : undefined)
+      run.openToolCalls.set(id, { startIndex: index, args: "", sawArgs: false, owner })
       if (parent !== undefined && !run.knownMessageIds.has(parent)) {
         emit("AGUI208", { parentMessageId: parent }, { pointer: "/parentMessageId" })
       }
@@ -37,6 +41,7 @@ export function handleToolCallEvent(api: CheckApi): void {
         open.args += delta
         open.sawArgs = true
       }
+      checkOwnerConsistency(emit, type, "toolCallId", id, event, open.owner)
       return
     }
 
@@ -48,6 +53,7 @@ export function handleToolCallEvent(api: CheckApi): void {
         emit("AGUI202", { toolCallId: id }, { pointer: "/toolCallId" })
         return
       }
+      checkOwnerConsistency(emit, type, "toolCallId", id, event, open.owner)
       run.openToolCalls.delete(id)
       run.closedToolCalls.set(id, index)
       checkArgsJson(id, open, emit, index)

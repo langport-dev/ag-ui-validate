@@ -1,4 +1,4 @@
-{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300019500}
-{"type":"TOOL_CALL_START","toolCallId":"call_001","timestamp":1755300019600}
-{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300019700}
-{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300019800}
+{"type":"RUN_STARTED","threadId":"thread_001","runId":"run_001","timestamp":1755300021900}
+{"type":"TOOL_CALL_START","toolCallId":"call_001","timestamp":1755300022000}
+{"type":"TOOL_CALL_END","toolCallId":"call_001","timestamp":1755300022100}
+{"type":"RUN_FINISHED","threadId":"thread_001","runId":"run_001","outcome":{"type":"success"},"timestamp":1755300022200}

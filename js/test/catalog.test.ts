@@ -52,7 +52,7 @@ describe("rule catalog", () => {
     ).toThrow(/specUrl/)
   })
 
-  const CATEGORIES = ["lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene"]
+  const CATEGORIES = ["lifecycle", "text", "toolcall", "state", "reasoning", "transport", "hygiene", "subagent"]
 
   it("rejects a catalog with an unknown category", () => {
     expect(() =>
@@ -87,6 +87,7 @@ describe("rule catalog", () => {
       "3": "state",
       "4": "reasoning",
       "5": "transport",
+      "6": "subagent",
       "9": "hygiene",
     }
     for (const rule of CATALOG.rules) {
