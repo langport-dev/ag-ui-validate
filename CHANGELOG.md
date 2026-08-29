@@ -1,5 +1,13 @@
 # ag-ui-validate
 
+## 0.4.0
+
+### Minor Changes
+
+- 4b55fc7: New `--fail-on <error|warning|none>` flag (JS and Python, in parity): controls which severity triggers a nonzero exit. Defaults to `error`, matching today's behavior exactly. `--fail-on warning` also fails on any warning finding, independent of `--max-warnings`. `--fail-on none` never fails on findings — useful for report-only/annotate-only CI runs that shouldn't block the job.
+- 4b55fc7: Every rule in the catalog now carries a `category` (`lifecycle`, `text`, `toolcall`, `state`, `reasoning`, `transport`, or `hygiene`), matching the grouping already used in the docs and rule index. `--json` diagnostics and SARIF rule metadata (as a `properties.tags` entry) now include it, so downstream tooling can group or filter findings without re-deriving the category from the rule ID.
+- 6f7fbe7: Support for the AG-UI subagent lifecycle events (`SUBAGENT_STARTED`/`SUBAGENT_FINISHED`/`SUBAGENT_ERROR`, added in `@ag-ui/core` 0.0.59 / `ag-ui-protocol` 0.1.21), in parity across JS and Python. Six new rules (`AGUI601`–`AGUI606`) catch duplicate or unmatched `SUBAGENT_STARTED`/`FINISHED`/`ERROR` (with the suspended-subagent resumption exception), subagents left open at `RUN_FINISHED`, unknown `parentSubagentRunId` references, and continuation events (text messages, tool calls, steps) whose `subagentRunId` disagrees with the owner their entity was opened under.
+
 ## 0.3.0
 
 ### Minor Changes
